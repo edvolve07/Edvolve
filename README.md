@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Lucide_Icons-F56565?style=for-the-badge&logo=lucide&logoColor=white" alt="Lucide"/>
 </p>
 
-<h1 align="center">🎯 PrepUp Frontend</h1>
+<h1 align="center">PrepUp Frontend</h1>
 <p align="center">
   <strong>React + Vite frontend for the PrepUp AI-driven placement readiness platform</strong>
   <br/>
@@ -16,44 +16,185 @@
 
 ---
 
-## 📋 Table of Contents
+## Architecture Overview
 
-- [Overview](#-overview)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Routes & Pages](#-routes--pages)
-  - [Authentication](#-authentication-routes)
-  - [Student](#-student-routes)
-  - [Admin](#-admin-routes)
-  - [Master Admin](#-master-admin-routes)
-- [Feature Walkthrough](#-feature-walkthrough)
-  - [Mock AI Interview](#-mock-ai-interview)
-  - [Aptitude Assessments](#-aptitude-assessments)
-  - [Admin Assessment Management](#%EF%B8%8F-admin-assessment-management)
-  - [Reports & Analytics](#-reports--analytics)
-  - [User Management](#-user-management)
-  - [AI Usage Dashboard](#-ai-usage-dashboard)
-- [Components](#-components)
-- [API Integration](#-api-integration)
-- [Project Structure](#-project-structure)
-- [Scripts](#-scripts)
+```mermaid
+graph TB
+    subgraph Browser["Browser Layer"]
+        A[BrowserRouter]
+        B[AuthProvider]
+        C[ToastProvider]
+    end
+
+    subgraph Routing["Route Layer"]
+        D[Public Routes]
+        E[RequireSession Guard]
+        F[RequireRole Guard]
+        G[RoleGuard]
+    end
+
+    subgraph Layout["Layout Layer"]
+        H[AppShell]
+        I[Sidebar]
+        J[Header / Logout]
+    end
+
+    subgraph Pages["Page Components"]
+        K[Student Pages]
+        L[Admin Pages]
+        M[Master Admin Pages]
+        N[Auth Pages]
+    end
+
+    subgraph State["State Layer"]
+        O[AuthContext]
+        P[ToastContext]
+    end
+
+    subgraph API["API Layer"]
+        Q[lib/api.js fetch wrapper]
+    end
+
+    A --> B --> C
+    C --> Routing
+    D --> N
+    E --> Routing --> Layout
+    F --> E
+    G --> F
+    H --> I
+    H --> J
+    Layout --> Pages
+    Pages --> State
+    Pages --> API
+    State --> API
+```
 
 ---
 
-## 🌟 Overview
+## Route Hierarchy
 
-PrepUp is a comprehensive **placement readiness platform** that helps students prepare for job interviews and aptitude tests using AI-powered tools. The platform features:
+```mermaid
+graph LR
+    subgraph Public["Public Routes"]
+        direction LR
+        A1["/login"]
+        A2["/signup"]
+        A3["/forgot-password"]
+        A4["/reset-password"]
+        A5["/access-revoked"]
+    end
 
-- 🎤 **AI Mock Interviews** — Voice/video-based interviews with real-time AI evaluation, transcription, and feedback
-- 📝 **Aptitude Assessments** — Timed MCQ tests with AI-generated questions across 20 concepts
-- 📊 **Detailed Reports** — Radar charts, bar charts, ATS analysis, and downloadable PDFs
-- 👥 **Multi-role System** — Student, Admin, and Master Admin with distinct dashboards
-- 🤖 **AI Question Generation** — Automatic MCQ generation from predefined templates or AI providers
+    subgraph Student["Student Routes"]
+        direction LR
+        S1["/dashboard"]
+        S2["/interview"]
+        S3["/aptitude/*"]
+        S4["/reports/*"]
+        S5["/student/*"]
+    end
+
+    subgraph Admin["Admin Routes"]
+        direction LR
+        AD1["/admin-dashboard"]
+        AD2["/admin/assessments"]
+        AD3["/admin/analytics/*"]
+    end
+
+    subgraph Master["Master Admin Routes"]
+        direction LR
+        M1["/master-admin-dashboard"]
+        M2["/master-admin/students"]
+        M3["/master-admin/admins"]
+        M4["/master-admin/create-admin"]
+        M5["/master-admin/create-user"]
+        M6["/master-admin/ai-usage"]
+    end
+
+    Public -->|Login| Student
+    Public -->|Login| Admin
+    Public -->|Login| Master
+```
 
 ---
 
-## 🛠️ Tech Stack
+## Authentication Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Browser as Browser (LocalStorage)
+    participant Auth as AuthContext
+    participant API as Backend API
+
+    User->>Auth: Login(email, password)
+    Auth->>API: POST /auth/login
+    API-->>Auth: { token, user }
+    Auth->>Browser: Store token in localStorage
+    Auth-->>User: Set user state, redirect
+
+    Note over Auth,API: On app mount / refresh
+
+    Auth->>Browser: Read token from localStorage
+    Auth->>API: GET /auth/me
+    API-->>Auth: { user }
+    Auth-->>User: Set user state
+
+    Note over Auth,API: If token expired / invalid
+
+    API-->>Auth: 401 Unauthorized
+    Auth->>Browser: Clear localStorage tokens
+    Auth-->>User: Redirect to /login
+
+    Note over Auth,API: If account revoked
+
+    API-->>Auth: 423 Locked
+    Auth-->>User: Redirect to /access-revoked
+```
+
+---
+
+## Role-Based Access Control
+
+```mermaid
+graph TD
+    subgraph Roles["Three Role Tiers"]
+        SA[Super Admin]
+        AD[Admin]
+        ST[Student]
+    end
+
+    subgraph MasterPerms["Super Admin Permissions"]
+        M1[Create / Revoke Admins]
+        M2[Create / Revoke Users]
+        M3[View All Students]
+        M4[View All Admins]
+        M5[Manage API Keys]
+        M6[AI Usage Dashboard]
+    end
+
+    subgraph AdminPerms["Admin Permissions"]
+        A1[Create Assessments]
+        A2[View Analytics]
+        A3[Manage Questions]
+        A4[View Student Results]
+        A5[Extend Attempt Timers]
+    end
+
+    subgraph StudentPerms["Student Permissions"]
+        S1[Take Interviews]
+        S2[Take Aptitude Tests]
+        S3[View Reports]
+        S4[Download PDFs]
+    end
+
+    SA --> MasterPerms
+    AD --> AdminPerms
+    ST --> StudentPerms
+```
+
+---
+
+## Tech Stack
 
 | Category | Technology |
 |---|---|
@@ -64,418 +205,321 @@ PrepUp is a comprehensive **placement readiness platform** that helps students p
 | **Charts** | Recharts 2 |
 | **Icons** | Lucide React |
 | **State Management** | React Context (Auth + Toast) |
-| **HTTP Client** | Native `fetch` (wrapped) |
+| **HTTP Client** | Native fetch |
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js** >= 18
-- **Backend server** running (see [Backend README](../backend/README.md))
+- Node.js 18 or later
+- Backend server running
 
 ### Installation
 
 ```bash
-# 1. Clone the repository
 git clone <repo-url>
 cd frontend
-
-# 2. Install dependencies
 npm install
-
-# 3. Configure environment
 cp .env.local.example .env.local
-# Edit .env.local with your backend URL
-
-# 4. Start development server
 npm run dev
 ```
 
-The app starts at **http://localhost:5173** by default.
+The app starts at **http://localhost:5173**.
 
 ### Production Build
 
 ```bash
-npm run build     # Outputs to dist/
-npm run preview   # Preview the production build locally
+npm run build
+npm run preview
 ```
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `VITE_API_URL` | ✅ | `http://localhost:8000` | Backend API base URL |
-| `VITE_API_KEY` | ❌ | — | Optional API secret key |
+| `VITE_API_URL` | Yes | `http://localhost:8000` | Backend API base URL |
+| `VITE_API_KEY` | No | — | Optional API secret key |
 
-> The Vite dev server proxies `/api` requests to the configured `VITE_API_URL`, avoiding CORS issues during development.
-
----
-
-## 🗺️ Routes & Pages
-
-### 🔑 Authentication Routes
-
-| Route | Component | Description |
-|---|---|---|
-| `/` | Landing | Redirects to role-based dashboard or login |
-| `/login` | `Login` | Email + password authentication |
-| `/signup` | `Signup` | New user registration with auto role assignment |
-| `/forgot-password` | `ForgotPassword` | Request password reset email (5-min TTL) |
-| `/reset-password` | `ResetPassword` | Reset password using token from email |
-
-### 👨‍🎓 Student Routes
-
-| Route | Component | Description |
-|---|---|---|
-| `/dashboard` | `DashboardPage` | Overview: interview stats, topic performance, recent submissions |
-| `/student/dashboard` | `StudentDashboard` | Portal-styled student stats |
-| `/interview` | `InterviewPage` | Full AI mock interview: domain/role selection → resume upload → 10 Q&A → report |
-| `/aptitude` | `AptitudePage` | Available aptitude assessments list |
-| `/aptitude/:id/start` | `StartAssessment` | Take an aptitude test (timer + MCQ) |
-| `/aptitude/results` | `StudentResults` | View aptitude results |
-| `/aptitude/results/:id` | `ResultDetails` | Detailed result per question |
-| `/student/assessments` | `StudentAssessments` | Portal-styled assessment list |
-| `/student/assessments/:id/start` | `StartAssessment` | Portal-styled test-taking interface |
-| `/student/results` | `StudentResults` | Portal-styled results list |
-| `/student/results/:attemptId` | `ResultDetails` | Portal-styled result detail |
-| `/report` | `ReportPage` | Interview report viewer with charts |
-| `/reports` | `ReportsResultsPage` | Combined reports + results overview |
-| `/reports/results/:attemptId` | `ResultDetails` | Result detail from combined view |
-
-### 👨‍💼 Admin Routes
-
-| Route | Component | Description |
-|---|---|---|
-| `/admin-dashboard` | `PrepupAdminDashboard` | Admin overview: stats, quick actions |
-| `/admin/assessments` | `AdminAssessments` | List, publish/unpublish, delete, extend duration |
-| `/admin/assessments/create` | `CreateAssessment` | AI-powered question generation form |
-| `/admin/assessments/:id/questions` | `QuestionReview` | Review/edit generated questions before publishing |
-| `/admin/assessments/:id/results` | `AssessmentResults` | Per-student attempt monitoring + time extension |
-| `/admin/analytics/aptitude` | `AdminAptitudeAnalytics` | Per-student aptitude analytics |
-| `/admin/analytics/interviews` | `AdminInterviewAnalytics` | Interview analytics with reports viewer |
-| `/admin/assessments` | `AdminAssessments` | Admin assessment management (portal) |
-
-### 👑 Master Admin Routes
-
-| Route | Component | Description |
-|---|---|---|
-| `/master-admin-dashboard` | `MasterAdminDashboard` | User counts, AI usage overview |
-| `/master-admin/users` | `UserManagement` | Create, bulk import, change roles |
-| `/master-admin/ai-usage` | `AiUsagePage` | AI usage stats + API key management |
+The Vite dev server proxies `/api` requests to the configured backend URL.
 
 ---
 
-## 🎯 Feature Walkthrough
+## Pages by Role
 
-### 🎤 Mock AI Interview
+### Authentication
 
-```
-Dashboard → Go to Interview → Select Domain & Role → Upload Resume (PDF)
-    → Question 1 appears → Record Answer (Mic + Camera) → Review → Submit
-    → AI evaluates (Confidence, Body Language, Knowledge, Fluency, Skill Relevance)
-    → Next Question (10 total) → End Interview → View Full Report
-```
-
-**Key features:**
-- 🎙️ **Voice/Video Recording** — Uses `MediaRecorder` API with live waveform visualization (Web Audio API `AnalyserNode`)
-- 🤖 **AI Question Generation** — First question based on resume + domain; follow-ups adapt to conversation history
-- 📋 **ATS Analysis** — Resume scored on ATS criteria; skills found displayed live during interview
-- 📊 **Per-Answer Metrics** — 5-dimension radar + score with AI-generated feedback and transcript
-- 📄 **PDF Reports** — Download full performance report or ATS-specific summary
-
-**Technical flow:**
-```
-Frontend                           Backend
-   │                                  │
-   ├─ POST /api/start (resume PDF) ──►│─ Analyze resume (Groq)
-   │◄── ATS score + Q1 ──────────────┤
-   │                                  │
-   ├─ POST /api/answer_video ────────►│─ Transcribe (Whisper) + Evaluate (Groq)
-   │◄── Evaluation + Q2 ─────────────┤
-   │        ... (repeat for 10)       │
-   │                                  │
-   ├─ POST /api/end ─────────────────►│─ Generate report
-   │◄── Full report ─────────────────┤
-   │                                  │
-   ├─ GET /api/report/:id/pdf ───────►│─ Generate PDF
-   │◄── PDF download ────────────────┤
-```
-
-### 📝 Aptitude Assessments
-
-#### For Students
-
-```
-Dashboard → Student Assessments → Browse → Start Assessment
-    → Answer MCQs (Timer running) → Navigate questions → Submit
-    → View Results (Score, Percentage, Pass/Fail)
-```
-
-**Key features:**
-- ⏱️ **Live Timer** — Countdown synced with server every 3 seconds; supports admin time extensions
-- 🔄 **Question Navigator** — Jump between questions; see answered vs unanswered at a glance
-- 🚫 **Tab-Switch Detection** — `visibilitychange` event tracks focus loss; 3 strikes → auto-submit
-- 💾 **Answer Persistence** — Answers saved immediately to backend via PUT endpoint
-- 📖 **Result Details** — Per-question: correct/incorrect, explanation, shortcuts, topic-wise accuracy bars
-
-#### For Admins
-
-```
-Admin Dashboard → Create Assessment → Configure (Title, Concept, Difficulty, Count, Marks)
-    → Choose Generation Mode (Fast / AI Enhanced) → Upload Source File (optional)
-    → Review & Edit Questions → Publish
-```
-
-**Generation modes:**
-- ⚡ **Fast mode:** Algorithmic template-based generation — instant, no API cost, 20 concept templates
-- 🤖 **AI Enhanced:** Uses configured AI provider (NVIDIA/OpenAI) — more sophisticated questions, supports file context
-
-**Supported concepts:** Percentages, Profit & Loss, Simple Interest, Compound Interest, Time & Work, Time Speed Distance, Averages, Ratio & Proportion, Number System, Probability, Permutation & Combination, Algebra, Geometry, Trigonometry, Mensuration, Data Interpretation, Data Sufficiency, Blood Relations, Direction Sense, Coding Decoding
-
-### 📋 Admin Assessment Management
-
-- **CRUD operations** — Create, list, edit, soft-delete assessments
-- **Publishing workflow** — Draft → Edit → Publish (students see only published)
-- **Duration extension** — Extend time globally (assessment-level) or per-student (attempt-level)
-- **Results monitoring** — Per-assessment results table with student scores, time taken, pass/fail status
-
-### 📊 Reports & Analytics
-
-#### Interview Reports
-- 📈 **Radar chart** — 5 performance metrics visualized
-- 📊 **Bar chart** — Per-question scores
-- 🏆 **Overall grade** — A+, A, B+, B, C+, C, D, F with descriptive labels
-- 📋 **ATS analysis** — Score, skills found, improvement areas
-- 💪 **Strengths & Weaknesses** — AI-generated lists
-- 💡 **Interview Tips** — Personalized advice
-- 📄 **PDF download** — Full report + ATS summary
-
-#### Aptitude Analytics (Admin)
-- Per-student latest attempt summary
-- Expandable to see all attempts with scores, time taken, pass/fail
-- Top-level aggregate stats (total students, assessments, pass percentage, average score)
-
-#### Interview Analytics (Admin)
-- All interview reports in a sortable table
-- Student name, interview role, domain, score, grade, ATS score
-- Full report viewer in modal
-
-### 👥 User Management (Master Admin)
-
-- **Individual creation** — Name, email, password, role selector
-- **Bulk import** — CSV/Excel upload with column mapping (name, email)
-- **Role assignment** — Inline dropdown in user table; supports student/admin/master_admin
-- **Role hierarchy:** `master_admin` (top) → `admin` (middle) → `student` (bottom)
-
-### 🤖 AI Usage Dashboard (Master Admin)
-
-- **30-day totals** — Total requests, successful calls, failed calls, tracked tokens
-- **By-feature breakdown** — Interviews, transcription, question generation
-- **API key management** — View masked keys, update provider keys (Groq, NVIDIA, OpenAI, Gemini, Generic)
-- **Hot-reload** — API key updates take effect immediately (backend re-creates clients at runtime)
-
----
-
-## 🧩 Components
-
-### Shared Components (`components/`)
-
-| Component | Description |
+| Route | Purpose |
 |---|---|
-| `Sidebar` | Navigation sidebar (role-filtered) |
-| `VoiceRecorder` | Full voice/video recording hook (`useRecorder`) with waveform visualization |
+| `/` | Role-based redirect or login |
+| `/login` | Email + password sign in |
+| `/signup` | Registration with auto role assignment |
+| `/forgot-password` | Request reset email |
+| `/reset-password` | Reset with token |
+| `/access-revoked` | Account on hold notice |
 
-### Portal Components (`src/portal/components/`)
+### Student
 
-| Component | Description |
+| Route | Purpose |
 |---|---|
-| `Sidebar` | Portal navigation sidebar (student/admin) |
-| `RoleGuard` | Role-based route guard |
-| `LoadingSkeleton` | Animated loading placeholder |
-| `StatCard` | Statistics card with color-coded tones |
-| `AssessmentCard` | Assessment display card with metadata |
-| `Timer` | Countdown timer with expiry callback |
-| `ManualGenerationForm` | Admin form for AI assessment generation |
+| `/dashboard` | Overview with stats and topic performance |
+| `/interview` | Full AI mock interview flow |
+| `/aptitude` | Browse and take assessments |
+| `/aptitude/:id/start` | Timed MCQ test interface |
+| `/aptitude/results` | Assessment results list |
+| `/aptitude/results/:id` | Per-question result detail |
+| `/report` | Interview report viewer with charts |
+| `/reports` | Combined reports and results |
+
+### Admin
+
+| Route | Purpose |
+|---|---|
+| `/admin-dashboard` | Overview with stats and quick actions |
+| `/admin/assessments` | List and manage assessments |
+| `/admin/assessments/create` | AI-powered question generation |
+| `/admin/assessments/:id/questions` | Review and edit questions |
+| `/admin/assessments/:id/results` | Student attempt monitoring |
+| `/admin/analytics/aptitude` | Per-student aptitude analytics |
+| `/admin/analytics/interviews` | Interview report analytics |
+
+### Master Admin
+
+| Route | Purpose |
+|---|---|
+| `/master-admin-dashboard` | Platform overview and usage stats |
+| `/master-admin/students` | View all students with admin filter |
+| `/master-admin/admins` | View all admin accounts |
+| `/master-admin/master-admins` | View super admin accounts |
+| `/master-admin/create-admin` | Create admins with module access |
+| `/master-admin/create-user` | Create users with admin assignment |
+| `/master-admin/ai-usage` | AI usage stats + API key management |
+
+---
+
+## Feature Deep Dive
+
+### Mock AI Interview
+
+```mermaid
+sequenceDiagram
+    actor Student
+    participant Frontend
+    participant Backend
+    participant Groq as Groq AI
+
+    Student->>Frontend: Select Domain & Role
+    Student->>Frontend: Upload Resume (PDF)
+    Frontend->>Backend: POST /api/start
+    Backend->>Groq: Analyze Resume (ATS)
+    Groq-->>Backend: ATS Score + Skills
+    Backend->>Groq: Generate First Question
+    Groq-->>Backend: Question
+    Backend-->>Frontend: ATS Score + Q1
+    Frontend-->>Student: Display Question
+
+    Student->>Frontend: Record Answer (Mic + Camera)
+    Frontend->>Backend: POST /api/answer_video
+    Backend->>Groq: Transcribe (Whisper)
+    Groq-->>Backend: Transcript
+    Backend->>Groq: Evaluate Answer
+    Groq-->>Backend: 5 Metrics + Feedback
+    Backend->>Groq: Generate Next Question
+    Groq-->>Backend: Next Question
+    Backend-->>Frontend: Evaluation + Q2
+    Frontend-->>Student: Feedback + Next Question
+
+    Note over Student,Frontend: Repeat for 10 questions
+
+    Student->>Frontend: End Interview
+    Frontend->>Backend: POST /api/end
+    Backend->>Groq: Generate Overall Report
+    Groq-->>Backend: Report
+    Backend-->>Frontend: Full Report
+    Frontend-->>Student: Charts + PDF Download
+```
+
+### Aptitude Assessments
+
+```mermaid
+sequenceDiagram
+    actor Student
+    participant Frontend
+    participant Backend
+
+    Student->>Frontend: Browse Assessments
+    Frontend->>Backend: GET /api/student/assessments
+    Backend-->>Frontend: Published Assessments
+    Frontend-->>Student: Assessment List
+
+    Student->>Frontend: Start Assessment
+    Frontend->>Backend: POST /api/student/assessments/:id/start
+    Backend-->>Frontend: Questions + Timer
+    Frontend-->>Student: MCQ Interface
+
+    Student->>Frontend: Answer Questions
+    Frontend->>Backend: PUT /api/student/attempts/:id/answers
+    Backend-->>Frontend: Saved
+
+    Student->>Frontend: Submit
+    Frontend->>Backend: POST /api/student/attempts/:id/submit
+    Backend-->>Frontend: Score + Results
+    Frontend-->>Student: Result Summary
+```
+
+### Admin Assessment Creation
+
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant Frontend
+    participant Backend
+    participant AI as AI Provider
+
+    Admin->>Frontend: Configure Assessment
+    Admin->>Frontend: Upload Source File (optional)
+    Frontend->>Backend: POST /api/admin/assessments/generate
+    Backend->>AI: Generate Questions (batch)
+    AI-->>Backend: Questions
+    Backend-->>Frontend: Assessment + Questions
+    Frontend-->>Admin: Review Questions
+
+    Admin->>Frontend: Edit / Approve Questions
+    Frontend->>Backend: PUT /api/admin/assessments/:id/questions
+    Backend-->>Frontend: Updated
+
+    Admin->>Frontend: Publish
+    Frontend->>Backend: PATCH /api/admin/assessments/:id/status
+    Backend-->>Frontend: Published
+```
+
+### User & Access Management
+
+```mermaid
+flowchart LR
+    subgraph Creation["User Creation"]
+        direction LR
+        CA[Create Admin Form] --> BA[POST /api/master/admins]
+        CU[Create User Form] --> BU[POST /api/master/users/create-with-details]
+        CI[CSV/Excel Import] --> BI[POST /api/master/admins/import]
+    end
+
+    subgraph DB[(MongoDB Users)]
+        direction LR
+        MA[Master Admin]
+        AD[Admin]
+        ST[Student]
+    end
+
+    subgraph Actions["Management Actions"]
+        direction LR
+        RV[Revoke Access]
+        RS[Restore Access]
+        DL[Delete User]
+        RO[Change Role]
+    end
+
+    Creation --> DB
+    DB --> Actions
+    Actions --> DB
+```
+
+---
+
+## Components
+
+### Shared Components
+
+| Component | Purpose |
+|---|---|
+| `Sidebar` | Role-filtered navigation sidebar |
+| `VoiceRecorder` | Mic/video recording with waveform |
+
+### Portal Components
+
+| Component | Purpose |
+|---|---|
+| `Sidebar` | Portal-styled student/admin sidebar |
+| `RoleGuard` | Role-based route protection |
+| `Timer` | Countdown with expiry callback |
+| `StatCard` | Color-coded statistics card |
+| `AssessmentCard` | Assessment display card |
 | `QuestionList` | Editable question list |
 | `QuestionEditorCard` | Individual question editor |
-| `ResultSummary` | Score/percentage/pass summary |
+| `ResultSummary` | Score and pass/fail summary |
+| `ManualGenerationForm` | AI assessment generation form |
+| `LoadingSkeleton` | Animated loading placeholder |
 
 ---
 
-## 🔌 API Integration
-
-All API calls are centralized in **`lib/api.js`** with automatic:
-- `Authorization: Bearer <token>` header injection
-- `X-API-Key` header (if `VITE_API_KEY` is set)
-- 401 → auto-logout (clears tokens)
-- Error extraction from multiple response formats
-
-### Key API Functions
-
-```js
-// Authentication
-login(email, password)
-signup(name, email, password)
-
-// Interviews
-startInterview(domain, role, resumeFile)
-submitTextAnswer(sessionId, answer)
-submitAnswer(sessionId, audioBlob, videoBlob)
-endInterview(sessionId)
-getReport(sessionId)
-getInterviewReports()
-downloadReportPdf(sessionId)
-downloadReportAtsPdf(sessionId)
-
-// Student Assessments
-getStudentAssessments()
-startStudentAssessment(assessmentId)
-saveStudentAnswer(attemptId, questionId, selectedOption)
-submitStudentAttempt(attemptId)
-getStudentResults()
-getStudentResult(attemptId)
-
-// Admin
-getAdminAssessments()
-generateAssessment(data)
-updateAssessment(id, data)
-deleteAssessment(id)
-publishAssessment(id)
-extendAssessmentDuration(id, minutes)
-getAssessmentResults(id)
-extendAttemptTime(attemptId, minutes)
-
-// Master Admin
-getUsers()
-createUser(data)
-importUsers(file)
-updateUserRole(id, role)
-getApiKeys()
-updateApiKey(providerId, key)
-```
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 frontend/
-├── index.html                     # HTML shell
-├── vite.config.js                 # Vite config + API proxy
-├── tailwind.config.js             # Custom Tailwind theme
-├── postcss.config.cjs             # PostCSS config
-├── .env.local.example             # Environment template
-├── package.json
-│
-├── components/                    # Shared components
-│   ├── Sidebar.jsx                # AppShell navigation
-│   └── VoiceRecorder.jsx          # Mic/video recording with waveform
-│
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+├── components/
+│   ├── Sidebar.jsx
+│   └── VoiceRecorder.jsx
 ├── lib/
-│   └── api.js                     # Centralized API client
-│
+│   └── api.js
 └── src/
-    ├── main.jsx                   # Entry: BrowserRouter → Toast → Auth → App
-    ├── App.jsx                    # Full route tree with guards
-    ├── constants.js               # NAV_ITEMS, labels, domains, colors
-    ├── globals.css                # Custom animations + component classes
-    ├── navigation.jsx             # Router adapter (Link, usePathname)
-    │
-    ├── portal/                    # Assessment portal (merged from old client)
+    ├── main.jsx
+    ├── App.jsx
+    ├── constants.js
+    ├── globals.css
+    ├── navigation.jsx
+    ├── portal/
     │   ├── context/
-    │   │   ├── AuthContext.jsx    # Auth state (user, login, logout)
-    │   │   └── ToastContext.jsx   # Success/error notifications
+    │   │   ├── AuthContext.jsx
+    │   │   └── ToastContext.jsx
     │   ├── utils/
-    │   │   └── api.js             # Portal API wrapper
+    │   │   └── api.js
     │   ├── components/
-    │   │   ├── Sidebar.jsx        # Portal sidebar
-    │   │   ├── RoleGuard.jsx      # Route guard
-    │   │   ├── Timer.jsx          # Countdown timer
-    │   │   ├── AssessmentCard.jsx # Assessment display
-    │   │   ├── StatCard.jsx       # Statistics card
-    │   │   ├── QuestionList.jsx   # Editable questions
-    │   │   ├── QuestionEditorCard.jsx # Question editor
-    │   │   ├── ManualGenerationForm.jsx # AI generation form
-    │   │   ├── ResultSummary.jsx  # Score summary
-    │   │   └── LoadingSkeleton.jsx # Loading placeholder
+    │   │   ├── Sidebar.jsx
+    │   │   ├── RoleGuard.jsx
+    │   │   ├── Timer.jsx
+    │   │   ├── AssessmentCard.jsx
+    │   │   ├── StatCard.jsx
+    │   │   ├── QuestionList.jsx
+    │   │   ├── QuestionEditorCard.jsx
+    │   │   ├── ManualGenerationForm.jsx
+    │   │   ├── ResultSummary.jsx
+    │   │   └── LoadingSkeleton.jsx
     │   └── pages/
     │       ├── Login.jsx
     │       ├── Signup.jsx
     │       ├── ForgotPassword.jsx
     │       ├── ResetPassword.jsx
     │       ├── student/
-    │       │   ├── StudentDashboard.jsx
-    │       │   ├── StudentAssessments.jsx
-    │       │   ├── StartAssessment.jsx
-    │       │   ├── StudentResults.jsx
-    │       │   └── ResultDetails.jsx
     │       └── admin/
-    │           ├── AdminDashboard.jsx
-    │           ├── AdminAssessments.jsx
-    │           ├── CreateAssessment.jsx
-    │           ├── QuestionReview.jsx
-    │           └── AssessmentResults.jsx
-    │
-    └── pages/                     # Legacy + unified pages
-        ├── DashboardPage.jsx      # Student dashboard
-        ├── InterviewPage.jsx      # Voice interview flow
-        ├── AptitudePage.jsx       # Aptitude router page
-        ├── ReportPage.jsx         # Interview report viewer
-        ├── ReportsResultsPage.jsx # Combined reports/results
-        ├── aptitude/              # Legacy aptitude components
-        │   ├── StudentAssessments.jsx
-        │   ├── StartAssessment.jsx
-        │   ├── StudentResults.jsx
-        │   ├── ResultDetails.jsx
-        │   ├── Timer.jsx
-        │   ├── ResultSummary.jsx
-        │   └── LoadingSkeleton.jsx
-        └── admin/                 # Admin + master admin pages
-            ├── PrepupAdminDashboard.jsx
-            ├── AdminAptitudeAnalytics.jsx
-            ├── AdminInterviewAnalytics.jsx
-            ├── AiUsagePage.jsx
-            ├── MasterAdminDashboard.jsx
-            ├── UserManagement.jsx
-            ├── MasterAiUsagePage.jsx
-            └── MasterUsersPage.jsx
+    └── pages/
+        ├── DashboardPage.jsx
+        ├── InterviewPage.jsx
+        ├── AptitudePage.jsx
+        ├── ReportPage.jsx
+        ├── ReportsResultsPage.jsx
+        ├── AccessRevoked.jsx
+        ├── aptitude/
+        └── admin/
 ```
 
 ---
 
-## 📜 Scripts
+## Scripts
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start Vite dev server (hot-reload) |
+| `npm run dev` | Start development server with hot reload |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Preview production build locally |
 
 ---
 
-## 🎨 Features at a Glance
+## License
 
-| Feature | Student | Admin | Master Admin |
-|---|---|---|---|
-| **Mock Interviews** | ✅ Take, review, download PDFs | ✅ View analytics | — |
-| **Aptitude Tests** | ✅ Take, view results | ✅ Create, manage, view analytics | — |
-| **Assessment CRUD** | — | ✅ Create, edit, publish, delete | — |
-| **User Management** | — | — | ✅ Create, import, role assignment |
-| **AI Usage & API Keys** | — | — | ✅ Monitor, update keys |
-| **Role Assignment** | Automatic (by email) | Automatic (by email) | Manual override |
-| **Reports & Analytics** | ✅ Personal | ✅ All students | — |
-| **PDF Downloads** | ✅ Full + ATS | — | — |
-| **Tab-Switch Protection** | ✅ 3 strikes → auto-submit | — | — |
-| **Timer Extensions** | — | ✅ Per-assessment & per-student | — |
-| **Bulk User Import** | — | — | ✅ CSV/Excel |
-| **Question Review/Edit** | — | ✅ Before publishing | — |
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
+MIT
