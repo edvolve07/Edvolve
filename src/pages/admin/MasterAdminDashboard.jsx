@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, BookOpenCheck, Crown, Cpu, Loader2, ShieldCheck, Users } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpenCheck,
+  Crown,
+  Cpu,
+  Loader2,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { Link } from "@/src/navigation";
 import { apiFetch } from "@/lib/api";
 
@@ -10,7 +19,6 @@ function StatCard({ label, value, icon: Icon, tone = "brand" }) {
     amber: "bg-amber-50 text-amber-600",
     purple: "bg-purple-50 text-purple-600",
   };
-
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
       <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${tones[tone]}`}>
@@ -29,24 +37,19 @@ export default function MasterAdminDashboard() {
   useEffect(() => {
     let active = true;
     apiFetch("/api/master/dashboard")
-      .then((payload) => {
-        if (active) setData(payload);
+      .then((dash) => {
+        if (active) setData(dash);
       })
       .catch((err) => {
-        if (active) setError(err.message || "Unable to load master admin dashboard.");
+        if (active) setError(err.message || "Unable to load dashboard.");
       });
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
   if (error) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm font-medium text-red-700">
-          {error}
-        </div>
+      <div className="mx-auto max-w-6xl px-3 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-sm font-medium text-red-700">{error}</div>
       </div>
     );
   }
@@ -64,31 +67,34 @@ export default function MasterAdminDashboard() {
   const usageTotals = data.ai_usage?.totals || {};
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
+    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 space-y-4 sm:space-y-6">
+      {/* Header */}
+      <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-6">
         <p className="text-sm font-medium text-brand-600">Organization control</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Master Admin Dashboard
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          A clean overview of PrepUp users and AI activity. Use the dedicated pages for user management and API usage.
+          Platform overview with usage statistics and quick links.
         </p>
       </section>
 
-      <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+      {/* Stats */}
+      <section className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <StatCard label="Total users" value={totals.users} icon={Users} />
         <StatCard label="Students" value={totals.students} icon={BookOpenCheck} tone="green" />
-        <StatCard label="Lecturers" value={totals.admins} icon={ShieldCheck} tone="amber" />
+        <StatCard label="Admins" value={totals.admins} icon={ShieldCheck} tone="amber" />
         <StatCard label="Master admins" value={totals.master_admins} icon={Crown} tone="purple" />
       </section>
 
-      <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <StatCard label="AI requests, 30d" value={usageTotals.requests} icon={Cpu} />
-        <StatCard label="Successful AI calls" value={usageTotals.successful_requests} icon={BarChart3} tone="green" />
-        <StatCard label="Failed AI calls" value={usageTotals.failed_requests} icon={ShieldCheck} tone="amber" />
+        <StatCard label="Successful calls" value={usageTotals.successful_requests} icon={BarChart3} tone="green" />
+        <StatCard label="Failed calls" value={usageTotals.failed_requests} icon={ShieldCheck} tone="amber" />
         <StatCard label="Tracked tokens" value={usageTotals.total_tokens} icon={Cpu} tone="purple" />
       </section>
 
+      {/* Quick Links */}
       <section className="grid gap-3 sm:gap-4 lg:grid-cols-2">
         <Link
           href="/master-admin/users"
@@ -97,15 +103,12 @@ export default function MasterAdminDashboard() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
             <Users size={19} />
           </div>
-          <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">User Creation and Roles</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Create users, bulk upload CSV/Excel files, and assign student, admin, or master admin roles.
-          </p>
+          <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">User Management</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Full user list with role assignment and advanced management.</p>
           <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
             Open user management <ArrowRight size={15} />
           </span>
         </Link>
-
         <Link
           href="/master-admin/ai-usage"
           className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5"
@@ -114,14 +117,13 @@ export default function MasterAdminDashboard() {
             <Cpu size={19} />
           </div>
           <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">AI API Usage</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Review AI calls by feature and provider, then update API keys from one protected page.
-          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Review AI calls by feature and provider, then update API keys from one protected page.</p>
           <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
             Open AI usage <ArrowRight size={15} />
           </span>
         </Link>
       </section>
+
     </div>
   );
 }

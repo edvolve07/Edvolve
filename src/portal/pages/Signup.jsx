@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BarChart3, BookOpenCheck, Mic2, ShieldCheck, Sparkles, UserPlus } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpenCheck, Eye, EyeOff, Mic2, ShieldCheck, Sparkles, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
@@ -16,6 +16,8 @@ export default function Signup() {
   const { loginWithToken } = useAuth();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -118,25 +120,35 @@ export default function Signup() {
             </label>
             <label className="text-sm font-bold text-slate-700">
               Password
-              <input
-                type="password"
-                minLength="8"
-                required
-                value={form.password}
-                onChange={(event) => update('password', event.target.value)}
-                className="field"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  minLength="8"
+                  required
+                  value={form.password}
+                  onChange={(event) => update('password', event.target.value)}
+                  className="field pr-10"
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </label>
             <label className="text-sm font-bold text-slate-700">
               Confirm Password
-              <input
-                type="password"
-                minLength="8"
-                required
-                value={form.confirmPassword}
-                onChange={(event) => update('confirmPassword', event.target.value)}
-                className="field"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  minLength="8"
+                  required
+                  value={form.confirmPassword}
+                  onChange={(event) => update('confirmPassword', event.target.value)}
+                  className="field pr-10"
+                />
+                <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </label>
           </div>
           <button disabled={loading} className="btn-primary mt-6 w-full">

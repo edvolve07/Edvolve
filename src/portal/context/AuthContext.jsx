@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(
     Boolean(localStorage.getItem('token') || localStorage.getItem('auth_token')),
   );
+  const [revoked, setRevoked] = useState(false);
 
   const refresh = useCallback(async () => {
     const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
@@ -20,10 +21,16 @@ export function AuthProvider({ children }) {
     try {
       const data = await apiFetch('/auth/me');
       setUser(data.user);
-    } catch {
-      localStorage.removeItem('token');
-      localStorage.removeItem('auth_token');
-      setUser(null);
+      setRevoked(false);
+    } catch (error) {
+      if (error.locked) {
+        setRevoked(true);
+        setUser(null);
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('auth_token');
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -37,17 +44,19 @@ export function AuthProvider({ children }) {
     localStorage.setItem('token', token);
     localStorage.setItem('auth_token', token);
     setUser(nextUser);
+    setRevoked(false);
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('auth_token');
     setUser(null);
+    setRevoked(false);
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, loginWithToken, logout, refresh }),
-    [user, loading, loginWithToken, logout, refresh],
+    () => ({ user, loading, revoked, loginWithToken, logout, refresh }),
+    [user, loading, revoked, loginWithToken, logout, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

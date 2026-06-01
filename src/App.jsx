@@ -1,6 +1,8 @@
 import { LogOut, Menu, Sparkles } from "lucide-react";
 import { Navigate, Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
+import AccessRevoked from "@/src/pages/AccessRevoked";
+import AdminsList from "@/src/pages/admin/AdminsList";
 import AptitudePage from "@/src/pages/AptitudePage";
 import DashboardPage from "@/src/pages/DashboardPage";
 import InterviewPage from "@/src/pages/InterviewPage";
@@ -10,8 +12,12 @@ import ResultDetails from "@/src/pages/aptitude/ResultDetails";
 import AdminAptitudeAnalytics from "@/src/pages/admin/AdminAptitudeAnalytics";
 import AdminInterviewAnalytics from "@/src/pages/admin/AdminInterviewAnalytics";
 import AiUsagePage from "@/src/pages/admin/AiUsagePage";
+import CreateAdmin from "@/src/pages/admin/CreateAdmin";
+import CreateUser from "@/src/pages/admin/CreateUser";
 import MasterAdminDashboard from "@/src/pages/admin/MasterAdminDashboard";
+import MasterAdminsList from "@/src/pages/admin/MasterAdminsList";
 import PrepupAdminDashboard from "@/src/pages/admin/PrepupAdminDashboard";
+import StudentsList from "@/src/pages/admin/StudentsList";
 import UserManagement from "@/src/pages/admin/UserManagement";
 import AppSidebar from "../components/Sidebar";
 import { APP_NAME } from "./constants";
@@ -90,8 +96,9 @@ function AppShell({ children }) {
 }
 
 function RequireSession() {
-  const { user, loading } = useAuth();
+  const { user, loading, revoked } = useAuth();
   if (loading) return <PortalLoadingSkeleton label="Checking session" />;
+  if (revoked) return <Navigate to="/access-revoked" replace />;
   if (!user) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
@@ -115,8 +122,9 @@ function homeForRole(role) {
 }
 
 function RequireRole({ roles }) {
-  const { user, loading } = useAuth();
+  const { user, loading, revoked } = useAuth();
   if (loading) return <PortalLoadingSkeleton label="Checking session" />;
+  if (revoked) return <Navigate to="/access-revoked" replace />;
   if (!user) return <Navigate to="/login" replace />;
   if (!roles.includes(user.role)) return <Navigate to={homeForRole(user.role)} replace />;
   return <Outlet />;
@@ -127,6 +135,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<AuthLanding />} />
       <Route path="/login" element={<PortalLogin />} />
+      <Route path="/access-revoked" element={<AccessRevoked />} />
       <Route path="/signup" element={<PortalSignup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
@@ -156,7 +165,12 @@ export default function App() {
 
       <Route element={<RequireRole roles={["master_admin"]} />}>
         <Route path="/master-admin-dashboard" element={<AppShell><MasterAdminDashboard /></AppShell>} />
-        <Route path="/master-admin/users" element={<AppShell><UserManagement /></AppShell>} />
+        <Route path="/master-admin/students" element={<AppShell><StudentsList /></AppShell>} />
+        <Route path="/master-admin/admins" element={<AppShell><AdminsList /></AppShell>} />
+        <Route path="/master-admin/master-admins" element={<AppShell><MasterAdminsList /></AppShell>} />
+        <Route path="/master-admin/create-admin" element={<AppShell><CreateAdmin /></AppShell>} />
+        <Route path="/master-admin/create-user" element={<AppShell><CreateUser /></AppShell>} />
+
         <Route path="/master-admin/ai-usage" element={<AppShell><AiUsagePage /></AppShell>} />
       </Route>
 

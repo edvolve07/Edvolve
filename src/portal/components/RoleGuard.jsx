@@ -9,11 +9,12 @@ function homeForRole(role) {
 }
 
 export default function RoleGuard({ role, roles }) {
-  const { user, loading } = useAuth();
+  const { user, loading, revoked } = useAuth();
   const location = useLocation();
   const allowedRoles = roles || (role ? [role] : null);
 
   if (loading) return <LoadingSkeleton label="Checking session" />;
+  if (revoked) return <Navigate to="/access-revoked" replace />;
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to={homeForRole(user.role)} replace />;

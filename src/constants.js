@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpenCheck,
   BrainCircuit,
   ClipboardList,
   Crown,
@@ -11,6 +12,7 @@ import {
   ShieldCheck,
   Sparkles,
   TrendingUp,
+  UserCog,
 } from "lucide-react";
 
 export const APP_NAME = "PrepUp";
@@ -26,7 +28,11 @@ export const NAV_ITEMS = [
   { href: "/master-admin-dashboard", label: "Master Admin", icon: Crown, roles: ["master_admin"] },
   { href: "/admin/assessments/create", label: "Create Assessment", icon: FilePlus2, roles: ["admin"] },
   { href: "/admin/assessments", label: "Assessments", icon: ClipboardList, roles: ["admin"] },
-  { href: "/master-admin/users", label: "Users", icon: ClipboardList, roles: ["master_admin"] },
+  { href: "/master-admin/students", label: "Students", icon: BookOpenCheck, roles: ["master_admin"] },
+  { href: "/master-admin/admins", label: "Admins", icon: ShieldCheck, roles: ["master_admin"] },
+  { href: "/master-admin/master-admins", label: "Master Admins", icon: Crown, roles: ["master_admin"] },
+  { href: "/master-admin/create-admin", label: "Create Admin", icon: ShieldCheck, roles: ["master_admin"] },
+  { href: "/master-admin/create-user", label: "Create User", icon: UserCog, roles: ["master_admin"] },
   { href: "/master-admin/ai-usage", label: "AI Usage", icon: Cpu, roles: ["master_admin"] },
 ];
 

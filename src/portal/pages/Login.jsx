@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, LogIn, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Eye, EyeOff, LogIn, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
@@ -17,6 +17,7 @@ export default function Login() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const platformHighlights = [
     'Practice interviews that feel close to the real round',
@@ -111,14 +112,19 @@ export default function Login() {
           </label>
           <label className="mt-4 block text-sm font-bold text-slate-700">
             Password
-            <input
-              type="password"
-              required
-              value={form.password}
-              onChange={(event) => setForm({ ...form, password: event.target.value })}
-              className="field"
-              placeholder="Enter your password"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={form.password}
+                onChange={(event) => setForm({ ...form, password: event.target.value })}
+                className="field pr-10"
+                placeholder="Enter your password"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </label>
           <div className="mt-3 flex justify-end">
             <Link className="text-sm font-black text-brand" to="/forgot-password">
