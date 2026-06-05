@@ -63,6 +63,47 @@ export const INTERVIEW_ROLES = [
   "DevOps Engineer",
 ];
 
+export const DOMAIN_ROLES = {
+  Engineering: [
+    "Mechanical Engineer",
+    "Civil Engineer",
+    "Electrical Engineer",
+    "Industrial Engineer",
+  ],
+  "Computer Science": [
+    "Software Engineer",
+    "Frontend Developer",
+    "Backend Developer",
+    "Full Stack Developer",
+    "Data Scientist",
+    "DevOps Engineer",
+  ],
+  Business: [
+    "Product Manager",
+    "Business Analyst",
+    "Management Consultant",
+    "Operations Manager",
+  ],
+  Finance: [
+    "Financial Analyst",
+    "Investment Banker",
+    "Accountant",
+    "Auditor",
+  ],
+  Marketing: [
+    "Marketing Manager",
+    "Digital Marketing Specialist",
+    "Brand Manager",
+    "Content Strategist",
+  ],
+  Healthcare: [
+    "Doctor",
+    "Nurse",
+    "Healthcare Administrator",
+    "Medical Researcher",
+  ],
+};
+
 export const APTITUDE_DOMAINS = {
   engineering: {
     label: "Engineering",

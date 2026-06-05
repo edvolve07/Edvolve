@@ -14,7 +14,7 @@ import {
   VideoOff,
 } from "lucide-react";
 import clsx from "clsx";
-import { INTERVIEW_DOMAINS, INTERVIEW_ROLES, METRIC_LABELS } from "@/src/constants";
+import { DOMAIN_ROLES, INTERVIEW_DOMAINS, INTERVIEW_ROLES, METRIC_LABELS } from "@/src/constants";
 import { useNavigate } from "@/src/navigation";
 import { endInterview, startInterview, submitAnswer as submitInterviewAnswer } from "@/lib/api";
 import { useRecorder } from "@/components/VoiceRecorder";
@@ -38,11 +38,36 @@ function MetricBar({ label, value }) {
 
 function SetupForm({ onStart }) {
   const [domain, setDomain] = useState(INTERVIEW_DOMAINS[0]);
-  const [role, setRole] = useState(INTERVIEW_ROLES[0]);
+  const [role, setRole] = useState(DOMAIN_ROLES[INTERVIEW_DOMAINS[0]][0]);
+  const [customRole, setCustomRole] = useState("");
+  const [isCustomRole, setIsCustomRole] = useState(false);
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const domainRoles = DOMAIN_ROLES[domain] ?? [];
+
+  function handleDomainClick(item) {
+    setDomain(item);
+    setRole(DOMAIN_ROLES[item][0]);
+    setIsCustomRole(false);
+    setCustomRole("");
+  }
+
+  function handleRoleClick(item) {
+    setRole(item);
+    setIsCustomRole(false);
+    setCustomRole("");
+  }
+
+  function handleCustomRoleChange(value) {
+    setCustomRole(value);
+    setIsCustomRole(true);
+    if (value.trim()) {
+      setRole(value.trim());
+    }
+  }
 
   async function submit() {
     if (!file || loading) return;
@@ -75,7 +100,7 @@ function SetupForm({ onStart }) {
               {INTERVIEW_DOMAINS.map((item) => (
                 <button
                   key={item}
-                  onClick={() => setDomain(item)}
+                  onClick={() => handleDomainClick(item)}
                   className={clsx(
                     "rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
                     domain === item
@@ -92,13 +117,13 @@ function SetupForm({ onStart }) {
           <section className="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
             <h2 className="mb-4 text-sm font-semibold text-slate-900">Target role</h2>
             <div className="grid gap-2 sm:grid-cols-2">
-              {INTERVIEW_ROLES.map((item) => (
+              {domainRoles.map((item) => (
                 <button
                   key={item}
-                  onClick={() => setRole(item)}
+                  onClick={() => handleRoleClick(item)}
                   className={clsx(
                     "rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
-                    role === item
+                    role === item && !isCustomRole
                       ? "border-brand-300 bg-brand-50 text-brand-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   )}
@@ -106,6 +131,25 @@ function SetupForm({ onStart }) {
                   {item}
                 </button>
               ))}
+            </div>
+            <div className="mt-3">
+              <div className="flex items-center gap-2">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-xs font-medium text-slate-400">or add a custom role</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+              <input
+                type="text"
+                value={customRole}
+                onChange={(event) => handleCustomRoleChange(event.target.value)}
+                placeholder="Type your own role..."
+                className={clsx(
+                  "mt-3 w-full rounded-xl border px-4 py-3 text-sm font-medium outline-none transition",
+                  isCustomRole
+                    ? "border-brand-300 bg-brand-50 text-brand-700"
+                    : "border-slate-200 text-slate-600"
+                )}
+              />
             </div>
           </section>
         </div>
