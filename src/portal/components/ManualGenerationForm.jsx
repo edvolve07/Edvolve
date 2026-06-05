@@ -105,8 +105,7 @@ export default function ManualGenerationForm() {
       const [datePart, timePart] = form.start_time.split('T');
       const [y, m, d] = datePart.split('-').map(Number);
       const [hh, mm] = timePart.split(':').map(Number);
-      const localDate = new Date(y, m - 1, d, hh, mm);
-      const startISO = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000).toISOString();
+      const startISO = new Date(y, m - 1, d, hh, mm).toISOString();
       payload.append('start_time', startISO);
       payload.append('startTime', startISO);
     }
@@ -115,8 +114,7 @@ export default function ManualGenerationForm() {
       const [datePart, timePart] = form.end_time.split('T');
       const [y, m, d] = datePart.split('-').map(Number);
       const [hh, mm] = timePart.split(':').map(Number);
-      const localDate = new Date(y, m - 1, d, hh, mm);
-      const endISO = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000).toISOString();
+      const endISO = new Date(y, m - 1, d, hh, mm).toISOString();
       payload.append('end_time', endISO);
       payload.append('endTime', endISO);
     }
