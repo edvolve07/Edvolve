@@ -43,7 +43,10 @@ export default function StudentsList() {
   function filteredStudents() {
     let list = students;
     if (selectedAdmin) {
-      list = list.filter((s) => s.assigned_admin === selectedAdmin);
+      list = list.filter((s) => {
+        const adminId = s.assigned_admin?.id || s.assigned_admin?._id || s.assigned_admin;
+        return String(adminId) === selectedAdmin;
+      });
     }
     if (search.trim()) {
       const q = search.toLowerCase();
