@@ -12,7 +12,7 @@ function bestVideoMime() {
   return "";
 }
 
-export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled) {
+export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled, maxDuration = 90) {
   const [micState, setMicState] = useState("idle");
   const [recSecs, setRecSecs] = useState(0);
   const [hasCamera, setHasCamera] = useState(false);
@@ -30,6 +30,7 @@ export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled) {
   const audioStreamRef = useRef(null);
   const videoStreamRef = useRef(null);
   const acRef = useRef(null);
+  const timeLimitRef = useRef(false);
 
   /* ── Waveform ── */
   const drawWave = useCallback(() => {
@@ -160,7 +161,10 @@ export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled) {
       pendingAudio.current = aBlob;
       pendingVideo.current = (vMR && videoChunks.current.length > 0)
         ? new Blob(videoChunks.current, { type: vMR.mimeType || "video/webm" }) : null;
-      // ★ REVIEW state — user must explicitly click "Submit Answer"
+      if (timeLimitRef.current) {
+        submitAnswer();
+        return;
+      }
       setMicState("review");
     };
 
@@ -178,7 +182,16 @@ export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled) {
     aMR.start(500); vMR?.start(500);
     setMicState("recording");
     setRecSecs(0);
-    recTimerRef.current = setInterval(() => setRecSecs(s => s + 1), 1000);
+    timeLimitRef.current = false;
+    recTimerRef.current = setInterval(() => {
+      setRecSecs((s) => {
+        const next = s + 1;
+        if (next >= maxDuration && !timeLimitRef.current) {
+          timeLimitRef.current = true;
+        }
+        return next;
+      });
+    }, 1000);
   };
 
   /* ── Stop mic — goes to review, NOT submit ── */
@@ -204,6 +217,13 @@ export function useRecorder(videoRef, waveCanvasRef, onSubmit, disabled) {
     pendingAudio.current = null; pendingVideo.current = null;
     setMicState("idle");
   };
+
+  /* ── Auto-stop when time limit reached ── */
+  useEffect(() => {
+    if (micState === "recording" && recSecs >= maxDuration && timeLimitRef.current) {
+      stopMic();
+    }
+  }, [recSecs, micState, maxDuration]);
 
   const fmt = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
