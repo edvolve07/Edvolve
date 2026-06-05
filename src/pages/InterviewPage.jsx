@@ -16,7 +16,7 @@ import {
 import clsx from "clsx";
 import { DOMAIN_ROLES, INTERVIEW_DOMAINS, INTERVIEW_ROLES, METRIC_LABELS } from "@/src/constants";
 import { useNavigate } from "@/src/navigation";
-import { endInterview, startInterview, submitAnswer as submitInterviewAnswer } from "@/lib/api";
+import { endInterview, getSessionState, startInterview, submitAnswer as submitInterviewAnswer } from "@/lib/api";
 import { useRecorder } from "@/components/VoiceRecorder";
 
 function MetricBar({ label, value }) {
@@ -233,16 +233,36 @@ function LiveInterview({
   const videoRef = useRef(null);
   const waveRef = useRef(null);
   const [seconds, setSeconds] = useState(0);
+  const [tabWarnings, setTabWarnings] = useState(0);
+  const tabWarnRef = useRef(false);
   const recorder = useRecorder(videoRef, waveRef, onAnswer, loading);
 
   useEffect(() => {
     recorder.startCamera();
     const timer = setInterval(() => setSeconds((value) => value + 1), 1000);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        tabWarnRef.current = true;
+        setTimeout(() => {
+          if (document.hidden) {
+            setTabWarnings((c) => {
+              const next = c + 1;
+              if (next >= 3) onEnd();
+              return next;
+            });
+          }
+        }, 2000);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
     return () => {
       clearInterval(timer);
       recorder.stopAll();
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, []); // recorder methods are stable enough for this mount-only effect.
+  }, []);
 
   const isRecording = recorder.micState === "recording";
   const isReviewing = recorder.micState === "review";
@@ -262,6 +282,11 @@ function LiveInterview({
               </h1>
             </div>
             <div className="flex items-center gap-3">
+              {tabWarnings > 0 && (
+                <span className="rounded-xl bg-amber-100 px-3 py-2 font-mono text-xs font-semibold text-amber-700">
+                  {tabWarnings}/3 tab switches
+                </span>
+              )}
               <span className="rounded-xl bg-slate-100 px-3 py-2 font-mono text-sm font-semibold text-slate-700">
                 {sessionTime}
               </span>
@@ -452,6 +477,8 @@ function LiveInterview({
   );
 }
 
+const STORAGE_KEY = "activeInterviewSession";
+
 export default function InterviewPage() {
   const navigate = useNavigate();
   const [phase, setPhase] = useState("setup");
@@ -463,6 +490,29 @@ export default function InterviewPage() {
   const [transcript, setTranscript] = useState("");
   const [feedback, setFeedback] = useState("");
   const [metrics, setMetrics] = useState(null);
+  const resumeAttempted = useRef(false);
+
+  useEffect(() => {
+    if (resumeAttempted.current) return;
+    resumeAttempted.current = true;
+    const savedId = localStorage.getItem(STORAGE_KEY);
+    if (!savedId) return;
+    setLoading(true);
+    getSessionState(savedId)
+      .then((data) => {
+        if (data.status !== "active") {
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+        const resumeSession = { ...data, session_id: data.session_id };
+        setSession(resumeSession);
+        setQuestion(data.question);
+        setQuestionNumber(data.question_number);
+        setPhase("live");
+      })
+      .catch(() => localStorage.removeItem(STORAGE_KEY))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleStart(domain, role, file) {
     const data = await startInterview(domain, role, file);
@@ -474,6 +524,7 @@ export default function InterviewPage() {
     setFeedback("");
     setMetrics(null);
     setPhase("live");
+    localStorage.setItem(STORAGE_KEY, interviewSession.session_id);
   }
 
   const handleAnswer = useCallback(
@@ -494,6 +545,7 @@ export default function InterviewPage() {
         setFeedback(data.feedback ?? "");
         setMetrics(data.metrics ?? null);
         if (data.completed) {
+          localStorage.removeItem(STORAGE_KEY);
           setPhase("complete");
         } else {
           setQuestion(data.next_question ?? "");
@@ -565,7 +617,7 @@ export default function InterviewPage() {
         feedback={feedback}
         metrics={metrics}
         onAnswer={handleAnswer}
-        onEnd={() => setPhase("complete")}
+        onEnd={() => { localStorage.removeItem(STORAGE_KEY); setPhase("complete"); }}
       />
     );
   }
