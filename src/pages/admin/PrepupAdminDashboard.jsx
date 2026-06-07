@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, BookOpenCheck, Clock3, FilePlus2, Loader2, Mic2, Users } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpenCheck, Clock3, Code2, FilePlus2, Loader2, Mic2, Users } from "lucide-react";
 import { Link } from "@/src/navigation";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/src/portal/context/AuthContext";
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-brand-50 text-brand-600",
+    brand: "bg-emerald-50 text-emerald-600",
     green: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
     slate: "bg-slate-100 text-slate-700",
@@ -28,7 +28,9 @@ export default function PrepupAdminDashboard() {
   const userModules = user?.modules_access || ["both"];
   const hasAptitude = userModules.includes("aptitude") || userModules.includes("both");
   const hasInterview = userModules.includes("ai_interview") || userModules.includes("both");
+  const hasProgramming = userModules.includes("programming") || userModules.includes("both");
   const [stats, setStats] = useState(null);
+  const [programmingStats, setProgrammingStats] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -40,6 +42,14 @@ export default function PrepupAdminDashboard() {
       .catch((err) => {
         if (active) setError(err.message || "Unable to load admin dashboard.");
       });
+
+    if (hasProgramming) {
+      apiFetch("/api/programming/admin/dashboard")
+        .then((data) => {
+          if (active) setProgrammingStats(data);
+        })
+        .catch(() => {});
+    }
 
     return () => {
       active = false;
@@ -59,7 +69,7 @@ export default function PrepupAdminDashboard() {
   if (!stats) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+        <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
         Loading admin dashboard
       </div>
     );
@@ -70,7 +80,7 @@ export default function PrepupAdminDashboard() {
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-brand-600">Lecturer workspace</p>
+            <p className="text-sm font-medium text-emerald-600">Lecturer workspace</p>
             <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
               Admin Dashboard
             </h1>
@@ -80,7 +90,7 @@ export default function PrepupAdminDashboard() {
           </div>
           <Link
             href="/admin/assessments/create"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-emerald-600 sm:w-auto"
           >
             Create assessment <FilePlus2 size={16} />
           </Link>
@@ -116,20 +126,29 @@ export default function PrepupAdminDashboard() {
         </section>
       ) : null}
 
-      <section className="grid gap-3 sm:gap-4 lg:grid-cols-2">
+      {hasProgramming && programmingStats ? (
+        <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+          <StatCard label="Coding Problems" value={programmingStats.total_problems} icon={Code2} tone="brand" />
+          <StatCard label="Published" value={programmingStats.published_problems} icon={BarChart3} tone="green" />
+          <StatCard label="Submissions" value={programmingStats.total_submissions} icon={Users} tone="amber" />
+          <StatCard label="Acceptance Rate" value={`${programmingStats.acceptance_rate ?? 0}%`} icon={BarChart3} tone="slate" />
+        </section>
+      ) : null}
+
+      <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
         {hasAptitude ? (
           <Link
             href="/admin/analytics/aptitude"
             className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5"
           >
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
               <BookOpenCheck size={19} />
             </div>
             <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">Aptitude Analytics</h2>
             <p className="mt-2 text-sm leading-6 text-slate-500">
               See each student&apos;s latest aptitude result first, then open all attempts for that student.
             </p>
-            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
               Open aptitude analytics <ArrowRight size={15} />
             </span>
           </Link>
@@ -147,8 +166,26 @@ export default function PrepupAdminDashboard() {
             <p className="mt-2 text-sm leading-6 text-slate-500">
               Review student interview reports, scores, grades, ATS scores, and full report details.
             </p>
-            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
               Open interview analytics <ArrowRight size={15} />
+            </span>
+          </Link>
+        ) : null}
+
+        {hasProgramming ? (
+          <Link
+            href="/admin/programming"
+            className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5"
+          >
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <Code2 size={19} />
+            </div>
+            <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">Programming Problems</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Create and manage coding problems, review student submissions and track progress.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
+              Manage problems <ArrowRight size={15} />
             </span>
           </Link>
         ) : null}

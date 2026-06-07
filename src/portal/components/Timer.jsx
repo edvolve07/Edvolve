@@ -24,7 +24,7 @@ export default function Timer({ startedAt, durationMinutes, onExpire }) {
   const seconds = Math.floor((remaining % 60000) / 1000);
 
   return (
-    <div className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-ink">
+    <div className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-900">
       {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
     </div>
   );

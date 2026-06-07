@@ -39,7 +39,7 @@ export default function ResetPassword() {
       <section className="w-full max-w-md overflow-hidden rounded-md border border-white/70 bg-white shadow-card-hover">
         <div className="bg-night px-6 py-5 text-white">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-md bg-brand">
+            <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-900">
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
@@ -50,8 +50,8 @@ export default function ResetPassword() {
         </div>
 
         <form onSubmit={submit} className="p-6 sm:p-8">
-          <p className="text-sm font-bold uppercase text-brand">Secure reset</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">Set new password</h1>
+          <p className="text-sm font-bold uppercase text-emerald-800">Secure reset</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-900">Set new password</h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Reset links expire after 5 minutes. Request a new link if this one no longer works.
           </p>
@@ -101,7 +101,7 @@ export default function ResetPassword() {
             {loading ? 'Resetting...' : 'Reset password'}
           </button>
 
-          <Link className="mt-5 inline-flex items-center gap-2 text-sm font-black text-brand" to="/login">
+          <Link className="mt-5 inline-flex items-center gap-2 text-sm font-black text-emerald-800" to="/login">
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to sign in
           </Link>

@@ -43,7 +43,7 @@ export default function AssessmentResults() {
     <section className="page-stack">
       <div className="page-hero">
         <p className="eyebrow">Attempt Monitor</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Assessment Results</h2>
+        <h2 className="mt-2 text-3xl font-black text-slate-900">Assessment Results</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
           Inspect started and submitted attempts, add extra time for active students, and review pass status.
         </p>
@@ -74,7 +74,7 @@ export default function AssessmentResults() {
                     <span
                       className={`badge ${
                         result.status === 'in_progress'
-                          ? 'bg-blue-50 text-blue-700'
+                          ? 'bg-emerald-50 text-emerald-700'
                           : 'bg-emerald-50 text-emerald-700'
                       }`}
                     >
@@ -120,7 +120,7 @@ export default function AssessmentResults() {
                         <button
                           onClick={() => extendAttempt(result.id)}
                           disabled={savingAttemptId === result.id}
-                          className="focus-ring rounded-md bg-brand px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
+                          className="focus-ring rounded-md bg-emerald-900 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
                         >
                           {savingAttemptId === result.id ? 'Adding...' : 'Add min'}
                         </button>

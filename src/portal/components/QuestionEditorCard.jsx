@@ -15,7 +15,7 @@ export default function QuestionEditorCard({ question, index, onChange, onDelete
   return (
     <article className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-black text-ink">Question {index + 1}</h3>
+        <h3 className="font-black text-slate-900">Question {index + 1}</h3>
         <button
           onClick={() => onDelete(index)}
           className="focus-ring rounded-md border border-red-100 p-2 text-red-600 hover:bg-red-50"

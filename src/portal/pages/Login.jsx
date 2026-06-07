@@ -51,7 +51,7 @@ export default function Login() {
       <section className="grid w-full max-w-5xl overflow-hidden rounded-md border border-white/70 bg-white shadow-card-hover lg:grid-cols-[0.95fr_1.05fr]">
         <div className="hidden bg-night p-8 text-white lg:block">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-md bg-brand">
+            <span className="grid h-11 w-11 place-items-center rounded-md bg-emerald-900">
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
@@ -84,11 +84,11 @@ export default function Login() {
               <span className="grid h-10 w-10 place-items-center rounded-md bg-night text-white">
                 <Sparkles className="h-5 w-5" />
               </span>
-              <p className="text-xl font-black text-ink">PrepUp</p>
+              <p className="text-xl font-black text-slate-900">PrepUp</p>
             </div>
           </div>
-          <p className="mt-8 text-sm font-bold uppercase text-brand lg:mt-0">Welcome back</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Sign in to PrepUp</h2>
+          <p className="mt-8 text-sm font-bold uppercase text-emerald-800 lg:mt-0">Welcome back</p>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Sign in to PrepUp</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Pick up exactly where you left off: interviews, aptitude practice, scorecards, and progress analytics.
           </p>
@@ -127,7 +127,7 @@ export default function Login() {
             </div>
           </label>
           <div className="mt-3 flex justify-end">
-            <Link className="text-sm font-black text-brand" to="/forgot-password">
+            <Link className="text-sm font-black text-emerald-800" to="/forgot-password">
               Forgot password?
             </Link>
           </div>
@@ -137,7 +137,7 @@ export default function Login() {
           </button>
           <p className="mt-5 flex items-center justify-center gap-1 text-center text-sm text-slate-600">
             New here?
-            <Link className="inline-flex items-center gap-1 font-black text-brand" to="/signup">
+            <Link className="inline-flex items-center gap-1 font-black text-emerald-800" to="/signup">
               Create account <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </p>

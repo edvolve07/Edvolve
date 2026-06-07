@@ -21,7 +21,7 @@ function formatDuration(seconds) {
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-brand-50 text-brand-600",
+    brand: "bg-emerald-50 text-emerald-600",
     green: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
   };
@@ -70,7 +70,7 @@ export default function AdminAptitudeAnalytics() {
   if (!data) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+        <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
         Loading aptitude analytics
       </div>
     );
@@ -79,7 +79,7 @@ export default function AdminAptitudeAnalytics() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Admin analytics</p>
+        <p className="text-sm font-medium text-emerald-600">Admin analytics</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Aptitude Analytics
         </h1>
@@ -145,7 +145,7 @@ export default function AdminAptitudeAnalytics() {
                 <button
                   type="button"
                   onClick={() => setSelectedStudent(student)}
-                  className="mt-4 inline-flex items-center justify-center rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+                  className="mt-4 inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
                 >
                   More details
                 </button>

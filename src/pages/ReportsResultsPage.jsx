@@ -42,7 +42,7 @@ function AssessmentResultsList() {
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
               <BarChart3 size={16} />
             </span>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">
@@ -69,7 +69,7 @@ function AssessmentResultsList() {
 
       {!results ? (
         <div className="flex items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-10 text-sm font-medium text-slate-500">
-          <Loader2 size={18} className="mr-2 animate-spin text-brand-500" />
+          <Loader2 size={18} className="mr-2 animate-spin text-emerald-500" />
           Loading assessment results
         </div>
       ) : results.length === 0 ? (
@@ -80,7 +80,7 @@ function AssessmentResultsList() {
         <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Latest result</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-emerald-600">Latest result</p>
               <h3 className="mt-1 text-lg font-black text-slate-950">{results[0].assessment_title}</h3>
               <p className="mt-1 text-sm text-slate-500">
                 {results[0].concept} · {results[0].difficulty} · {formatDateTime(results[0].submitted_at)}
@@ -115,7 +115,7 @@ function AssessmentResultsList() {
             <button
               type="button"
               onClick={() => navigate(`/reports/results/${results[0].id}`)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
             >
               View latest result <ArrowRight size={15} />
             </button>
@@ -172,7 +172,7 @@ function AssessmentResultsList() {
                   <button
                     type="button"
                     onClick={() => navigate(`/reports/results/${result.id}`)}
-                    className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+                    className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
                   >
                     View result
                   </button>
@@ -220,7 +220,7 @@ function InterviewReportsList({ onMoreDetails }) {
   if (!reports) {
     return (
       <div className="flex items-center justify-center rounded-xl border border-slate-100 bg-slate-50 px-4 py-10 text-sm font-medium text-slate-500">
-        <Loader2 size={18} className="mr-2 animate-spin text-brand-500" />
+        <Loader2 size={18} className="mr-2 animate-spin text-emerald-500" />
         Loading interview reports
       </div>
     );
@@ -238,7 +238,7 @@ function InterviewReportsList({ onMoreDetails }) {
             </p>
             <Link
               href="/interview"
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
             >
               Start interview <FileText size={15} />
             </Link>
@@ -265,12 +265,12 @@ function InterviewReportsList({ onMoreDetails }) {
             <div className="flex items-center gap-4">
               <div className="text-right">
               <p className="text-2xl font-black text-slate-950">{report.grade || "--"}</p>
-              <p className="text-sm font-bold text-brand-700">{Math.round(report.percentage || 0)}%</p>
+              <p className="text-sm font-bold text-emerald-700">{Math.round(report.percentage || 0)}%</p>
               </div>
               <button
                 type="button"
                 onClick={() => onMoreDetails(report.session_id)}
-                className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+                className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
               >
                 More details
               </button>
@@ -294,7 +294,7 @@ export default function ReportsResultsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-        <p className="text-sm font-medium text-brand-600">Performance archive</p>
+        <p className="text-sm font-medium text-emerald-600">Performance archive</p>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-950">
           Reports and Results
         </h1>
@@ -305,7 +305,7 @@ export default function ReportsResultsPage() {
 
       <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
         <div className="mb-5 flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
             <Mic2 size={16} />
           </span>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">
@@ -323,7 +323,7 @@ export default function ReportsResultsPage() {
           <div className="mx-auto flex max-h-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-brand-600">Interview report</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-emerald-600">Interview report</p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-950">More details</h2>
               </div>
               <button

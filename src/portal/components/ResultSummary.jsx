@@ -3,17 +3,17 @@ export default function ResultSummary({ attempt, assessment }) {
     <section className="grid gap-4 md:grid-cols-4">
       <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-slate-500">Score</p>
-        <p className="mt-1 text-3xl font-black text-ink">
+        <p className="mt-1 text-3xl font-black text-slate-900">
           {attempt.score}/{assessment.total_marks}
         </p>
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-slate-500">Percentage</p>
-        <p className="mt-1 text-3xl font-black text-ink">{attempt.percentage}%</p>
+        <p className="mt-1 text-3xl font-black text-slate-900">{attempt.percentage}%</p>
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-slate-500">Passing Marks</p>
-        <p className="mt-1 text-3xl font-black text-ink">{assessment.passing_marks}</p>
+        <p className="mt-1 text-3xl font-black text-slate-900">{assessment.passing_marks}</p>
       </div>
       <div
         className={`rounded-md border p-5 shadow-sm ${

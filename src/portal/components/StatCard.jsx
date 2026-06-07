@@ -1,6 +1,6 @@
 export default function StatCard({ label, value, tone = 'blue' }) {
   const tones = {
-    blue: 'border-indigo-100 bg-indigo-50 text-indigo-700',
+    blue: 'border-emerald-100 bg-emerald-50 text-emerald-700',
     mint: 'border-emerald-100 bg-emerald-50 text-emerald-700',
     coral: 'border-orange-100 bg-orange-50 text-orange-700',
     gold: 'border-amber-100 bg-amber-50 text-amber-700',

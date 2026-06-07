@@ -61,7 +61,7 @@ export default function AdminAssessments() {
       <div className="page-hero flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Assessment Library</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Assessments</h2>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Assessments</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Review, publish, edit questions, extend duration, and inspect results.
           </p>
@@ -92,7 +92,7 @@ export default function AdminAssessments() {
             <tbody className="divide-y divide-slate-100">
               {assessments.map((assessment) => (
                 <tr key={assessment.id} className="hover:bg-slate-50/70">
-                  <td className="font-semibold text-ink">{assessment.title}</td>
+                  <td className="font-semibold text-slate-900">{assessment.title}</td>
                   <td>{assessment.concept}</td>
                   <td>{assessment.difficulty}</td>
                   <td>
@@ -119,7 +119,7 @@ export default function AdminAssessments() {
                       <button
                         onClick={() => extendAssessmentDuration(assessment.id)}
                         disabled={savingAssessmentId === assessment.id}
-                        className="focus-ring rounded-md bg-brand px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
+                        className="focus-ring rounded-md bg-emerald-900 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
                       >
                         {savingAssessmentId === assessment.id ? 'Adding...' : 'Add min'}
                       </button>

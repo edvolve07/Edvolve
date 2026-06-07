@@ -39,7 +39,7 @@ export default function StudentResults() {
     <section className="page-stack">
       <div className="page-hero">
         <p className="eyebrow">Performance Archive</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Reports and Results</h2>
+        <h2 className="mt-2 text-3xl font-black text-slate-900">Reports and Results</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
           Review interview reports, submitted assessments, scores, pass status, explanations, and topic analytics.
         </p>
@@ -48,8 +48,8 @@ export default function StudentResults() {
 
       <section className="surface p-5">
         <div className="mb-4 flex items-center gap-2">
-          <Mic2 className="h-5 w-5 text-brand" />
-          <h3 className="text-lg font-black text-ink">Interview Reports</h3>
+          <Mic2 className="h-5 w-5 text-emerald-800" />
+          <h3 className="text-lg font-black text-slate-900">Interview Reports</h3>
         </div>
         <div className="grid gap-4">
           {interviewReports.map((report) => (
@@ -60,14 +60,14 @@ export default function StudentResults() {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h4 className="font-black text-ink">{report.role || 'Interview report'}</h4>
+                  <h4 className="font-black text-slate-900">{report.role || 'Interview report'}</h4>
                   <p className="mt-1 text-sm text-slate-500">
                     {report.domain || 'Interview'} · {formatDateTime(report.created_at)} · {report.report_id}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-black text-ink">{report.grade || '--'}</p>
-                  <p className="text-sm font-bold text-brand">{Math.round(report.percentage || 0)}%</p>
+                  <p className="text-2xl font-black text-slate-900">{report.grade || '--'}</p>
+                  <p className="text-sm font-bold text-emerald-800">{Math.round(report.percentage || 0)}%</p>
                 </div>
               </div>
             </Link>
@@ -82,8 +82,8 @@ export default function StudentResults() {
 
       <section className="surface p-5">
         <div className="mb-4 flex items-center gap-2">
-          <FileText className="h-5 w-5 text-brand" />
-          <h3 className="text-lg font-black text-ink">Assessment Results</h3>
+          <FileText className="h-5 w-5 text-emerald-800" />
+          <h3 className="text-lg font-black text-slate-900">Assessment Results</h3>
         </div>
       <div className="grid gap-4">
         {results.map((result) => (
@@ -94,13 +94,13 @@ export default function StudentResults() {
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="font-black text-ink">{result.assessment_title}</h3>
+                <h3 className="font-black text-slate-900">{result.assessment_title}</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   {result.concept} · {result.difficulty} · {formatDateTime(result.submitted_at)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black text-ink">{result.percentage}%</p>
+                <p className="text-2xl font-black text-slate-900">{result.percentage}%</p>
                 <p className={result.passed ? 'text-sm font-bold text-emerald-700' : 'text-sm font-bold text-red-600'}>
                   {result.passed ? 'Passed' : 'Failed'}
                 </p>

@@ -123,7 +123,7 @@ export default function MasterUsersPage() {
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+        <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
         Loading users
       </div>
     );
@@ -132,7 +132,7 @@ export default function MasterUsersPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <section className="mb-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-        <p className="text-sm font-medium text-brand-600">Master admin</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin</p>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-950">
           User Creation
         </h1>
@@ -150,7 +150,7 @@ export default function MasterUsersPage() {
       <section className="mb-6 grid gap-6 xl:grid-cols-2">
         <form onSubmit={createUser} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
           <div className="mb-5 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-brand-500" />
+            <Plus className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Create User</h2>
               <p className="mt-1 text-sm text-slate-500">Add students, admins, or another master admin.</p>
@@ -195,7 +195,7 @@ export default function MasterUsersPage() {
               <option value="admin">Admin</option>
               <option value="master_admin">Master Admin</option>
             </select>
-            <button disabled={creating} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600">
+            <button disabled={creating} className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600">
               <Save size={16} />
               {creating ? "Creating..." : "Create user"}
             </button>
@@ -204,7 +204,7 @@ export default function MasterUsersPage() {
 
         <form onSubmit={importUsers} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
           <div className="mb-5 flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-brand-500" />
+            <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Bulk Upload Users</h2>
               <p className="mt-1 text-sm text-slate-500">Upload CSV or Excel and apply one role to every row.</p>
@@ -305,7 +305,7 @@ export default function MasterUsersPage() {
                       <span className="inline-flex gap-1">
                         {(user.modules_access || []).map((m) => (
                           <span key={m} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                            {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : "All"}
+                            {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : m === "programming" ? "Programming" : "All"}
                           </span>
                         ))}
                       </span>

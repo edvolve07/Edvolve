@@ -63,7 +63,7 @@ export default function StudentsList() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Master admin tools</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Students
         </h1>
@@ -107,7 +107,7 @@ export default function StudentsList() {
       <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card">
         <div className="border-b border-slate-100 px-4 py-4 sm:px-5">
           <div className="flex items-center gap-2">
-            <BookOpenCheck className="h-5 w-5 text-brand-500" />
+            <BookOpenCheck className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">
                 Student accounts
@@ -121,7 +121,7 @@ export default function StudentsList() {
         </div>
         {loading ? (
           <div className="flex items-center justify-center px-5 py-12 text-sm font-medium text-slate-500">
-            <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
             Loading students
           </div>
         ) : (
@@ -153,7 +153,7 @@ export default function StudentsList() {
                         <span className="inline-flex gap-1">
                           {(s.modules_access || []).map((m) => (
                             <span key={m} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : "All"}
+                              {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : m === "programming" ? "Programming" : "All"}
                             </span>
                           ))}
                         </span>

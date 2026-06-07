@@ -39,7 +39,7 @@ export default function CreateUser() {
     const admin = admins.find((a) => a.id === adminId);
     if (admin) {
       const modules = Array.isArray(admin.modules_access) ? admin.modules_access : [admin.modules_access || "both"];
-      setSelectedAdminModules(modules.join(", ").replace("ai_interview", "AI Interview").replace("aptitude", "Aptitude"));
+      setSelectedAdminModules(modules.join(", ").replace("ai_interview", "AI Interview").replace("aptitude", "Aptitude").replace("programming", "Programming"));
     } else {
       setSelectedAdminModules("");
     }
@@ -90,7 +90,7 @@ export default function CreateUser() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Master admin tools</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Create User
         </h1>
@@ -109,7 +109,7 @@ export default function CreateUser() {
       <div className="mb-4 grid gap-4 sm:mb-6 lg:grid-cols-2 lg:gap-6">
         <form onSubmit={createUser} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-4 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-brand-500" />
+            <Plus className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Single User</h2>
               <p className="mt-1 text-sm text-slate-500">Create one student at a time.</p>
@@ -136,7 +136,7 @@ export default function CreateUser() {
               </select>
             </div>
             {form.assigned_admin ? (
-              <div className="rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
+              <div className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
                 Inherited modules: <span className="font-semibold">{selectedAdminModules}</span>
               </div>
             ) : null}
@@ -144,7 +144,7 @@ export default function CreateUser() {
               <KeyRound size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input className="field pl-8 font-mono text-xs" value={tempPassword} readOnly tabIndex={-1} />
             </div>
-            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 disabled:opacity-70">
+            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:opacity-70">
               <Save size={15} />
               {creating ? "Creating..." : "Create User"}
             </button>
@@ -162,7 +162,7 @@ export default function CreateUser() {
 
         <form onSubmit={importUsers} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-4 flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-brand-500" />
+            <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Bulk Upload Users</h2>
               <p className="mt-1 text-sm text-slate-500">Upload CSV or Excel to create multiple users at once.</p>

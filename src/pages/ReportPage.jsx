@@ -33,7 +33,7 @@ import { downloadReportAtsPdf, downloadReportPdf, getReport } from "@/lib/api";
 function SectionTitle({ icon: Icon, title }) {
   return (
     <div className="mb-4 flex items-center gap-2">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
         <Icon size={15} />
       </span>
       <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
@@ -46,10 +46,10 @@ function GradeCard({ report }) {
   return (
     <section className="mb-5 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
       <div className="flex flex-col gap-6 md:flex-row md:items-center">
-        <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-brand">
+        <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-card">
           <div className="text-center">
             <p className="font-display text-4xl font-bold leading-none">{overall.grade}</p>
-            <p className="mt-1 text-xs text-brand-100">{Math.round(overall.percentage)}%</p>
+            <p className="mt-1 text-xs text-emerald-100">{Math.round(overall.percentage)}%</p>
           </div>
         </div>
         <div className="flex-1">
@@ -59,7 +59,7 @@ function GradeCard({ report }) {
             <span className="font-sans text-xl font-normal text-slate-400"> / {overall.max_score} pts</span>
           </p>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full rounded-full bg-brand-500" style={{ width: `${overall.percentage}%` }} />
+            <div className="h-full rounded-full bg-emerald-500" style={{ width: `${overall.percentage}%` }} />
           </div>
         </div>
         <div className="grid min-w-[190px] gap-2">
@@ -83,7 +83,7 @@ function QuestionBreakdownContent({ report }) {
       {report.question_breakdown.map((item) => (
         <article key={item.number} className="p-5">
           <div className="flex gap-3">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-50 text-xs font-bold text-brand-700">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-xs font-bold text-emerald-700">
               Q{item.number}
             </span>
             <div className="min-w-0 flex-1">
@@ -169,7 +169,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
     return (
       <div className="flex min-h-[70vh] items-center justify-center px-4">
         <div className="flex flex-col items-center gap-4 text-slate-500">
-          <Loader2 size={36} className="animate-spin text-brand-500" />
+          <Loader2 size={36} className="animate-spin text-emerald-500" />
           <p className="text-sm font-medium">Loading interview report</p>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
           <button
             type="button"
             onClick={() => downloadReportPdf(report.session_id)}
-            className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
           >
             <Download size={16} /> Download PDF
           </button>
@@ -262,7 +262,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
           <p className="mt-1 text-xs text-slate-500">resume score</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {report.ats_analysis.skills_found.map((skill) => (
-              <span key={skill} className="rounded-lg bg-brand-50 px-2 py-1 text-xs font-medium text-brand-700">
+              <span key={skill} className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
                 {skill}
               </span>
             ))}
@@ -299,7 +299,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
         <div className="grid gap-3 md:grid-cols-2">
           {report.interview_tips.map((tip, index) => (
             <div key={tip} className="flex gap-3 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
                 {index + 1}
               </span>
               {tip}
@@ -327,7 +327,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
             <button
               type="button"
               onClick={() => setShowQuestionBreakdown(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
             >
               <ListChecks size={16} />
               View full breakdown
@@ -341,7 +341,7 @@ export default function ReportPage({ sessionId: sessionIdOverride, showQuestionB
           <div className="mx-auto flex max-h-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-brand-600">Detailed review</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-emerald-600">Detailed review</p>
                 <h2 className="mt-1 text-xl font-semibold text-slate-950">Question breakdown</h2>
               </div>
               <button

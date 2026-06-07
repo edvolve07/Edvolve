@@ -70,7 +70,7 @@ export default function Signup() {
         <div className="bg-night px-6 py-5 text-white sm:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-md bg-brand">
+              <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-900">
                 <Sparkles className="h-5 w-5" />
               </span>
               <div>
@@ -92,8 +92,8 @@ export default function Signup() {
         </div>
 
         <form onSubmit={submit} className="p-6 sm:p-8">
-          <p className="text-sm font-bold uppercase text-brand">Start your PrepUp journey</p>
-          <h1 className="mt-2 text-3xl font-black text-ink">Create your account</h1>
+          <p className="text-sm font-bold uppercase text-emerald-800">Start your PrepUp journey</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-900">Create your account</h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Create one account for interviews, aptitude practice, reports, and analytics. New users start as students, while lecturer and master admin access is assigned from approved emails.
           </p>
@@ -157,7 +157,7 @@ export default function Signup() {
           </button>
           <p className="mt-5 flex items-center justify-center gap-1 text-center text-sm text-slate-600">
             Already have an account?
-            <Link className="inline-flex items-center gap-1 font-black text-brand" to="/login">
+            <Link className="inline-flex items-center gap-1 font-black text-emerald-800" to="/login">
               Sign in <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </p>

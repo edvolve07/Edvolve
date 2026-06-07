@@ -70,7 +70,7 @@ export default function CreateAdmin() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Master admin tools</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Create Admin
         </h1>
@@ -89,7 +89,7 @@ export default function CreateAdmin() {
       <div className="mb-4 grid gap-4 sm:mb-6 lg:grid-cols-2 lg:gap-6">
         <form onSubmit={createAdmin} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-4 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-brand-500" />
+            <Plus className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Single Admin</h2>
               <p className="mt-1 text-sm text-slate-500">Create one admin at a time.</p>
@@ -107,15 +107,16 @@ export default function CreateAdmin() {
               <input className="field pl-8" placeholder="Organization name" value={form.organization} onChange={(e) => updateField("organization", e.target.value)} />
             </div>
             <select className="field" value={form.modules_access} onChange={(e) => updateField("modules_access", e.target.value)}>
-              <option value="both">Both (AI Interview + Aptitude)</option>
+              <option value="both">All modules</option>
               <option value="ai_interview">AI Interview only</option>
               <option value="aptitude">Aptitude only</option>
+              <option value="programming">Programming only</option>
             </select>
             <div className="relative">
               <KeyRound size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input className="field pl-8 font-mono text-xs" value={tempPassword} readOnly tabIndex={-1} />
             </div>
-            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 disabled:opacity-70">
+            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:opacity-70">
               <Save size={15} />
               {creating ? "Creating..." : "Create Admin"}
             </button>
@@ -132,7 +133,7 @@ export default function CreateAdmin() {
 
         <form onSubmit={importAdmins} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-4 flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-brand-500" />
+            <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Bulk Upload Admins</h2>
               <p className="mt-1 text-sm text-slate-500">Upload CSV or Excel to create multiple admins at once.</p>
@@ -141,9 +142,10 @@ export default function CreateAdmin() {
           <div className="grid gap-3">
             <input className="field" type="file" accept=".csv,.xlsx,.xls" onChange={(e) => setImportForm({ ...importForm, file: e.target.files?.[0] || null })} required />
             <select className="field" value={importForm.modules_access} onChange={(e) => setImportForm({ ...importForm, modules_access: e.target.value })}>
-              <option value="both">Both modules (default)</option>
+              <option value="both">All modules (default)</option>
               <option value="ai_interview">AI Interview only</option>
               <option value="aptitude">Aptitude only</option>
+              <option value="programming">Programming only</option>
             </select>
             <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
               Temp passwords auto-generated as <strong className="font-mono">name@XXXX</strong> for each row.

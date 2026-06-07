@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-brand-50 text-brand-600",
+    brand: "bg-emerald-50 text-emerald-600",
     green: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
     purple: "bg-violet-50 text-violet-600",
@@ -53,7 +53,7 @@ export default function MasterAiUsagePage() {
   if (!usage) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+        <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
         Loading AI API usage
       </div>
     );
@@ -64,7 +64,7 @@ export default function MasterAiUsagePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <section className="mb-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-        <p className="text-sm font-medium text-brand-600">Master admin</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin</p>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-950">
           AI API Usage
         </h1>
@@ -96,7 +96,7 @@ export default function MasterAiUsagePage() {
                   </p>
                   <p className="text-xs text-slate-500">{item.total_tokens || 0} tracked tokens</p>
                 </div>
-                <span className="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700">
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
                   {item.requests} calls
                 </span>
               </div>

@@ -169,7 +169,7 @@ export default function UserManagement() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Master admin tools</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           User Creation and Role Assignment
         </h1>
@@ -187,7 +187,7 @@ export default function UserManagement() {
       <section className="mb-4 grid gap-4 sm:mb-6 lg:grid-cols-2 lg:gap-6">
         <form onSubmit={createUser} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-5 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-brand-500" />
+            <Plus className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Create User</h2>
               <p className="mt-1 text-sm text-slate-500">Add a student, admin, or master admin account.</p>
@@ -233,7 +233,7 @@ export default function UserManagement() {
               <option value="admin">Admin</option>
               <option value="master_admin">Master Admin</option>
             </select>
-            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600">
+            <button disabled={creating} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600">
               <Save size={16} />
               {creating ? "Creating..." : "Create user"}
             </button>
@@ -242,7 +242,7 @@ export default function UserManagement() {
 
         <form onSubmit={importUsers} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-5 flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-brand-500" />
+            <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Bulk Upload Users</h2>
               <p className="mt-1 text-sm text-slate-500">Upload CSV or Excel and apply one role to every row.</p>
@@ -311,7 +311,7 @@ export default function UserManagement() {
       <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card">
         <div className="border-b border-slate-100 px-4 py-4 sm:px-5">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-brand-500" />
+            <Users className="h-5 w-5 text-emerald-500" />
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Users and Role Assignment</h2>
               <p className="mt-1 text-sm text-slate-500">Manage current accounts and their assigned roles.</p>
@@ -320,7 +320,7 @@ export default function UserManagement() {
         </div>
         {loading ? (
           <div className="flex items-center justify-center px-5 py-12 text-sm font-medium text-slate-500">
-            <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
             Loading users
           </div>
         ) : (
@@ -364,7 +364,7 @@ export default function UserManagement() {
                         <span className="inline-flex gap-1">
                           {(user.modules_access || []).map((m) => (
                             <span key={m} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : "All"}
+                              {m === "ai_interview" ? "Interview" : m === "aptitude" ? "Aptitude" : m === "programming" ? "Programming" : "All"}
                             </span>
                           ))}
                         </span>

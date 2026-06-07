@@ -18,7 +18,7 @@ export default function ResultDetails() {
     <section className="page-stack">
       <div className="page-hero">
         <p className="eyebrow">Result Review</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">{data.assessment.title}</h2>
+        <h2 className="mt-2 text-3xl font-black text-slate-900">{data.assessment.title}</h2>
         <p className="text-sm text-slate-500">
           {data.assessment.concept} · {data.assessment.difficulty}
         </p>
@@ -26,7 +26,7 @@ export default function ResultDetails() {
       <ResultSummary attempt={data.attempt} assessment={data.assessment} />
 
       <section className="surface p-5">
-        <h3 className="font-black text-ink">Topic-wise Performance</h3>
+        <h3 className="font-black text-slate-900">Topic-wise Performance</h3>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {data.topic_analytics.map((topic) => (
             <div key={topic.concept} className="rounded-md border border-slate-200 bg-slate-50/70 p-4">
@@ -35,7 +35,7 @@ export default function ResultDetails() {
                 <span>{topic.accuracy}%</span>
               </div>
               <div className="mt-3 h-2 rounded bg-slate-100">
-                <div className="h-2 rounded bg-brand" style={{ width: `${topic.accuracy}%` }} />
+                <div className="h-2 rounded bg-emerald-900" style={{ width: `${topic.accuracy}%` }} />
               </div>
               <p className="mt-2 text-xs text-slate-500">
                 {topic.correct}/{topic.total} correct · Score {topic.score}
@@ -49,7 +49,7 @@ export default function ResultDetails() {
         {data.answers.map((answer, index) => (
           <article key={answer.id} className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-black text-ink">Question {index + 1}</h3>
+              <h3 className="font-black text-slate-900">Question {index + 1}</h3>
               <span className={`badge ${answer.is_correct ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
                 {answer.is_correct ? 'Correct' : 'Incorrect'} · {answer.marks_awarded} marks
               </span>

@@ -85,7 +85,7 @@ function SetupForm({ onStart }) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <p className="text-sm font-medium text-brand-600">Mock interview</p>
+        <p className="text-sm font-medium text-emerald-600">Mock interview</p>
         <h1 className="font-display text-3xl font-semibold text-slate-950">Start a live interview</h1>
         <p className="mt-2 text-sm leading-6 text-slate-500">
           Select your domain and target role, then upload a PDF resume so the questions can match your background.
@@ -104,7 +104,7 @@ function SetupForm({ onStart }) {
                   className={clsx(
                     "rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
                     domain === item
-                      ? "border-brand-300 bg-brand-50 text-brand-700"
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   )}
                 >
@@ -124,7 +124,7 @@ function SetupForm({ onStart }) {
                   className={clsx(
                     "rounded-xl border px-4 py-3 text-left text-sm font-medium transition",
                     role === item && !isCustomRole
-                      ? "border-brand-300 bg-brand-50 text-brand-700"
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                       : "border-slate-200 text-slate-600 hover:bg-slate-50"
                   )}
                 >
@@ -146,7 +146,7 @@ function SetupForm({ onStart }) {
                 className={clsx(
                   "mt-3 w-full rounded-xl border px-4 py-3 text-sm font-medium outline-none transition",
                   isCustomRole
-                    ? "border-brand-300 bg-brand-50 text-brand-700"
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                     : "border-slate-200 text-slate-600"
                 )}
               />
@@ -170,14 +170,14 @@ function SetupForm({ onStart }) {
             }}
             className={clsx(
               "flex min-h-44 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-5 text-center transition",
-              dragging ? "border-brand-400 bg-brand-50" : "border-slate-200 bg-slate-50"
+              dragging ? "border-emerald-400 bg-emerald-50" : "border-slate-200 bg-slate-50"
             )}
           >
             {file ? (
               <>
                 <FileText size={28} className="text-emerald-500" />
                 <p className="max-w-full truncate text-sm font-medium text-slate-800">{file.name}</p>
-                <button onClick={() => setFile(null)} className="text-xs font-semibold text-brand-600">
+                <button onClick={() => setFile(null)} className="text-xs font-semibold text-emerald-600">
                   Replace file
                 </button>
               </>
@@ -185,7 +185,7 @@ function SetupForm({ onStart }) {
               <>
                 <Upload size={28} className="text-slate-400" />
                 <p className="text-sm text-slate-500">Drop your PDF here</p>
-                <label className="cursor-pointer text-sm font-semibold text-brand-600">
+                <label className="cursor-pointer text-sm font-semibold text-emerald-600">
                   Browse files
                   <input
                     type="file"
@@ -207,7 +207,7 @@ function SetupForm({ onStart }) {
           <button
             onClick={submit}
             disabled={!file || loading}
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 py-4 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-4 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : <Mic2 size={18} />}
             {loading ? "Analyzing resume" : "Start interview"}
@@ -318,7 +318,7 @@ function LiveInterview({
                 {recorder.hasCamera ? <Video size={14} /> : <VideoOff size={14} />}
                 {isRecording ? "Recording" : "Live"}
               </div>
-              <div className="absolute bottom-4 left-4 rounded-xl bg-black/55 px-3 py-2 text-xs font-semibold text-brand-200 backdrop-blur">
+              <div className="absolute bottom-4 left-4 rounded-xl bg-black/55 px-3 py-2 text-xs font-semibold text-emerald-200 backdrop-blur">
                 ATS {session.ats_score}
               </div>
             </div>
@@ -333,7 +333,7 @@ function LiveInterview({
               {session.skills_found.length > 0 && (
                 <div className="flex flex-wrap gap-2 border-t border-slate-100 p-5">
                   {session.skills_found.map((skill) => (
-                    <span key={skill} className="rounded-lg bg-brand-50 px-2 py-1 text-xs font-medium text-brand-700">
+                    <span key={skill} className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
                       {skill}
                     </span>
                   ))}
@@ -366,7 +366,7 @@ function LiveInterview({
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {loading ? (
                   <span className="inline-flex items-center gap-2 text-sm text-slate-400">
-                    <Loader2 size={16} className="animate-spin text-brand-400" /> Evaluating answer
+                    <Loader2 size={16} className="animate-spin text-emerald-400" /> Evaluating answer
                   </span>
                 ) : isReviewing ? (
                   <>
@@ -378,7 +378,7 @@ function LiveInterview({
                     </button>
                     <button
                       onClick={recorder.submitAnswer}
-                      className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
+                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
                     >
                       <Send size={16} /> Submit answer
                     </button>
@@ -396,7 +396,7 @@ function LiveInterview({
                 ) : (
                   <button
                     onClick={recorder.startMic}
-                    className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-white shadow-brand transition hover:bg-brand-600"
+                    className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-card transition hover:bg-emerald-600"
                   >
                     <Mic size={22} />
                   </button>
@@ -423,8 +423,8 @@ function LiveInterview({
                 </div>
               )}
               {transcript && (
-                <div className="mb-4 rounded-xl bg-brand-50 p-4 text-sm leading-6 text-brand-900">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-500">Transcript</p>
+                <div className="mb-4 rounded-xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-900">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-emerald-500">Transcript</p>
                   {transcript}
                 </div>
               )}
@@ -452,7 +452,7 @@ function LiveInterview({
               {Array.from({ length: 10 }).map((_, index) => (
                 <span
                   key={index}
-                  className={clsx("h-2 rounded-full", index < questionNumber ? "bg-brand-500" : "bg-slate-200")}
+                  className={clsx("h-2 rounded-full", index < questionNumber ? "bg-emerald-500" : "bg-slate-200")}
                 />
               ))}
             </div>
@@ -596,7 +596,7 @@ export default function InterviewPage() {
         <button
           onClick={openReport}
           disabled={loading}
-          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-6 py-4 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           {loading ? <Loader2 size={18} className="animate-spin" /> : <FileText size={18} />}
           {loading ? "Generating report" : "View report"}

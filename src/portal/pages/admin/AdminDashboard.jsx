@@ -29,7 +29,7 @@ export default function AdminDashboard() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="eyebrow">Admin Overview</p>
-            <h2 className="mt-2 text-3xl font-black text-ink">Assessment command center</h2>
+            <h2 className="mt-2 text-3xl font-black text-slate-900">Assessment command center</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
               Monitor publishing, submissions, pass rates, and student performance from one focused dashboard.
             </p>
@@ -57,12 +57,12 @@ export default function AdminDashboard() {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div>
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-brand" />
-              <h3 className="text-lg font-black text-ink">Student Submission Analytics</h3>
+              <BarChart3 className="h-5 w-5 text-emerald-800" />
+              <h3 className="text-lg font-black text-slate-900">Student Submission Analytics</h3>
             </div>
             <p className="text-sm text-slate-500">Latest submitted attempts across all assessments</p>
           </div>
-          <Link to="/admin/assessments" className="inline-flex items-center gap-1 text-sm font-black text-brand">
+          <Link to="/admin/assessments" className="inline-flex items-center gap-1 text-sm font-black text-emerald-800">
             Manage assessments <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
                 stats.submissions.map((submission) => (
                   <tr key={submission.id} className="hover:bg-slate-50/70">
                     <td>
-                      <p className="font-semibold text-ink">{submission.student_name}</p>
+                      <p className="font-semibold text-slate-900">{submission.student_name}</p>
                       <p className="text-xs text-slate-500">{submission.email}</p>
                     </td>
                     <td className="font-semibold">{submission.assessment_title}</td>
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
                       <p className="text-xs text-slate-500">Pass: {submission.passing_marks}</p>
                     </td>
                     <td>
-                      <span className="font-bold text-ink">{submission.percentage}%</span>
+                      <span className="font-bold text-slate-900">{submission.percentage}%</span>
                     </td>
                     <td>
                       {formatDuration(submission.time_taken_seconds)}

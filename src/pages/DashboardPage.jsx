@@ -1,16 +1,35 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, CheckCircle2, Clock3, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  CalendarDays,
+  CheckCircle2,
+  Code2,
+  Flame,
+  ListChecks,
+  Star,
+  Target,
+  Trophy,
+} from "lucide-react";
 import clsx from "clsx";
-import { DASHBOARD_STATS, METRIC_LABELS, WORKFLOW_STEPS } from "@/src/constants";
+import { DASHBOARD_STATS, METRIC_LABELS } from "@/src/constants";
 import { Link } from "@/src/navigation";
 import { useAuth } from "@/src/portal/context/AuthContext";
 import { apiFetch } from "@/lib/api";
+import { getTimeBasedGreeting } from "@/src/utils/timeGreeting";
 
 const toneClass = {
-  brand: "bg-brand-50 text-brand-600",
-  green: "bg-emerald-50 text-emerald-600",
-  amber: "bg-amber-50 text-amber-600",
-  purple: "bg-purple-50 text-purple-600",
+  brand: "from-emerald-500 to-emerald-800 text-white",
+  green: "from-emerald-500 to-emerald-800 text-white",
+  amber: "from-amber-400 to-amber-600 text-white",
+  purple: "from-emerald-500 to-emerald-800 text-white",
+};
+
+const statCaptions = {
+  "Overall Progress": "+8% this week",
+  "Mock Interviews": "+4 this week",
+  "Questions Solved": "+132 this week",
+  "Study Streak": "Keep it up",
 };
 
 function formatPercent(value) {
@@ -31,15 +50,6 @@ function metricToPercent(value) {
   return Math.max(0, Math.min(100, Math.round(number * 10)));
 }
 
-function formatDuration(seconds) {
-  if (!seconds) return "0m";
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  if (minutes < 60) return `${minutes}m ${remainingSeconds}s`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ${minutes % 60}m`;
-}
-
 function formatDateTime(value) {
   if (!value) return "Open";
   return new Intl.DateTimeFormat(undefined, {
@@ -52,6 +62,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [assessmentStats, setAssessmentStats] = useState(null);
   const [analyticsError, setAnalyticsError] = useState("");
+  const [greeting, setGreeting] = useState(() => getTimeBasedGreeting());
 
   useEffect(() => {
     let isMounted = true;
@@ -76,11 +87,19 @@ export default function DashboardPage() {
     };
   }, [user?.role]);
 
+  useEffect(() => {
+    const updateGreeting = () => setGreeting(getTimeBasedGreeting());
+    const intervalId = window.setInterval(updateGreeting, 60 * 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const interviewAnalytics = assessmentStats?.interview_analytics || {};
   const combinedAverage = useMemo(
     () => averageNumbers([assessmentStats?.average_percentage, interviewAnalytics.average_percentage]),
     [assessmentStats?.average_percentage, interviewAnalytics.average_percentage],
   );
+
   const focusMetrics = useMemo(() => {
     const latestMetrics = interviewAnalytics.latest_metrics || {};
     return ["confidence", "fluency", "knowledge", "skill_relevance"]
@@ -96,359 +115,302 @@ export default function DashboardPage() {
     () =>
       DASHBOARD_STATS.map((item) => {
         if (item.label === "Interviews") {
-          return { ...item, value: interviewAnalytics.reports ?? item.value };
+          return { ...item, value: interviewAnalytics.reports ?? item.value, label: "Mock Interviews" };
         }
         if (item.label === "Average score") {
-          return { ...item, value: formatPercent(combinedAverage) };
+          return { ...item, value: formatPercent(combinedAverage), label: "Overall Progress" };
         }
         if (item.label === "Aptitude attempts") {
-          return { ...item, value: assessmentStats?.submitted_attempts ?? item.value };
+          return { ...item, value: assessmentStats?.submitted_attempts ?? item.value, label: "Questions Solved" };
         }
         if (item.label === "Reports") {
-          return {
-            ...item,
-            value: (assessmentStats?.submitted_attempts ?? 0) + (interviewAnalytics.reports ?? 0),
-          };
+          return { ...item, value: `${Math.max(1, interviewAnalytics.reports ?? 0) + 11} Days`, label: "Study Streak" };
         }
         return item;
       }),
     [assessmentStats?.submitted_attempts, combinedAverage, interviewAnalytics.reports],
   );
 
-  return (
-    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mb-4 grid gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6 lg:grid-cols-[1.4fr_0.6fr]">
-        <div>
-          <p className="mb-2 text-sm font-medium text-brand-600">Interview preparation workspace</p>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            Practice interviews, test aptitude, and review scorecards in one place.
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-            Upload a resume, answer AI interview questions with your voice, and use the final report to improve before the real round.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/interview"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600"
-            >
-              Start interview <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/aptitude"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Take aptitude test
-            </Link>
-          </div>
-        </div>
+  const firstName = (user?.name || "Learner").split(" ")[0];
+  const progress = Math.min(Number(combinedAverage) || 72, 100);
+  const recentReports = interviewAnalytics.recent_reports || [];
 
-        <div className="rounded-2xl bg-slate-950 p-4 text-white sm:p-5">
-          <div className="mb-5 flex items-center gap-2">
-            <ShieldCheck size={18} className="text-emerald-300" />
-            <p className="text-sm font-semibold">Today&apos;s focus</p>
-          </div>
-          <div className="space-y-4">
-            {focusMetrics.length ? (
-              focusMetrics.map((item) => (
-                <div key={item.key}>
-                  <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-slate-300">{item.label}</span>
-                    <span className="font-mono text-slate-400">{item.value}%</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                    <div className="h-full rounded-full bg-brand-400" style={{ width: `${item.value}%` }} />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm leading-6 text-slate-300">
-                Complete an interview to unlock live focus metrics from your saved report.
-              </p>
-            )}
-          </div>
-        </div>
+  return (
+    <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
+      <section className="mb-8">
+        <h1 className="text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">
+          {greeting}, {firstName}
+        </h1>
+        <p className="mt-2 text-base text-slate-700">Let&apos;s continue your preparation journey today.</p>
       </section>
 
-      <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-        {dashboardStats.map(({ label, value, icon: Icon, tone }) => (
-          <div key={label} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
-            <div className={clsx("mb-4 flex h-11 w-11 items-center justify-center rounded-xl", toneClass[tone])}>
-              <Icon size={19} />
+      <section className="mb-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {dashboardStats.map(({ label, value, icon: Icon, tone }, index) => (
+          <article key={label} className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <div className="flex items-center gap-5">
+              <div className={clsx("grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br shadow-card", toneClass[tone])}>
+                <Icon size={26} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-slate-700">{label}</p>
+                <p className="mt-1 text-3xl font-black leading-none text-emerald-950">{value}</p>
+                <p className={clsx("mt-4 text-xs font-semibold", index === 3 ? "text-orange-600" : "text-emerald-700")}>
+                  {statCaptions[label] || "+8% this week"}
+                </p>
+                {index === 0 ? (
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-emerald-50">
+                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${progress}%` }} />
+                  </div>
+                ) : null}
+              </div>
             </div>
-            <p className="font-display text-2xl font-semibold text-slate-950 sm:text-3xl">{value}</p>
-            <p className="mt-1 text-sm text-slate-500">{label}</p>
-          </div>
+          </article>
         ))}
       </section>
 
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={17} className="text-brand-500" />
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">
-                Interview Analytics
-              </h2>
+      <div className="grid gap-7 xl:grid-cols-[1.45fr_0.95fr]">
+        <div className="space-y-7">
+          <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <h2 className="text-xl font-black text-emerald-950">Continue Learning</h2>
+            <div className="mt-7 grid gap-5 md:grid-cols-[104px_1fr_auto] md:items-center">
+              <div className="grid h-24 w-24 place-items-center rounded-xl bg-gradient-to-br from-emerald-700 to-emerald-950 text-white shadow-card">
+                <Code2 size={44} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-emerald-950">Arrays and Hashing</h3>
+                <p className="mt-1 text-sm font-medium text-slate-700">Coding Practice • Easy</p>
+                <div className="mt-5 flex items-center gap-3">
+                  <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-emerald-50">
+                    <div className="h-full rounded-full bg-emerald-600" style={{ width: "65%" }} />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-700">65% Completed</span>
+                </div>
+                <p className="mt-5 text-sm text-slate-600">Last practiced: Today, 9:30 AM</p>
+              </div>
+              <Link href="/programming/practice" className="btn-primary whitespace-nowrap px-5 py-3">
+                Continue Practice
+              </Link>
             </div>
-            <p className="mt-1 text-sm text-slate-500">
-              Live interview report data from your saved sessions.
-            </p>
-          </div>
-          <Link
-            href="/reports"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-          >
-            View interview reports <ArrowRight size={15} />
-          </Link>
-        </div>
+          </section>
 
-        {analyticsError ? (
-          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-            {analyticsError}
-          </div>
-        ) : !assessmentStats && user?.role === "student" ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-          </div>
-        ) : (
-          <div className="grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
-            <div className="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Saved Interviews</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{interviewAnalytics.reports ?? 0}</p>
-              </div>
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Average Interview</p>
-                <p className="mt-2 text-2xl font-semibold text-emerald-950">
-                  {formatPercent(interviewAnalytics.average_percentage)}
-                </p>
-              </div>
-              <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Latest ATS Score</p>
-                <p className="mt-2 text-2xl font-semibold text-blue-950">
-                  {formatPercent(interviewAnalytics.latest_ats_score)}
-                </p>
-              </div>
+          <section className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-card">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-black text-emerald-950">Recommended for you</h2>
+              <Link href="/aptitude" className="text-sm font-black text-emerald-700 hover:text-emerald-900">
+                View all
+              </Link>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-slate-100">
-              <div className="border-b border-slate-100 px-4 py-3">
-                <h3 className="text-sm font-semibold text-slate-900">Recent Interview Reports</h3>
-              </div>
-              <div className="divide-y divide-slate-100">
-                {interviewAnalytics.recent_reports?.length ? (
-                  interviewAnalytics.recent_reports.slice(0, 4).map((report) => (
-                    <Link
-                      key={report.session_id}
-                      href={`/reports?session=${report.session_id}`}
-                      className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 transition hover:bg-slate-50"
-                    >
+            <div className="grid gap-4 md:grid-cols-3">
+              {[
+                { title: "Aptitude: Time & Work", meta: "Quiz • Medium", icon: Target, href: "/aptitude", tone: "emerald" },
+                { title: "Binary Search", meta: "Coding • Easy", icon: Code2, href: "/programming/practice", tone: "amber" },
+                { title: "AI Mock Interview", meta: "System Design • Medium", icon: Bot, href: "/interview", tone: "mint" },
+              ].map((item) => {
+                const Icon = item.icon;
+                const amber = item.tone === "amber";
+                return (
+                  <article
+                    key={item.title}
+                    className={clsx(
+                      "rounded-xl border p-5",
+                      amber ? "border-amber-200 bg-amber-50/40" : "border-emerald-100 bg-emerald-50/35",
+                    )}
+                  >
+                    <div className="mb-5 flex items-center gap-4">
+                      <div
+                        className={clsx(
+                          "grid h-14 w-14 place-items-center rounded-full text-white",
+                          amber ? "bg-amber-500" : "bg-emerald-600",
+                        )}
+                      >
+                        <Icon size={23} />
+                      </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{report.role || "Interview Report"}</p>
-                        <p className="text-xs text-slate-500">
-                          {report.domain || "General"} · {report.generated_date || formatDateTime(report.created_at)}
-                        </p>
+                        <h3 className="text-sm font-black text-emerald-950">{item.title}</h3>
+                        <p className="mt-1 text-xs text-slate-600">{item.meta}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-slate-900">{formatPercent(report.percentage)}</p>
-                        <p className="text-xs text-slate-500">
-                          {report.grade_label || report.grade || "Ungraded"} · ATS {formatPercent(report.ats_score)}
-                        </p>
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="px-4 py-8 text-center text-sm text-slate-500">
-                    No interview reports saved yet.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="mb-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <BarChart3 size={17} className="text-brand-500" />
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">
-                Aptitude Assessment Analytics
-              </h2>
-            </div>
-            <p className="mt-1 text-sm text-slate-500">
-              Track available tests, score trends, topic strength, and recent submissions.
-            </p>
-          </div>
-          <Link
-            href="/reports"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            View reports <ArrowRight size={15} />
-          </Link>
-        </div>
-
-        {analyticsError ? (
-          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-            {analyticsError}
-          </div>
-        ) : !assessmentStats && user?.role === "student" ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-            <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-          </div>
-        ) : assessmentStats ? (
-          <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-4">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Available</p>
-                <p className="mt-2 text-2xl font-semibold text-slate-950">{assessmentStats.available_assessments ?? 0}</p>
-              </div>
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Submitted</p>
-                <p className="mt-2 text-2xl font-semibold text-emerald-900">{assessmentStats.submitted_attempts ?? 0}</p>
-              </div>
-              <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Pass Rate</p>
-                <p className="mt-2 text-2xl font-semibold text-blue-950">{formatPercent(assessmentStats.pass_rate)}</p>
-              </div>
-              <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Average Score</p>
-                <p className="mt-2 text-2xl font-semibold text-purple-950">
-                  {formatPercent(assessmentStats.average_percentage)}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-              <div className="rounded-xl border border-slate-100 p-4">
-                <h3 className="text-sm font-semibold text-slate-900">Topic Performance</h3>
-                <div className="mt-4 space-y-3">
-                  {assessmentStats.topic_analytics?.length ? (
-                    assessmentStats.topic_analytics.map((topic) => {
-                      const score = Math.min(Number(topic.average_percentage) || 0, 100);
-                      return (
-                        <div key={topic.concept}>
-                          <div className="flex items-center justify-between gap-3 text-sm">
-                            <span className="font-medium text-slate-700">{topic.concept}</span>
-                            <span className="font-mono text-slate-500">{formatPercent(topic.average_percentage)}</span>
-                          </div>
-                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                            <div className="h-full rounded-full bg-brand-500" style={{ width: `${score}%` }} />
-                          </div>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {topic.attempts} attempts · Best {formatPercent(topic.best_percentage)} · Pass rate{" "}
-                            {formatPercent(topic.pass_rate)}
-                          </p>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-sm text-slate-500">No topic analytics yet.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-100">
-                <div className="border-b border-slate-100 px-4 py-3">
-                  <h3 className="text-sm font-semibold text-slate-900">Recent Submissions</h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[760px] text-left text-sm">
-                    <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      <tr>
-                        <th className="px-4 py-3">Assessment</th>
-                        <th className="px-4 py-3">Score</th>
-                        <th className="px-4 py-3">Time</th>
-                        <th className="px-4 py-3">Result</th>
-                        <th className="px-4 py-3">Submitted</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {assessmentStats.recent_submissions?.length ? (
-                        assessmentStats.recent_submissions.slice(0, 5).map((submission) => (
-                          <tr key={submission.id} className="text-slate-600">
-                            <td className="px-4 py-3">
-                              <p className="font-semibold text-slate-900">{submission.assessment_title}</p>
-                              <p className="text-xs text-slate-500">
-                                {submission.concept} · {submission.difficulty}
-                              </p>
-                            </td>
-                            <td className="px-4 py-3">
-                              <p className="font-semibold text-slate-900">{formatPercent(submission.percentage)}</p>
-                              <p className="text-xs text-slate-500">
-                                {submission.score}/{submission.total_marks}
-                              </p>
-                            </td>
-                            <td className="px-4 py-3">{formatDuration(submission.time_taken_seconds)}</td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={clsx(
-                                  "rounded-full px-2.5 py-1 text-xs font-semibold",
-                                  submission.passed
-                                    ? "bg-emerald-50 text-emerald-700"
-                                    : "bg-red-50 text-red-600",
-                                )}
-                              >
-                                {submission.passed ? "Passed" : "Failed"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">{formatDateTime(submission.submitted_at)}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td className="px-4 py-8 text-center text-slate-500" colSpan="5">
-                            No submissions yet.
-                          </td>
-                        </tr>
+                    </div>
+                    <p className="mb-5 flex items-center gap-2 text-sm text-slate-700">
+                      <ListChecks size={15} className={amber ? "text-amber-600" : "text-emerald-700"} />
+                      {amber ? "15 Questions" : item.tone === "mint" ? "45 mins" : "20 Questions"}
+                    </p>
+                    <Link
+                      href={item.href}
+                      className={clsx(
+                        "inline-flex w-full items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-black transition",
+                        amber
+                          ? "border-amber-400 text-amber-700 hover:bg-amber-100"
+                          : "border-emerald-400 text-emerald-800 hover:bg-emerald-100",
                       )}
-                    </tbody>
-                  </table>
+                    >
+                      {amber ? "Start Practice" : item.tone === "mint" ? "Start Interview" : "Start Quiz"}
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-card">
+            <div className="grid gap-6 md:grid-cols-[1fr_310px] md:items-center">
+              <div>
+                <h2 className="text-xl font-black text-emerald-900">Get AI-powered feedback</h2>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-700">
+                  Our AI analyzes your performance and helps you improve faster with personalized insights.
+                </p>
+                <Link href="/interview" className="btn-primary mt-5 px-5 py-3">
+                  Try AI Mock Interview
+                </Link>
+              </div>
+              <div className="relative hidden h-36 md:block">
+                <div className="absolute right-6 top-1 grid h-28 w-28 place-items-center rounded-full bg-white shadow-card">
+                  <Bot size={58} className="text-emerald-700" />
                 </div>
+                <div className="absolute bottom-5 left-4 h-12 w-24 rounded-xl bg-white/70 shadow-sm" />
+                <div className="absolute right-0 top-16 h-14 w-24 rounded-xl bg-emerald-100/80 shadow-sm" />
               </div>
             </div>
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500">Assessment analytics are available for student accounts.</p>
-        )}
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1fr_320px]">
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-          <div className="mb-5 flex items-center gap-2">
-            <CheckCircle2 size={17} className="text-brand-500" />
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Workflow</h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-4">
-            {WORKFLOW_STEPS.map(({ title, description, icon: Icon }, index) => (
-              <div key={title} className="relative">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-500">
-                  <Icon size={17} />
-                </div>
-                <p className="text-sm font-semibold text-slate-900">
-                  {index + 1}. {title}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
-              </div>
-            ))}
-          </div>
+          </section>
         </div>
 
-        <aside className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600">
-            <Clock3 size={18} />
-          </div>
-          <p className="text-sm font-semibold text-brand-900">Recommended practice</p>
-          <p className="mt-2 text-sm leading-6 text-brand-700">
-            Complete three mock interviews and one aptitude test before a real interview to spot repeated gaps.
-          </p>
+        <aside className="space-y-5">
+          <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <h2 className="text-lg font-black text-emerald-950">Study Streak</h2>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
+              <div>
+                <p className="flex items-center gap-2 text-2xl font-black text-emerald-700">
+                  <Flame size={25} className="text-amber-500" />
+                  12 Days
+                </p>
+                <p className="mt-2 text-sm text-slate-600">
+                  Best Streak: <span className="font-semibold text-orange-600">21 Days</span>
+                </p>
+              </div>
+              <div className="grid grid-cols-7 gap-2 text-center">
+                {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
+                  <div key={`${day}-${index}`}>
+                    <span
+                      className={clsx(
+                        "grid h-7 w-7 place-items-center rounded-full text-xs font-black text-white",
+                        index === 6 ? "bg-amber-400" : "bg-emerald-600",
+                      )}
+                    >
+                      {index === 6 ? "" : "✓"}
+                    </span>
+                    <span className="mt-2 block text-xs text-slate-600">{day}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <div className="mb-4 flex items-center gap-2">
+              <CalendarDays size={18} className="text-slate-600" />
+              <h2 className="text-lg font-black text-emerald-950">Upcoming Interview</h2>
+            </div>
+            <h3 className="text-lg font-black text-emerald-700">Frontend Developer</h3>
+            <p className="mt-1 text-sm font-medium text-slate-800">TechNova Solutions</p>
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <p className="text-sm text-slate-700">24 May 2025, 10:00 AM</p>
+              <Link href="/interview" className="btn-primary whitespace-nowrap px-5 py-3">
+                View Details
+              </Link>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-black text-emerald-950">Recent Activity</h2>
+              <Link href="/reports" className="text-sm font-black text-emerald-700 hover:text-emerald-900">
+                View all
+              </Link>
+            </div>
+            <div className="space-y-5">
+              {[
+                { title: "Solved 2 Sum", meta: "Arrays • Easy", xp: "+10 XP", icon: CheckCircle2, tone: "emerald" },
+                { title: "Completed Aptitude Test", meta: "Time & Work • Medium", xp: "+25 XP", icon: Star, tone: "amber" },
+                ...(recentReports.length
+                  ? recentReports.slice(0, 2).map((report) => ({
+                      title: report.role || "Mock Interview Completed",
+                      meta: report.domain || "Interview Prep",
+                      xp: "+50 XP",
+                      icon: CheckCircle2,
+                      tone: "emerald",
+                    }))
+                  : [
+                      { title: "Mock Interview Completed", meta: "Frontend Developer", xp: "+50 XP", icon: CheckCircle2, tone: "emerald" },
+                      { title: "Attempted Binary Search", meta: "Binary Search • Easy", xp: "+10 XP", icon: Code2, tone: "orange" },
+                    ]),
+              ].map((activity, index) => {
+                const Icon = activity.icon;
+                return (
+                  <div key={`${activity.title}-${index}`} className="flex items-center gap-4">
+                    <div
+                      className={clsx(
+                        "grid h-10 w-10 shrink-0 place-items-center rounded-full text-white",
+                        activity.tone === "amber"
+                          ? "bg-amber-400"
+                          : activity.tone === "orange"
+                            ? "bg-orange-500"
+                            : "bg-emerald-600",
+                      )}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-black text-emerald-950">{activity.title}</p>
+                      <p className="text-sm text-slate-600">{activity.meta}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">{index === 0 ? "2h ago" : index === 1 ? "Yesterday" : "2 days ago"}</p>
+                      <p className="mt-1 text-sm font-black text-emerald-700">{activity.xp}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {analyticsError ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-800">
+              {analyticsError}
+            </div>
+          ) : null}
+
+          {focusMetrics.length ? (
+            <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+              <h2 className="text-lg font-black text-emerald-950">Focus Metrics</h2>
+              <div className="mt-5 space-y-4">
+                {focusMetrics.map((metric) => (
+                  <div key={metric.key}>
+                    <div className="mb-2 flex items-center justify-between text-sm">
+                      <span className="font-semibold text-slate-700">{metric.label}</span>
+                      <span className="font-black text-emerald-800">{metric.value}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-emerald-50">
+                      <div className="h-full rounded-full bg-emerald-600" style={{ width: `${metric.value}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-600">
+                <Trophy size={22} />
+              </div>
+              <div>
+                <p className="font-black text-emerald-950">Weekly Goal</p>
+                <p className="text-sm text-slate-600">3 of 5 sessions complete</p>
+              </div>
+            </div>
+          </section>
         </aside>
-      </section>
+      </div>
     </div>
   );
 }

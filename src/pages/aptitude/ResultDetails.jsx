@@ -40,7 +40,7 @@ export default function ResultDetails({ attemptId, backPath = "/aptitude/results
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-brand-600">Result review</p>
+          <p className="text-sm font-medium text-emerald-600">Result review</p>
           <h1 className="mt-2 text-3xl font-semibold text-slate-950">{data.assessment.title}</h1>
           <p className="mt-1 text-sm text-slate-500">
             {data.assessment.concept} · {data.assessment.difficulty}
@@ -69,7 +69,7 @@ export default function ResultDetails({ attemptId, backPath = "/aptitude/results
                   <span>{topic.accuracy}%</span>
                 </div>
                 <div className="mt-3 h-2 rounded bg-slate-100">
-                  <div className="h-2 rounded bg-brand" style={{ width: `${topic.accuracy}%` }} />
+                  <div className="h-2 rounded bg-emerald-900" style={{ width: `${topic.accuracy}%` }} />
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
                   {topic.correct}/{topic.total} correct · Score {topic.score}

@@ -19,7 +19,7 @@ export default function StudentAssessments() {
     <section className="page-stack">
       <div className="page-hero">
         <p className="eyebrow">Assessment Library</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Available Assessments</h2>
+        <h2 className="mt-2 text-3xl font-black text-slate-900">Available Assessments</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
           Choose a published assessment and continue with your latest in-progress attempt when available.
         </p>

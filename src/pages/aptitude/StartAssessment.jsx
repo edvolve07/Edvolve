@@ -190,7 +190,7 @@ export default function StartAssessment({ assessmentId }) {
           </div>
           <button
             onClick={() => setStarted(true)}
-            className="btn-primary mt-6 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+            className="btn-primary mt-6 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
           >
             Start
           </button>
@@ -231,7 +231,7 @@ export default function StartAssessment({ assessmentId }) {
                 onClick={() => selectAnswer(question.id, key)}
                 className={`focus-ring flex w-full items-start gap-3 rounded-md border p-4 text-left ${
                   selected === key
-                    ? 'border-brand bg-indigo-50 text-brand shadow-sm'
+                    ? 'border-brand bg-emerald-50 text-emerald-800 shadow-sm'
                     : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
@@ -272,7 +272,7 @@ export default function StartAssessment({ assessmentId }) {
                 onClick={() => setCurrent(index)}
                 className={`h-10 rounded-md border text-sm font-bold ${
                   index === current
-                    ? 'border-brand bg-brand text-white'
+                    ? 'border-brand bg-emerald-900 text-white'
                     : answers[item.id]
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                     : 'border-slate-200 bg-white text-slate-600'

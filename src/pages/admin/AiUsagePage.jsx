@@ -4,7 +4,7 @@ import { apiFetch } from "@/lib/api";
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-brand-50 text-brand-600",
+    brand: "bg-emerald-50 text-emerald-600",
     green: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
     purple: "bg-purple-50 text-purple-600",
@@ -84,7 +84,7 @@ export default function AiUsagePage() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Master admin tools</p>
+        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           AI API Usage
         </h1>
@@ -101,7 +101,7 @@ export default function AiUsagePage() {
 
       {loading ? (
         <div className="flex min-h-[45vh] items-center justify-center text-sm font-medium text-slate-500">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+          <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
           Loading AI usage
         </div>
       ) : (
@@ -128,7 +128,7 @@ export default function AiUsagePage() {
                       <p className="font-semibold text-slate-950">{item.feature.replaceAll("_", " ")}</p>
                       <p className="text-xs text-slate-500">{item.total_tokens || 0} tracked tokens</p>
                     </div>
-                    <span className="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700">
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
                       {item.requests} calls
                     </span>
                   </div>
@@ -141,7 +141,7 @@ export default function AiUsagePage() {
 
           <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
             <div className="mb-5 flex items-center gap-2">
-              <KeyRound className="h-5 w-5 text-brand-500" />
+              <KeyRound className="h-5 w-5 text-emerald-500" />
               <div>
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Provider API Keys</h2>
                 <p className="mt-1 text-sm text-slate-500">
@@ -186,7 +186,7 @@ export default function AiUsagePage() {
                       type="button"
                       disabled={keySaving === provider.id}
                       onClick={() => updateApiKey(provider.id)}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-brand transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                     >
                       <Save size={16} />
                       {keySaving === provider.id ? "Saving..." : "Save"}

@@ -53,7 +53,7 @@ export default function QuestionReview() {
       <div className="page-hero flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Question Review</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">{assessment.title}</h2>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">{assessment.title}</h2>
           <p className="text-sm text-slate-500">
             {questions.length} questions · {assessment.status}
           </p>

@@ -14,7 +14,7 @@ import { apiFetch } from "@/lib/api";
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-brand-50 text-brand-600",
+    brand: "bg-emerald-50 text-emerald-600",
     green: "bg-emerald-50 text-emerald-600",
     amber: "bg-amber-50 text-amber-600",
     purple: "bg-purple-50 text-purple-600",
@@ -57,7 +57,7 @@ export default function MasterAdminDashboard() {
   if (!data) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-500" />
+        <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
         Loading master admin dashboard
       </div>
     );
@@ -70,7 +70,7 @@ export default function MasterAdminDashboard() {
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-6">
-        <p className="text-sm font-medium text-brand-600">Organization control</p>
+        <p className="text-sm font-medium text-emerald-600">Organization control</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
           Master Admin Dashboard
         </h1>
@@ -100,12 +100,12 @@ export default function MasterAdminDashboard() {
           href="/master-admin/users"
           className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5"
         >
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <Users size={19} />
           </div>
           <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">User Management</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">Full user list with role assignment and advanced management.</p>
-          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
+          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
             Open user management <ArrowRight size={15} />
           </span>
         </Link>
@@ -118,7 +118,7 @@ export default function MasterAdminDashboard() {
           </div>
           <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">AI API Usage</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">Review AI calls by feature and provider, then update API keys from one protected page.</p>
-          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-600">
+          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
             Open AI usage <ArrowRight size={15} />
           </span>
         </Link>

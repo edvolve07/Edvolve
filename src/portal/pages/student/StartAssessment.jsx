@@ -196,7 +196,7 @@ export default function StartAssessment() {
       <div className="page-hero flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="eyebrow">Live Assessment</p>
-          <h2 className="mt-1 text-2xl font-black text-ink">{data.assessment.title}</h2>
+          <h2 className="mt-1 text-2xl font-black text-slate-900">{data.assessment.title}</h2>
           <p className="text-sm text-slate-500">
             Question {current + 1} of {data.questions.length} · Warnings {warnings}/3
             {extraTimeMinutes ? ` · Extra time ${extraTimeMinutes}m` : ''}
@@ -211,7 +211,7 @@ export default function StartAssessment() {
 
       <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
         <article className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-lg font-semibold leading-7 text-ink">{question.question_text}</p>
+          <p className="text-lg font-semibold leading-7 text-slate-900">{question.question_text}</p>
           <div className="mt-6 grid gap-3">
             {Object.entries(question.options).map(([key, value]) => (
               <button
@@ -219,7 +219,7 @@ export default function StartAssessment() {
                 onClick={() => selectAnswer(question.id, key)}
                 className={`focus-ring flex items-start gap-3 rounded-md border p-4 text-left ${
                   selected === key
-                    ? 'border-brand bg-indigo-50 text-brand shadow-sm'
+                    ? 'border-brand bg-emerald-50 text-emerald-800 shadow-sm'
                     : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
@@ -251,7 +251,7 @@ export default function StartAssessment() {
         </article>
 
         <aside className="rounded-md border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-28 lg:self-start">
-          <p className="text-sm font-black text-ink">Navigator</p>
+          <p className="text-sm font-black text-slate-900">Navigator</p>
           <div className="mt-4 grid grid-cols-5 gap-2">
             {data.questions.map((item, index) => (
               <button
@@ -259,7 +259,7 @@ export default function StartAssessment() {
                 onClick={() => setCurrent(index)}
                 className={`h-10 rounded-md border text-sm font-bold ${
                   index === current
-                    ? 'border-brand bg-brand text-white'
+                    ? 'border-brand bg-emerald-900 text-white'
                     : answers[item.id]
                       ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                       : 'border-slate-200 bg-white text-slate-600'
