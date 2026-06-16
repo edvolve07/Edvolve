@@ -468,12 +468,12 @@ export default function CodeEditor({
   }
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-zinc-800 bg-black shadow-card ${className}`}>
+    <div className={`flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-black shadow-card ${className}`}>
       <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-2">
         <span className="text-xs font-bold uppercase tracking-wide text-zinc-300">Code</span>
         <span className="font-mono text-xs text-zinc-500">{language}</span>
       </div>
-      <div className="relative flex bg-black" style={{ minHeight }}>
+      <div className="relative flex min-h-0 flex-1 bg-black" style={{ minHeight }}>
         <div
           ref={gutterRef}
           className="code-editor-gutter select-none overflow-hidden border-r border-zinc-900 bg-black px-3 py-4 text-right font-mono text-sm leading-relaxed text-zinc-600"

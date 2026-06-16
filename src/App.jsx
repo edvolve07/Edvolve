@@ -1,6 +1,6 @@
 import { Bell, ChevronDown, Flame, Menu, Search, Sparkles } from "lucide-react";
 import { Navigate, Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AccessRevoked from "@/src/pages/AccessRevoked";
 import AdminsList from "@/src/pages/admin/AdminsList";
 import AptitudePage from "@/src/pages/AptitudePage";
@@ -9,6 +9,7 @@ import InterviewPage from "@/src/pages/InterviewPage";
 import ReportPage from "@/src/pages/ReportPage";
 import ReportsResultsPage from "@/src/pages/ReportsResultsPage";
 import ProfilePage from "@/src/pages/ProfilePage";
+import ResumeBuilderPage from "@/src/pages/ResumeBuilderPage";
 import ResultDetails from "@/src/pages/aptitude/ResultDetails";
 import AdminAptitudeAnalytics from "@/src/pages/admin/AdminAptitudeAnalytics";
 import AdminInterviewAnalytics from "@/src/pages/admin/AdminInterviewAnalytics";
@@ -63,9 +64,17 @@ function AppShell({ children }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const stored = Number(window.localStorage.getItem("app-sidebar-width"));
+    return Number.isFinite(stored) ? Math.min(Math.max(stored, 88), 360) : 288;
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem("app-sidebar-width", String(sidebarWidth));
+  }, [sidebarWidth]);
 
   return (
-    <div className="flex min-h-screen bg-canvas">
+    <div className="flex min-h-screen bg-canvas" style={{ "--app-sidebar-width": `${sidebarWidth}px` }}>
       {sidebarOpen ? (
         <button
           type="button"
@@ -74,8 +83,13 @@ function AppShell({ children }) {
           className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px]"
         />
       ) : null}
-      <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-72">
+      <AppSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        width={sidebarWidth}
+        onWidthChange={setSidebarWidth}
+      />
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-[var(--app-sidebar-width)]">
         <header className="sticky top-0 z-30 flex h-[76px] items-center gap-3 border-b border-emerald-100/60 bg-white/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10">
           <button
             type="button"
@@ -199,6 +213,7 @@ export default function App() {
         <Route path="/report" element={<AppShell><ReportPage /></AppShell>} />
         <Route path="/reports" element={<AppShell><ReportsResultsPage /></AppShell>} />
         <Route path="/reports/results/:attemptId" element={<AppShell><ReportsResultDetailsRoute /></AppShell>} />
+        <Route path="/resume-builder" element={<AppShell><ResumeBuilderPage /></AppShell>} />
         <Route path="/profile" element={<AppShell><ProfilePage /></AppShell>} />
       </Route>
 

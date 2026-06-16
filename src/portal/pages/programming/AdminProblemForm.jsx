@@ -30,8 +30,13 @@ export default function AdminProblemForm() {
     constraints: '',
     input_format: '',
     output_format: '',
+    hints: '',
+    follow_up: '',
     difficulty: 'Easy',
     concept: 'Arrays',
+    tags: '',
+    company_tags: '',
+    is_private_bank: true,
     time_limit: 2,
     memory_limit: 256,
     status: 'draft',
@@ -40,19 +45,34 @@ export default function AdminProblemForm() {
     hidden_test_cases: [emptyTestCase(false)],
     starter_code: emptyStarterCode(),
   });
+  const [editorial, setEditorial] = useState({
+    overview: '',
+    brute_force: '',
+    optimal_approach: '',
+    complexity: '',
+    pitfalls: '',
+  });
 
   useEffect(() => {
     if (!isEdit) return;
-    apiFetch(`/programming/admin/problems/${id}`).then((data) => {
-      const p = data.problem;
+    Promise.all([
+      apiFetch(`/programming/admin/problems/${id}`),
+      apiFetch(`/programming/admin/problems/${id}/editorial`),
+    ]).then(([problemData, editorialData]) => {
+      const p = problemData.problem;
       setForm({
         title: p.title || '',
         description: p.description || '',
         constraints: p.constraints || '',
         input_format: p.input_format || '',
         output_format: p.output_format || '',
+        hints: (p.hints || []).join('\n'),
+        follow_up: p.follow_up || '',
         difficulty: p.difficulty || 'Easy',
         concept: p.concept || 'Arrays',
+        tags: (p.tags || []).join(', '),
+        company_tags: (p.company_tags || []).join(', '),
+        is_private_bank: p.is_private_bank !== false,
         time_limit: p.time_limit || 2,
         memory_limit: p.memory_limit || 256,
         status: p.status || 'draft',
@@ -61,6 +81,15 @@ export default function AdminProblemForm() {
         hidden_test_cases: p.hidden_test_cases?.length ? p.hidden_test_cases : [emptyTestCase(false)],
         starter_code: { ...emptyStarterCode(), ...(p.starter_code || {}) },
       });
+      if (editorialData.editorial) {
+        setEditorial({
+          overview: editorialData.editorial.overview || '',
+          brute_force: editorialData.editorial.brute_force || '',
+          optimal_approach: editorialData.editorial.optimal_approach || '',
+          complexity: editorialData.editorial.complexity || '',
+          pitfalls: (editorialData.editorial.pitfalls || []).join('\n'),
+        });
+      }
       setLoading(false);
     });
   }, [id, isEdit]);
@@ -99,6 +128,10 @@ export default function AdminProblemForm() {
     }));
   }
 
+  function updateEditorialField(key, value) {
+    setEditorial((prev) => ({ ...prev, [key]: value }));
+  }
+
   async function handleSave() {
     setSaving(true);
     try {
@@ -108,15 +141,31 @@ export default function AdminProblemForm() {
         hidden_test_cases: form.hidden_test_cases.filter((tc) => tc.input || tc.output),
       };
 
+      let savedProblem;
       if (isEdit) {
-        await apiFetch(`/programming/admin/problems/${id}`, {
+        const response = await apiFetch(`/programming/admin/problems/${id}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
+        savedProblem = response.problem;
       } else {
-        await apiFetch('/programming/admin/problems', {
+        const response = await apiFetch('/programming/admin/problems', {
           method: 'POST',
           body: JSON.stringify(payload),
+        });
+        savedProblem = response.problem;
+      }
+
+      if (savedProblem?.id && editorial.overview.trim() && editorial.optimal_approach.trim()) {
+        await apiFetch(`/programming/admin/problems/${savedProblem.id}/editorial`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            overview: editorial.overview,
+            brute_force: editorial.brute_force,
+            optimal_approach: editorial.optimal_approach,
+            complexity: editorial.complexity,
+            pitfalls: editorial.pitfalls.split('\n').map((item) => item.trim()).filter(Boolean),
+          }),
         });
       }
       navigate('/admin/programming');
@@ -190,6 +239,33 @@ export default function AdminProblemForm() {
             </select>
           </div>
           <div>
+            <label className="label">Topic Tags</label>
+            <input
+              value={form.tags}
+              onChange={(e) => updateField('tags', e.target.value)}
+              className="input"
+              placeholder="arrays, prefix sum, hashing"
+            />
+          </div>
+          <div>
+            <label className="label">Company Tags</label>
+            <input
+              value={form.company_tags}
+              onChange={(e) => updateField('company_tags', e.target.value)}
+              className="input"
+              placeholder="TCS, Infosys, Amazon"
+            />
+          </div>
+          <label className="md:col-span-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.is_private_bank}
+              onChange={(e) => updateField('is_private_bank', e.target.checked)}
+              className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+            />
+            Keep this problem in my institution question bank
+          </label>
+          <div>
             <label className="label">Time Limit (seconds)</label>
             <input
               type="number"
@@ -234,6 +310,24 @@ export default function AdminProblemForm() {
               value={form.output_format}
               onChange={(e) => updateField('output_format', e.target.value)}
               className="input min-h-[60px]"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="label">Hints</label>
+            <textarea
+              value={form.hints}
+              onChange={(e) => updateField('hints', e.target.value)}
+              className="input min-h-[70px]"
+              placeholder="One hint per line"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="label">Follow-up</label>
+            <textarea
+              value={form.follow_up}
+              onChange={(e) => updateField('follow_up', e.target.value)}
+              className="input min-h-[60px]"
+              placeholder="Can you solve it with a better time or space complexity?"
             />
           </div>
         </div>
@@ -374,6 +468,64 @@ export default function AdminProblemForm() {
                 />
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-black text-emerald-950">Official Editorial</h3>
+              <p className="mt-1 text-xs font-semibold text-emerald-800">
+                Students see this as the official explanation. Overview and optimal approach are required to publish an editorial.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="label">Overview</label>
+              <textarea
+                value={editorial.overview}
+                onChange={(e) => updateEditorialField('overview', e.target.value)}
+                className="input min-h-[80px]"
+                placeholder="Explain the core idea of the problem."
+              />
+            </div>
+            <div>
+              <label className="label">Brute Force</label>
+              <textarea
+                value={editorial.brute_force}
+                onChange={(e) => updateEditorialField('brute_force', e.target.value)}
+                className="input min-h-[100px]"
+                placeholder="Describe the straightforward approach and why it may be slow."
+              />
+            </div>
+            <div>
+              <label className="label">Optimal Approach</label>
+              <textarea
+                value={editorial.optimal_approach}
+                onChange={(e) => updateEditorialField('optimal_approach', e.target.value)}
+                className="input min-h-[100px]"
+                placeholder="Describe the intended solution."
+              />
+            </div>
+            <div>
+              <label className="label">Complexity</label>
+              <textarea
+                value={editorial.complexity}
+                onChange={(e) => updateEditorialField('complexity', e.target.value)}
+                className="input min-h-[70px]"
+                placeholder="Time: O(n), Space: O(1)"
+              />
+            </div>
+            <div>
+              <label className="label">Pitfalls</label>
+              <textarea
+                value={editorial.pitfalls}
+                onChange={(e) => updateEditorialField('pitfalls', e.target.value)}
+                className="input min-h-[70px]"
+                placeholder="One common mistake per line"
+              />
+            </div>
           </div>
         </div>
 

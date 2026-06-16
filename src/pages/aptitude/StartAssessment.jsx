@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "../../navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
 import Timer from "./Timer";
 import {
   getStudentAttemptTime,
+  logProctoringEvent,
   saveStudentAnswer,
   startStudentAssessment,
   submitStudentAttempt,
@@ -41,6 +42,8 @@ export default function StartAssessment({ assessmentId }) {
   const [extraTimeMinutes, setExtraTimeMinutes] = useState(0);
   const [effectiveDurationMinutes, setEffectiveDurationMinutes] = useState(0);
   const [warnings, setWarnings] = useState(0);
+  const [proctorEvents, setProctorEvents] = useState(0);
+  const [snapshotMessage, setSnapshotMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -113,10 +116,24 @@ export default function StartAssessment({ assessmentId }) {
     [data?.attempt?.id, navigate]
   );
 
+  const logEvent = useCallback(
+    async (eventType, metadata = {}) => {
+      if (!data?.attempt?.id) return;
+      try {
+        const payload = await logProctoringEvent(data.attempt.id, eventType, metadata, "aptitude");
+        setProctorEvents(payload.total_events || 0);
+      } catch {
+        setProctorEvents((count) => count + 1);
+      }
+    },
+    [data?.attempt?.id]
+  );
+
   useEffect(() => {
     if (!started) return undefined;
     function onVisibility() {
       if (document.hidden) {
+        logEvent("tab_switch", { question_index: current });
         setWarnings((count) => {
           const next = count + 1;
           if (next >= 3) window.setTimeout(submit, 250);
@@ -126,7 +143,28 @@ export default function StartAssessment({ assessmentId }) {
     }
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
-  }, [started, submit]);
+  }, [current, logEvent, started, submit]);
+
+  useEffect(() => {
+    if (!started) return undefined;
+    function onFullscreenChange() {
+      if (!document.fullscreenElement) {
+        logEvent("fullscreen_exit", { question_index: current });
+      }
+    }
+    function blockClipboard(event) {
+      event.preventDefault();
+      logEvent(event.type, { question_index: current });
+    }
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("copy", blockClipboard);
+    document.addEventListener("paste", blockClipboard);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("copy", blockClipboard);
+      document.removeEventListener("paste", blockClipboard);
+    };
+  }, [current, logEvent, started]);
 
   useEffect(() => {
     if (!started || !data?.attempt?.id) return undefined;
@@ -143,6 +181,35 @@ export default function StartAssessment({ assessmentId }) {
       await saveStudentAnswer(data.attempt.id, questionId, option);
     } catch (err) {
       setError(err.message || "Unable to save answer.");
+    }
+  }
+
+  async function startSecureAssessment() {
+    setStarted(true);
+    try {
+      await document.documentElement.requestFullscreen?.();
+    } catch {
+      await logEvent("fullscreen_exit", { reason: "fullscreen_request_failed" });
+    }
+  }
+
+  async function captureSnapshot() {
+    setSnapshotMessage("");
+    try {
+      const stream = await navigator.mediaDevices?.getUserMedia?.({ video: true });
+      if (!stream) throw new Error("Camera unavailable");
+      const track = stream.getVideoTracks()[0];
+      const settings = track.getSettings?.() || {};
+      track.stop();
+      await logEvent("webcam_snapshot", {
+        question_index: current,
+        width: settings.width || null,
+        height: settings.height || null,
+      });
+      setSnapshotMessage("Snapshot logged.");
+    } catch {
+      setSnapshotMessage("Camera snapshot unavailable.");
+      await logEvent("webcam_snapshot", { question_index: current, failed: true });
     }
   }
 
@@ -184,12 +251,12 @@ export default function StartAssessment({ assessmentId }) {
             <div className="flex gap-2">
               <AlertTriangle className="h-5 w-5 shrink-0" />
               <p>
-                Answers and explanations are hidden during the test. Repeated tab switching may trigger automatic submission.
+                Fullscreen mode is recommended. Tab switching, fullscreen exits, copy/paste, and optional webcam snapshots are logged.
               </p>
             </div>
           </div>
           <button
-            onClick={() => setStarted(true)}
+            onClick={startSecureAssessment}
             className="btn-primary mt-6 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
           >
             Start
@@ -209,7 +276,7 @@ export default function StartAssessment({ assessmentId }) {
           <p className="eyebrow">Live Assessment</p>
           <h2 className="mt-1 text-2xl font-black text-slate-950">{data.assessment.title}</h2>
           <p className="text-sm text-slate-500">
-            Question {current + 1} of {data.questions.length} · Warnings {warnings}/3
+            Question {current + 1} of {data.questions.length} · Warnings {warnings}/3 · Proctor events {proctorEvents}
             {extraTimeMinutes ? ` · Extra time ${extraTimeMinutes}m` : ""}
           </p>
         </div>
@@ -291,6 +358,15 @@ export default function StartAssessment({ assessmentId }) {
             <CheckCircle2 className="h-4 w-4" />
             {submitting ? 'Submitting...' : 'Submit Assessment'}
           </button>
+          <button
+            type="button"
+            onClick={captureSnapshot}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <Camera className="h-4 w-4" />
+            Webcam Snapshot
+          </button>
+          {snapshotMessage ? <p className="mt-2 text-xs font-semibold text-slate-500">{snapshotMessage}</p> : null}
         </aside>
       </div>
     </section>

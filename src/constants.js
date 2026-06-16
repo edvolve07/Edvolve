@@ -28,6 +28,7 @@ export const NAV_ITEMS = [
   // { href: "/programming", label: "AI Mock Interview", icon: Cpu, roles: ["student"], modules: ["both", "programming"] },
   { href: "/programming/assessments", label: "Contests", icon: ClipboardCheck, roles: ["student"], modules: ["both", "programming"] },
   { href: "/reports", label: "Reports", icon: FileText, roles: ["student"], modules: ["both", "aptitude", "ai_interview"] },
+  { href: "/resume-builder", label: "Resume Builder", icon: FilePlus2, roles: ["student"] },
   { href: "/profile", label: "Profile", icon: UserRound, roles: ["student", "admin", "master_admin"] },
   { href: "/admin-dashboard", label: "Admin Dashboard", icon: ShieldCheck, roles: ["admin"] },
   { href: "/admin/analytics/aptitude", label: "Aptitude Analytics", icon: BrainCircuit, roles: ["admin"], modules: ["both", "aptitude"] },

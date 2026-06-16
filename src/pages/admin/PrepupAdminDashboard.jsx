@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, BookOpenCheck, Clock3, Code2, FilePlus2, Loader2, Mic2, Users } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpenCheck, Clock3, Code2, Download, FilePlus2, Loader2, Mic2, Users } from "lucide-react";
 import { Link } from "@/src/navigation";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, downloadAdminExport, downloadCodingProgressExport } from "@/lib/api";
 import { useAuth } from "@/src/portal/context/AuthContext";
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
@@ -134,6 +134,48 @@ export default function PrepupAdminDashboard() {
           <StatCard label="Acceptance Rate" value={`${programmingStats.acceptance_rate ?? 0}%`} icon={BarChart3} tone="slate" />
         </section>
       ) : null}
+
+      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-slate-950">Detailed Export Reports</h2>
+            <p className="mt-1 text-sm text-slate-500">Download Excel or PDF reports for institution review.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            ["student-performance", "Student performance"],
+            ["assessment-results", "Assessment results"],
+            ["interview-readiness", "Interview readiness"],
+            ["inactive-students", "Inactive students"],
+          ].map(([type, label]) => (
+            <div key={type} className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <span className="text-sm font-bold text-slate-700">{label}</span>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => downloadAdminExport(type, "xlsx")} className="rounded-lg bg-white p-2 text-emerald-700 hover:bg-emerald-50" title={`${label} Excel`}>
+                  <Download className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => downloadAdminExport(type, "pdf")} className="rounded-lg bg-white p-2 text-slate-700 hover:bg-slate-100" title={`${label} PDF`}>
+                  PDF
+                </button>
+              </div>
+            </div>
+          ))}
+          {hasProgramming ? (
+            <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <span className="text-sm font-bold text-slate-700">Coding progress</span>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => downloadCodingProgressExport("xlsx")} className="rounded-lg bg-white p-2 text-emerald-700 hover:bg-emerald-50" title="Coding progress Excel">
+                  <Download className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => downloadCodingProgressExport("pdf")} className="rounded-lg bg-white p-2 text-slate-700 hover:bg-slate-100" title="Coding progress PDF">
+                  PDF
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </section>
 
       <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
         {hasAptitude ? (

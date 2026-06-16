@@ -1,14 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Code2, Edit, Trash2 } from 'lucide-react';
+import { Plus, Code2, Edit, Trash2, CalendarDays, Trophy } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { apiFetch } from '../../utils/api';
 
 export default function AdminProblems() {
   const [data, setData] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [challenges, setChallenges] = useState([]);
 
   useEffect(() => {
-    apiFetch('/programming/admin/problems').then(setData);
+    Promise.all([
+      apiFetch('/programming/admin/problems'),
+      apiFetch('/programming/admin/leaderboard'),
+      apiFetch('/programming/admin/challenges'),
+    ]).then(([problemData, leaderboardData, challengeData]) => {
+      setData(problemData);
+      setLeaderboard((leaderboardData.leaderboard || []).slice(0, 5));
+      setChallenges((challengeData.challenges || []).slice(0, 4));
+    });
   }, []);
 
   async function handleToggleStatus(problem) {
@@ -34,6 +44,26 @@ export default function AdminProblems() {
     }));
   }
 
+  async function scheduleChallenge(problem, type) {
+    const days = type === 'weekly' ? 7 : 1;
+    if (!window.confirm(`Set "${problem.title}" as the ${type} challenge?`)) return;
+    const startsAt = new Date();
+    const endsAt = new Date();
+    endsAt.setDate(endsAt.getDate() + days);
+    const response = await apiFetch('/programming/admin/challenges', {
+      method: 'POST',
+      body: JSON.stringify({
+        problem_id: problem.id,
+        type,
+        title: type === 'weekly' ? 'Weekly Challenge' : 'Daily Challenge',
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        status: 'published',
+      }),
+    });
+    setChallenges((prev) => [response.challenge, ...prev].slice(0, 4));
+  }
+
   if (!data) return <LoadingSkeleton label="Loading problems" />;
 
   return (
@@ -47,6 +77,49 @@ export default function AdminProblems() {
           <Plus className="h-4 w-4" />
           Create Problem
         </Link>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-emerald-700" />
+            <h3 className="text-sm font-black text-slate-900">Institution Leaderboard</h3>
+          </div>
+          <div className="mt-4 divide-y divide-slate-100">
+            {leaderboard.length ? leaderboard.map((row) => (
+              <div key={row.student_id} className="flex items-center justify-between gap-3 py-2">
+                <div>
+                  <p className="text-sm font-bold text-slate-800">#{row.rank} {row.student_name}</p>
+                  <p className="text-xs font-semibold text-slate-400">{row.solved} solved / {row.total_submissions} attempts</p>
+                </div>
+                <span className="text-sm font-black text-emerald-700">{row.points}</span>
+              </div>
+            )) : (
+              <p className="py-6 text-center text-sm font-semibold text-slate-500">No coding submissions yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-emerald-700" />
+            <h3 className="text-sm font-black text-slate-900">Active Challenge Queue</h3>
+          </div>
+          <div className="mt-4 space-y-2">
+            {challenges.length ? challenges.map((challenge) => (
+              <div key={challenge.id} className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                <p className="text-sm font-bold text-slate-800">{challenge.title}</p>
+                <p className="text-xs font-semibold text-slate-500">
+                  {challenge.type} / {challenge.problem?.title || 'Problem'} / {challenge.status}
+                </p>
+              </div>
+            )) : (
+              <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-center text-sm font-semibold text-slate-500">
+                No challenges scheduled yet.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="table-shell">
@@ -119,6 +192,20 @@ export default function AdminProblems() {
                           className="rounded-md border border-red-200 bg-white p-2 text-red-600 hover:bg-red-50"
                         >
                           <Trash2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => scheduleChallenge(problem, 'daily')}
+                          className="rounded-md border border-emerald-200 bg-white p-2 text-emerald-700 hover:bg-emerald-50"
+                          title="Set as daily challenge"
+                        >
+                          <CalendarDays className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => scheduleChallenge(problem, 'weekly')}
+                          className="rounded-md border border-amber-200 bg-white p-2 text-amber-700 hover:bg-amber-50"
+                          title="Set as weekly challenge"
+                        >
+                          <Trophy className="h-4 w-4" />
                         </button>
                       </div>
                     </td>

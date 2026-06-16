@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Code2, Search, ChevronRight, BookOpen, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Code2, Search, ChevronRight, BookOpen, AlertTriangle, ArrowLeft, CheckCircle2, Filter } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { apiFetch } from '../../utils/api';
 
@@ -14,6 +14,10 @@ export default function Problems() {
   const { topicName } = useParams();
   const [data, setData] = useState(null);
   const [search, setSearch] = useState('');
+  const [difficulty, setDifficulty] = useState('');
+  const [solved, setSolved] = useState('');
+  const [tag, setTag] = useState('');
+  const [company, setCompany] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -24,11 +28,15 @@ export default function Problems() {
     if (topicName) {
       params.set('concept', topicName);
     }
+    if (difficulty) params.set('difficulty', difficulty);
+    if (solved) params.set('solved', solved);
+    if (tag) params.set('tag', tag);
+    if (company) params.set('company', company);
     const query = params.toString();
     apiFetch(`/programming/student/problems${query ? `?${query}` : ''}`)
       .then(setData)
       .catch((err) => setError(err.message || 'Failed to load problems'));
-  }, [topicName]);
+  }, [topicName, difficulty, solved, tag, company]);
 
   const problems = data?.problems || [];
   const filtered = search
@@ -68,6 +76,48 @@ export default function Problems() {
             className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-800 placeholder-slate-400 shadow-sm transition focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
+          <Filter className="h-4 w-4 text-slate-400" />
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:outline-none"
+          >
+            <option value="">All difficulties</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+          <select
+            value={solved}
+            onChange={(e) => setSolved(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:outline-none"
+          >
+            <option value="">All status</option>
+            <option value="true">Solved</option>
+            <option value="false">Unsolved</option>
+          </select>
+          <select
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:outline-none"
+          >
+            <option value="">All topics</option>
+            {(data?.filters?.tags || []).map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+          <select
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:outline-none"
+          >
+            <option value="">All companies</option>
+            {(data?.filters?.company_tags || []).map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error ? (
@@ -100,12 +150,33 @@ export default function Problems() {
                 </span>
               </div>
               <div className="mt-3">
-                <p className="font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">{problem.title}</p>
+                <div className="flex items-start gap-2">
+                  <p className="font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
+                    {problem.problem_number ? `${problem.problem_number}. ` : ''}{problem.title}
+                  </p>
+                  {problem.solved ? (
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  ) : null}
+                </div>
                 <p className="mt-1 text-xs text-slate-500">{problem.concept}</p>
+                {(problem.tags?.length || problem.company_tags?.length) ? (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {(problem.tags || []).slice(0, 2).map((item) => (
+                      <span key={item} className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">
+                        {item}
+                      </span>
+                    ))}
+                    {(problem.company_tags || []).slice(0, 1).map((item) => (
+                      <span key={item} className="rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-bold text-indigo-700">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                 <span className="text-xs text-slate-400">
-                  {problem.acceptance_rate || 0}% acceptance
+                  {problem.solved ? 'Solved' : problem.attempted ? 'Attempted' : `${problem.acceptance_rate || 0}% acceptance`}
                 </span>
                 <ChevronRight className="h-4 w-4 text-slate-300 transition group-hover:text-emerald-800 group-hover:translate-x-0.5" />
               </div>
