@@ -18,7 +18,7 @@ import CreateAdmin from "@/src/pages/admin/CreateAdmin";
 import CreateUser from "@/src/pages/admin/CreateUser";
 import MasterAdminDashboard from "@/src/pages/admin/MasterAdminDashboard";
 import MasterAdminsList from "@/src/pages/admin/MasterAdminsList";
-import PrepupAdminDashboard from "@/src/pages/admin/PrepupAdminDashboard";
+import EdvolveAdminDashboard from "@/src/pages/admin/EdvolveAdminDashboard";
 import StudentsList from "@/src/pages/admin/StudentsList";
 import UserManagement from "@/src/pages/admin/UserManagement";
 import AppSidebar from "../components/Sidebar";
@@ -218,7 +218,7 @@ export default function App() {
       </Route>
 
       <Route element={<RequireRole roles={["admin"]} />}>
-        <Route path="/admin-dashboard" element={<AppShell><PrepupAdminDashboard /></AppShell>} />
+        <Route path="/admin-dashboard" element={<AppShell><EdvolveAdminDashboard /></AppShell>} />
         <Route path="/admin/dashboard" element={<Navigate to="/admin-dashboard" replace />} />
         <Route path="/admin/analytics/aptitude" element={<AppShell><AdminAptitudeAnalytics /></AppShell>} />
         <Route path="/admin/analytics/interviews" element={<AppShell><AdminInterviewAnalytics /></AppShell>} />

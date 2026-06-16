@@ -35,9 +35,9 @@ const ROLE_CONTENT = {
   master_admin: {
     label: "Master Admin",
     eyebrow: "Company Operations",
-    title: "PrepUp company employee",
+    title: "Edvolve company employee",
     description:
-      "Handles platform operations for PrepUp, including user creation, admin creation, access control, and cross-organization oversight.",
+      "Handles platform operations for Edvolve, including user creation, admin creation, access control, and cross-organization oversight.",
     icon: Crown,
     duties: [
       "Create and manage institution admins",
@@ -67,7 +67,7 @@ const ROLE_CONTENT = {
     eyebrow: "Learner Profile",
     title: "Student preparation account",
     description:
-      "Uses PrepUp to practice aptitude, coding, and interview skills while tracking progress through reports and assessments.",
+      "Uses Edvolve to practice aptitude, coding, and interview skills while tracking progress through reports and assessments.",
     icon: GraduationCap,
     duties: [
       "Solve aptitude and coding practice problems",
@@ -337,7 +337,7 @@ export default function ProfilePage() {
                 <UserRound className="h-5 w-5 text-emerald-700" />
                 <div>
                   <h2 className="text-lg font-black text-emerald-950">Edit Profile</h2>
-                  <p className="text-xs font-semibold text-slate-500">Update the details shown across your PrepUp account.</p>
+                  <p className="text-xs font-semibold text-slate-500">Update the details shown across your Edvolve account.</p>
                 </div>
               </div>
               <button
@@ -426,7 +426,7 @@ export default function ProfilePage() {
                   value={form.profile_bio}
                   onChange={(event) => updateField("profile_bio", event.target.value)}
                   maxLength={500}
-                  placeholder="Add a short goal, background, or focus area for your PrepUp profile."
+                  placeholder="Add a short goal, background, or focus area for your Edvolve profile."
                 />
               </label>
 

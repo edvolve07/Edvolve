@@ -55,7 +55,7 @@ export default function Login() {
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-xl font-black">PrepUp</p>
+              <p className="text-xl font-black">Edvolve</p>
               <p className="text-xs font-semibold text-slate-300">Placement readiness, made sharper</p>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function Login() {
               Train smarter. Test faster. Walk into interviews prepared.
             </h1>
             <p className="mt-4 text-sm leading-6 text-slate-300">
-              PrepUp brings mock interviews &  aptitude practice into one focused workspace.
+              Edvolve brings mock interviews &  aptitude practice into one focused workspace.
             </p>
           </div>
           <div className="mt-8 grid gap-3 text-sm text-slate-300">
@@ -84,11 +84,11 @@ export default function Login() {
               <span className="grid h-10 w-10 place-items-center rounded-md bg-night text-white">
                 <Sparkles className="h-5 w-5" />
               </span>
-              <p className="text-xl font-black text-slate-900">PrepUp</p>
+              <p className="text-xl font-black text-slate-900">Edvolve</p>
             </div>
           </div>
           <p className="mt-8 text-sm font-bold uppercase text-emerald-800 lg:mt-0">Welcome back</p>
-          <h2 className="mt-2 text-3xl font-black text-slate-900">Sign in to PrepUp</h2>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Sign in to Edvolve</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Pick up exactly where you left off: interviews, aptitude practice, scorecards, and progress analytics.
           </p>

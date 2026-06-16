@@ -7,9 +7,9 @@
   <img src="https://img.shields.io/badge/Lucide_Icons-F56565?style=for-the-badge&logo=lucide&logoColor=white" alt="Lucide"/>
 </p>
 
-<h1 align="center">PrepUp Frontend</h1>
+<h1 align="center">Edvolve Frontend</h1>
 <p align="center">
-  <strong>React + Vite frontend for the PrepUp AI-driven placement readiness platform</strong>
+  <strong>React + Vite frontend for the Edvolve AI-driven placement readiness platform</strong>
   <br/>
   Mock interviews · Aptitude tests · Dashboards · Analytics · Reports
 </p>

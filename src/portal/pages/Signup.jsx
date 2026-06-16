@@ -74,7 +74,7 @@ export default function Signup() {
                 <Sparkles className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-lg font-black">PrepUp</p>
+                <p className="text-lg font-black">Edvolve</p>
                 <p className="text-xs font-semibold text-slate-300">Build your placement-ready profile</p>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function Signup() {
         </div>
 
         <form onSubmit={submit} className="p-6 sm:p-8">
-          <p className="text-sm font-bold uppercase text-emerald-800">Start your PrepUp journey</p>
+          <p className="text-sm font-bold uppercase text-emerald-800">Start your Edvolve journey</p>
           <h1 className="mt-2 text-3xl font-black text-slate-900">Create your account</h1>
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Create one account for interviews, aptitude practice, reports, and analytics. New users start as students, while lecturer and master admin access is assigned from approved emails.

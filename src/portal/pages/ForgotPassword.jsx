@@ -36,7 +36,7 @@ export default function ForgotPassword() {
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-lg font-black">PrepUp</p>
+              <p className="text-lg font-black">Edvolve</p>
               <p className="text-xs font-semibold text-slate-300">Password recovery</p>
             </div>
           </div>

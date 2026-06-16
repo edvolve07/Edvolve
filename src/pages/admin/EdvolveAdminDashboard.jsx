@@ -23,7 +23,7 @@ function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   );
 }
 
-export default function PrepupAdminDashboard() {
+export default function EdvolveAdminDashboard() {
   const { user } = useAuth();
   const userModules = user?.modules_access || ["both"];
   const hasAptitude = userModules.includes("aptitude") || userModules.includes("both");

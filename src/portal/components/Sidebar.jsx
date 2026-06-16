@@ -95,7 +95,7 @@ export default function Sidebar({ role }) {
             <ShieldCheck className="h-5 w-5" />
           </span>
           <span>
-            <span className="text-lg font-black">PrepUp</span>
+            <span className="text-lg font-black">Edvolve</span>
             <span className="block text-xs font-semibold text-emerald-100">
               {role === 'admin' ? 'Assessment Admin' : 'Student Prep'}
             </span>
