@@ -86,22 +86,19 @@ export default function MasterAiUsagePage() {
           <p className="mt-1 text-sm text-slate-500">Feature-level AI request volume and token tracking.</p>
         </div>
         <div className="divide-y divide-slate-100">
-          {usage.by_feature?.length ? (
-            usage.by_feature.map((item) => (
-              <div key={item.feature} className="flex items-center justify-between gap-4 px-5 py-4">
-                <div>
-                  <p className="font-semibold text-slate-950">{item.feature.replaceAll("_", " ")}</p>
-                  <p className="text-xs text-slate-500">
-                    {item.successful_requests || 0} successful, {item.failed_requests || 0} failed
-                  </p>
-                  <p className="text-xs text-slate-500">{item.total_tokens || 0} tracked tokens</p>
-                </div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
-                  {item.requests} calls
-                </span>
-              </div>
-            ))
-          ) : (
+              {usage.by_feature?.length ? (
+                usage.by_feature.map((item) => (
+                  <div key={item.feature} className="flex items-center justify-between gap-4 px-5 py-4">
+                    <div>
+                      <p className="font-semibold text-slate-950">{item.feature.replaceAll("_", " ")}</p>
+                      <p className="text-xs text-slate-500">{item.total_tokens || 0} tracked tokens</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+                      {item.requests} calls
+                    </span>
+                  </div>
+                ))
+              ) : (
             <p className="px-5 py-8 text-center text-sm text-slate-500">No AI API usage recorded yet.</p>
           )}
         </div>
