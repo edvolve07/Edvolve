@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Loader2, CheckCircle2, XCircle, Clock, AlertTriangle, BookOpen, Terminal, Beaker, ListChecks, ChevronDown, ChevronRight, History, GraduationCap, MessageSquare, Send, Sparkles, Lock, Lightbulb, Tag, Building2 } from 'lucide-react';
+import { ArrowLeft, Play, Loader2, CheckCircle2, XCircle, Clock, AlertTriangle, BookOpen, Terminal, Beaker, ListChecks, ChevronDown, ChevronRight, FileText, History, GraduationCap, MessageSquare, Send, Lock, Lightbulb, Tag, Building2 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { apiFetch } from '../../utils/api';
 import CodeEditor from '../../components/CodeEditor';
@@ -447,7 +447,7 @@ Output: ${formatExampleOutput(tc)}${tc.explanation ? `\nExplanation: ${tc.explan
               <div className="space-y-5 text-sm leading-6 text-slate-700">
                 {editorial?.is_generated_fallback ? (
                   <div className="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-                    <Sparkles className="h-3.5 w-3.5" />
+                    <FileText className="h-3.5 w-3.5" />
                     Draft guide until admin editorial is added
                   </div>
                 ) : null}

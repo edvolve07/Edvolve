@@ -6,6 +6,7 @@ import {
   Bot,
   BrainCircuit,
   CalendarDays,
+  Check,
   CheckCircle2,
   Code2,
   Download,
@@ -565,7 +566,7 @@ export default function DashboardPage() {
                             : "bg-slate-100 text-slate-400",
                       )}
                     >
-                      {day.active ? "✓" : ""}
+                      {day.active ? <Check className="h-3 w-3" /> : ""}
                     </span>
                     <span className="mt-2 block text-xs text-slate-600">{day.label}</span>
                   </div>

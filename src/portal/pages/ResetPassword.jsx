@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, KeyRound, Sparkles } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, GraduationCap, KeyRound } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
 
@@ -40,7 +40,7 @@ export default function ResetPassword() {
         <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-6 py-5 text-white">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
-              <Sparkles className="h-5 w-5 text-emerald-200" />
+              <GraduationCap className="h-5 w-5 text-emerald-200" />
             </span>
             <div>
               <p className="text-lg font-black">Edvolve</p>

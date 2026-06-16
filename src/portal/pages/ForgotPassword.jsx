@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Sparkles } from 'lucide-react';
+import { ArrowLeft, GraduationCap, Mail } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
 
@@ -28,52 +28,54 @@ export default function ForgotPassword() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 py-8">
-      <section className="w-full max-w-md overflow-hidden rounded-md border border-white/70 bg-white shadow-card-hover">
-        <div className="bg-night px-6 py-5 text-white">
+    <main className="grid min-h-screen place-items-center px-4 py-8" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #f4f7f6 50%, #ecfdf5 100%)' }}>
+      <section className="w-full max-w-md overflow-hidden rounded-2xl shadow-2xl">
+        <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-6 py-5 text-white">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-900">
-              <Sparkles className="h-5 w-5" />
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
+              <GraduationCap className="h-5 w-5 text-emerald-200" />
             </span>
             <div>
               <p className="text-lg font-black">Edvolve</p>
-              <p className="text-xs font-semibold text-slate-300">Password recovery</p>
+              <p className="text-xs font-semibold text-emerald-200/70">Password recovery</p>
             </div>
           </div>
         </div>
 
-        <form onSubmit={submit} className="p-6 sm:p-8">
-          <p className="text-sm font-bold uppercase text-emerald-800">Reset access</p>
-          <h1 className="mt-2 text-3xl font-black text-slate-900">Forgot password?</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Enter your account email and we will send a password reset link that works for 5 minutes.
+        <form onSubmit={submit} className="bg-white p-8 sm:p-10">
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Reset access</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Forgot password?</h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-500">
+            Enter your account email and we will send a reset link that works for 5 minutes.
           </p>
 
           {sent ? (
-            <div className="mt-6 rounded-md border border-emerald-100 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+            <div className="mt-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
               Check your inbox for the reset link. It expires in 5 minutes.
             </div>
           ) : null}
 
-          <label className="mt-6 block text-sm font-bold text-slate-700">
-            Email
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="field"
-              placeholder="you@example.com"
-            />
-          </label>
+          <div className="mt-8">
+            <label className="block">
+              <span className="text-sm font-bold text-slate-700">Email</span>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm transition placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                placeholder="you@example.com"
+              />
+            </label>
+          </div>
 
-          <button disabled={loading} className="btn-primary mt-6 w-full">
+          <button disabled={loading} className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-700 to-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-200 transition-all duration-200 hover:from-emerald-600 hover:to-emerald-500 hover:shadow-emerald-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60">
             <Mail className="h-4 w-4" />
             {loading ? 'Sending link...' : 'Send reset link'}
           </button>
 
-          <Link className="mt-5 inline-flex items-center gap-2 text-sm font-black text-emerald-800" to="/login">
-            <ArrowLeft className="h-3.5 w-3.5" />
+          <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-700 transition hover:text-emerald-800" to="/login">
+            <ArrowLeft className="h-4 w-4" />
             Back to sign in
           </Link>
         </form>

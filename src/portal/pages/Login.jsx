@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Eye, EyeOff, LogIn, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Eye, EyeOff, GraduationCap, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
@@ -52,7 +52,7 @@ export default function Login() {
         <div className="relative hidden flex-col justify-between bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 p-10 text-white lg:flex">
           <div className="flex items-center gap-3">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
-              <Sparkles className="h-6 w-6 text-emerald-200" />
+              <GraduationCap className="h-6 w-6 text-emerald-200" />
             </span>
             <div>
               <p className="text-2xl font-black tracking-tight">Edvolve</p>
@@ -83,7 +83,7 @@ export default function Login() {
           <div className="lg:hidden">
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-800 to-emerald-900 text-white">
-                <Sparkles className="h-5 w-5" />
+                <GraduationCap className="h-5 w-5" />
               </span>
               <p className="text-xl font-black text-emerald-900">Edvolve</p>
             </div>
@@ -144,12 +144,12 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <p className="mt-8 text-center text-sm text-slate-500">
+          {/* <p className="mt-8 text-center text-sm text-slate-500">
             New here?{' '}
             <Link className="font-bold text-emerald-700 transition hover:text-emerald-800" to="/signup">
               Create account <ArrowRight className="ml-0.5 inline h-3.5 w-3.5" />
             </Link>
-          </p>
+          </p> */}
         </form>
       </section>
     </main>

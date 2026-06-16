@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BarChart3, BookOpenCheck, Eye, EyeOff, Mic2, ShieldCheck, Sparkles, UserPlus } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpenCheck, Eye, EyeOff, GraduationCap, Mic2, ShieldCheck, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
@@ -71,7 +71,7 @@ export default function Signup() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
-                <Sparkles className="h-5 w-5 text-emerald-200" />
+                <GraduationCap className="h-5 w-5 text-emerald-200" />
               </span>
               <div>
                 <p className="text-xl font-black">Edvolve</p>

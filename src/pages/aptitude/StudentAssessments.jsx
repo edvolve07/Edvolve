@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BrainCircuit, CalendarDays, CheckCircle2, Clock3, Flame, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
+import { ArrowRight, BrainCircuit, CalendarDays, Check, CheckCircle2, Clock3, Flame, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
 import { useNavigate } from "../../navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
 import { getStudentAssessments, isUnauthorizedError } from "@/lib/api";
@@ -237,7 +237,7 @@ export default function StudentAssessments() {
                   {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
                     <div key={`${day}-${index}`}>
                       <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-black text-white ${index === 6 ? "bg-amber-400" : "bg-emerald-600"}`}>
-                        {index === 6 ? "" : "✓"}
+                        {index === 6 ? "" : <Check className="h-3 w-3" />}
                       </span>
                       <span className="mt-2 block text-xs text-slate-600">{day}</span>
                     </div>
