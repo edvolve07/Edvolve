@@ -55,6 +55,12 @@ function CreateAdminForm({ institutionId, onCreated }) {
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
+  useEffect(() => {
+    if (!result) return;
+    const t = setTimeout(() => setResult(null), 2000);
+    return () => clearTimeout(t);
+  }, [result]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
@@ -64,7 +70,7 @@ function CreateAdminForm({ institutionId, onCreated }) {
         method: "POST",
         body: JSON.stringify({ ...form, institutionId }),
       });
-      setResult({ type: "success", message: `Admin created`, tempPassword: data.temp_password, email: form.email });
+      setResult({ type: "success", message: `Admin created`, tempPassword: data.temp_password, email: form.email, email_sent: data.email_sent });
       setForm({ name: "", email: "", phone: "" });
       onCreated();
     } catch (err) {
@@ -135,6 +141,9 @@ function CreateAdminForm({ institutionId, onCreated }) {
                   </p>
                 </div>
               ) : null}
+              <p className={`mt-2 text-xs ${result.email_sent ? "text-emerald-600" : "text-amber-600"}`}>
+                {result.email_sent ? "Email sent with login details." : "Email could not be sent (SMTP not configured)."}
+              </p>
             </div>
             <button type="button" onClick={() => setResult(null)} className="text-slate-400 hover:text-slate-600">
               <X size={16} />
@@ -196,6 +205,12 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
+  useEffect(() => {
+    if (!result) return;
+    const t = setTimeout(() => setResult(null), 2000);
+    return () => clearTimeout(t);
+  }, [result]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
@@ -211,7 +226,7 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
           assigned_admin: form.assigned_admin || null,
         }),
       });
-      setResult({ type: "success", message: `Student created`, tempPassword: data.temp_password, email: form.email, adminName: data.user?.assigned_admin_name });
+      setResult({ type: "success", message: `Student created`, tempPassword: data.temp_password, email: form.email, adminName: data.user?.assigned_admin_name, email_sent: data.email_sent });
       setForm({ name: "", email: "", phone: "", assigned_admin: "" });
       onCreated();
     } catch (err) {
@@ -284,6 +299,9 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
                   </p>
                 </div>
               ) : null}
+              <p className={`mt-2 text-xs ${result.email_sent ? "text-emerald-600" : "text-amber-600"}`}>
+                {result.email_sent ? "Email sent with login details." : "Email could not be sent (SMTP not configured)."}
+              </p>
             </div>
             <button type="button" onClick={() => setResult(null)} className="text-slate-400 hover:text-slate-600">
               <X size={16} />
@@ -378,7 +396,7 @@ export default function InstitutionDetail() {
       await apiFetch(`/api/master/users/${deleteTarget.id}`, { method: "DELETE" });
       setAdmins((prev) => prev.filter((a) => a.id !== deleteTarget.id));
       setStudents((prev) => prev.filter((s) => s.id !== deleteTarget.id));
-      loadInstitution();
+      refreshAdmins();
     } catch (err) {
       alert(err.message || "Unable to delete user.");
     } finally {
@@ -401,6 +419,18 @@ export default function InstitutionDetail() {
       })
       .catch((err) => setError(err.message || "Unable to load institution details."))
       .finally(() => setLoading(false));
+  }
+
+  function refreshAdmins() {
+    Promise.all([
+      apiFetch(`/api/institutions/${id}/analytics`),
+      apiFetch(`/api/institutions/${id}/admins`),
+    ])
+      .then(([analyticsData, adminsData]) => {
+        setAnalytics(analyticsData.analytics);
+        setAdmins(adminsData.admins || []);
+      })
+      .catch(() => {});
   }
 
   function loadStudents() {
@@ -518,7 +548,7 @@ export default function InstitutionDetail() {
           </div>
           {showCreateAdmin ? (
             <div className="border-b border-slate-100 px-5 py-4">
-              <CreateAdminForm institutionId={id} onCreated={loadInstitution} />
+              <CreateAdminForm institutionId={id} onCreated={refreshAdmins} />
             </div>
           ) : null}
           <div className="divide-y divide-slate-100">
