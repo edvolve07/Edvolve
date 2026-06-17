@@ -50,8 +50,8 @@ function ModuleBadge({ enabled, label }) {
 
 function CreateAdminForm({ institutionId, onCreated }) {
   const [mode, setMode] = useState("single");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", modules_access: "both" });
-  const [importForm, setImportForm] = useState({ file: null, modules_access: "both" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [importForm, setImportForm] = useState({ file: null });
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -65,7 +65,7 @@ function CreateAdminForm({ institutionId, onCreated }) {
         body: JSON.stringify({ ...form, institutionId }),
       });
       setResult({ type: "success", message: `Admin created`, tempPassword: data.temp_password, email: form.email });
-      setForm({ name: "", email: "", phone: "", modules_access: "both" });
+      setForm({ name: "", email: "", phone: "" });
       onCreated();
     } catch (err) {
       setResult({ type: "error", message: err.message });
@@ -82,7 +82,6 @@ function CreateAdminForm({ institutionId, onCreated }) {
     try {
       const body = new FormData();
       body.append("file", importForm.file);
-      body.append("modules_access", importForm.modules_access);
       body.append("institutionId", institutionId);
       const data = await apiFetch("/api/master/admins/import", { method: "POST", body });
       const errCount = data.errors?.length || 0;
@@ -90,7 +89,7 @@ function CreateAdminForm({ institutionId, onCreated }) {
         type: "success",
         message: `${data.created} admin(s) created from ${data.total_rows} row(s)${errCount ? `, ${errCount} error(s)` : ""}`,
       });
-      setImportForm({ file: null, modules_access: "both" });
+      setImportForm({ file: null });
       e.target.reset();
       onCreated();
     } catch (err) {
@@ -158,13 +157,6 @@ function CreateAdminForm({ institutionId, onCreated }) {
               <input className="field pl-8" placeholder="Phone" value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
             </div>
-            <select className="field" value={form.modules_access}
-              onChange={(e) => setForm((p) => ({ ...p, modules_access: e.target.value }))}>
-              <option value="both">All modules</option>
-              <option value="aptitude">Aptitude only</option>
-              <option value="ai_interview">AI Interview only</option>
-              <option value="programming">Programming only</option>
-            </select>
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button disabled={saving}
@@ -179,13 +171,6 @@ function CreateAdminForm({ institutionId, onCreated }) {
           <div className="grid gap-3">
             <input className="field" type="file" accept=".csv,.xlsx,.xls"
               onChange={(e) => setImportForm((p) => ({ ...p, file: e.target.files?.[0] || null }))} required />
-            <select className="field" value={importForm.modules_access}
-              onChange={(e) => setImportForm((p) => ({ ...p, modules_access: e.target.value }))}>
-              <option value="both">All modules (default)</option>
-              <option value="aptitude">Aptitude only</option>
-              <option value="ai_interview">AI Interview only</option>
-              <option value="programming">Programming only</option>
-            </select>
             <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
               Columns: <span className="font-semibold text-slate-700">name</span>, <span className="font-semibold text-slate-700">email</span>,{" "}
               <span className="font-semibold text-slate-700">phone</span>, <span className="font-semibold text-slate-700">organization</span>

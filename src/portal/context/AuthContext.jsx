@@ -37,13 +37,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    function onAuthCleared() {
-      setUser(null);
-      setRevoked(false);
-    }
-    window.addEventListener("auth-cleared", onAuthCleared);
     refresh();
-    return () => window.removeEventListener("auth-cleared", onAuthCleared);
   }, [refresh]);
 
   const loginWithToken = useCallback((token, nextUser) => {
