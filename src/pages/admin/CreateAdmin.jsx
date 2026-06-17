@@ -11,8 +11,9 @@ function generateTempPassword(name) {
 }
 
 export default function CreateAdmin() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", organization: "", modules_access: "both" });
-  const [importForm, setImportForm] = useState({ file: null, modules_access: "both" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", organization: "", modules_access: "both", institutionId: "" });
+  const [importForm, setImportForm] = useState({ file: null, modules_access: "both", institutionId: "" });
+  const [institutions, setInstitutions] = useState([]);
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
@@ -21,6 +22,12 @@ export default function CreateAdmin() {
   const [emailHelp, setEmailHelp] = useState("");
 
   const tempPassword = useMemo(() => generateTempPassword(form.name), [form.name]);
+
+  useEffect(() => {
+    apiFetch("/api/master/institutions-list")
+      .then((data) => setInstitutions(data.institutions || []))
+      .catch(() => {});
+  }, []);
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -38,7 +45,7 @@ export default function CreateAdmin() {
       });
       setResult(res);
       setEmailHelp(res.email_sent ? "Credentials sent to admin's email." : "Email service not configured. Share the temp password manually.");
-      setForm({ name: "", email: "", phone: "", organization: "", modules_access: "both" });
+      setForm({ name: "", email: "", phone: "", organization: "", modules_access: "both", institutionId: "" });
     } catch (err) {
       setError(err.message || "Unable to create admin.");
     } finally {
@@ -106,6 +113,15 @@ export default function CreateAdmin() {
               <Building2 size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input className="field pl-8" placeholder="Organization name" value={form.organization} onChange={(e) => updateField("organization", e.target.value)} />
             </div>
+            <div className="relative">
+              <Building2 size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.institutionId} onChange={(e) => updateField("institutionId", e.target.value)}>
+                <option value="">Select institution</option>
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>{inst.name} ({inst.code})</option>
+                ))}
+              </select>
+            </div>
             <select className="field" value={form.modules_access} onChange={(e) => updateField("modules_access", e.target.value)}>
               <option value="both">All modules</option>
               <option value="ai_interview">AI Interview only</option>
@@ -141,6 +157,15 @@ export default function CreateAdmin() {
           </div>
           <div className="grid gap-3">
             <input className="field" type="file" accept=".csv,.xlsx,.xls" onChange={(e) => setImportForm({ ...importForm, file: e.target.files?.[0] || null })} required />
+            <div className="relative">
+              <Building2 size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={importForm.institutionId} onChange={(e) => setImportForm({ ...importForm, institutionId: e.target.value })}>
+                <option value="">Select institution</option>
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>{inst.name} ({inst.code})</option>
+                ))}
+              </select>
+            </div>
             <select className="field" value={importForm.modules_access} onChange={(e) => setImportForm({ ...importForm, modules_access: e.target.value })}>
               <option value="both">All modules (default)</option>
               <option value="ai_interview">AI Interview only</option>

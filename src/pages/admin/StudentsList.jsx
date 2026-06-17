@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { BookOpenCheck, Loader2, Search, Users } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, BookOpenCheck, Loader2, Search, Users } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 function formatDateTime(value) {
@@ -11,6 +12,9 @@ function formatDateTime(value) {
 }
 
 export default function StudentsList() {
+  const [searchParams] = useSearchParams();
+  const institutionId = searchParams.get("institution_id") || "";
+  const [institution, setInstitution] = useState(null);
   const [students, setStudents] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,9 +25,12 @@ export default function StudentsList() {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    const params = new URLSearchParams({ role: "student", limit: "200" });
+    if (institutionId) params.set("institution_id", institutionId);
+    const adminParams = institutionId ? `?institutionId=${institutionId}` : "";
     Promise.all([
-      apiFetch("/api/master/users?role=student&limit=200"),
-      apiFetch("/api/master/admins-list"),
+      apiFetch(`/api/master/users?${params.toString()}`),
+      apiFetch(`/api/master/admins-list${adminParams}`),
     ])
       .then(([userPayload, adminPayload]) => {
         if (active) {
@@ -37,8 +44,15 @@ export default function StudentsList() {
       .finally(() => {
         if (active) setLoading(false);
       });
+    if (institutionId) {
+      apiFetch(`/api/institutions/${institutionId}`)
+        .then((data) => { if (active) setInstitution(data.institution); })
+        .catch(() => {});
+    } else {
+      setInstitution(null);
+    }
     return () => { active = false; };
-  }, []);
+  }, [institutionId]);
 
   function filteredStudents() {
     let list = students;
@@ -63,12 +77,20 @@ export default function StudentsList() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
+        {institution ? (
+          <Link to={`/master-admin/institutions/${institutionId}`}
+            className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+            <ArrowLeft size={14} /> Back to {institution.name}
+          </Link>
+        ) : null}
         <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          Students
+          {institution ? `${institution.name} — Students` : "Students"}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          View all student accounts. Filter by assigned admin to see students under a specific administrator.
+          {institution
+            ? `Student accounts under ${institution.name} (${institution.code}).`
+            : "View all student accounts. Filter by assigned admin to see students under a specific administrator."}
         </p>
       </section>
 
@@ -126,10 +148,11 @@ export default function StudentsList() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Institution</th>
                   <th className="px-4 py-3">Phone</th>
                   <th className="px-4 py-3">Organization</th>
                   <th className="px-4 py-3">Modules</th>
@@ -147,6 +170,7 @@ export default function StudentsList() {
                         <p className="font-semibold text-slate-950">{s.name}</p>
                         <p className="text-xs text-slate-500">{s.email}</p>
                       </td>
+                      <td className="px-4 py-3 text-xs font-medium">{s.institution_name || "—"}</td>
                       <td className="px-4 py-3 text-xs">{s.phone || "—"}</td>
                       <td className="px-4 py-3 text-xs">{s.organization || "—"}</td>
                       <td className="px-4 py-3">
@@ -173,7 +197,7 @@ export default function StudentsList() {
                 })}
                 {!visible.length ? (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-500" colSpan="7">
+                    <td className="px-4 py-8 text-center text-slate-500" colSpan="8">
                       No students found.
                     </td>
                   </tr>

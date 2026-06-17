@@ -11,8 +11,9 @@ function generateTempPassword(name) {
 }
 
 export default function CreateUser() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", organization: "", assigned_admin: "" });
-  const [importForm, setImportForm] = useState({ file: null, assigned_admin: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", organization: "", institutionId: "", assigned_admin: "" });
+  const [importForm, setImportForm] = useState({ file: null, institutionId: "", assigned_admin: "" });
+  const [institutions, setInstitutions] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [selectedAdminModules, setSelectedAdminModules] = useState("both");
   const [creating, setCreating] = useState(false);
@@ -29,10 +30,22 @@ export default function CreateUser() {
   }
 
   useEffect(() => {
-    apiFetch("/api/master/admins-list")
-      .then((data) => setAdmins(data.admins || []))
+    apiFetch("/api/master/institutions-list")
+      .then((data) => setInstitutions(data.institutions || []))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!form.institutionId) {
+      apiFetch("/api/master/admins-list")
+        .then((data) => setAdmins(data.admins || []))
+        .catch(() => {});
+      return;
+    }
+    apiFetch(`/api/master/admins-list?institutionId=${form.institutionId}`)
+      .then((data) => setAdmins(data.admins || []))
+      .catch(() => {});
+  }, [form.institutionId]);
 
   function handleAdminChange(adminId) {
     setForm((prev) => ({ ...prev, assigned_admin: adminId }));
@@ -43,6 +56,11 @@ export default function CreateUser() {
     } else {
       setSelectedAdminModules("");
     }
+  }
+
+  function handleInstitutionChange(instId) {
+    setForm((prev) => ({ ...prev, institutionId: instId, assigned_admin: "" }));
+    setSelectedAdminModules("");
   }
 
   async function createUser(event) {
@@ -127,10 +145,19 @@ export default function CreateUser() {
               <input className="field pl-8" placeholder="Organization name" value={form.organization} onChange={(e) => updateField("organization", e.target.value)} />
             </div>
             <div className="relative">
+              <Building2 size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.institutionId} onChange={(e) => handleInstitutionChange(e.target.value)}>
+                <option value="">Select institution</option>
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>{inst.name} ({inst.code})</option>
+                ))}
+              </select>
+            </div>
+            <div className="relative">
               <UserCog size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <select className="field pl-8" value={form.assigned_admin} onChange={(e) => handleAdminChange(e.target.value)}>
-                <option value="">Select admin (for module inheritance)</option>
-                {admins.map((a) => (
+                <option value="">{form.institutionId ? "Select admin from institution" : "Select institution first"}</option>
+                {admins.filter((a) => !form.institutionId || a.institutionId === form.institutionId).map((a) => (
                   <option key={a.id} value={a.id}>{a.name} ({a.email})</option>
                 ))}
               </select>
@@ -170,6 +197,15 @@ export default function CreateUser() {
           </div>
           <div className="grid gap-3">
             <input className="field" type="file" accept=".csv,.xlsx,.xls" onChange={(e) => setImportForm({ ...importForm, file: e.target.files?.[0] || null })} required />
+            <div className="relative">
+              <Building2 size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={importForm.institutionId} onChange={(e) => setImportForm({ ...importForm, institutionId: e.target.value })}>
+                <option value="">Select institution</option>
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>{inst.name} ({inst.code})</option>
+                ))}
+              </select>
+            </div>
             <div className="relative">
               <UserCog size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <select className="field pl-8" value={importForm.assigned_admin} onChange={(e) => setImportForm({ ...importForm, assigned_admin: e.target.value })}>

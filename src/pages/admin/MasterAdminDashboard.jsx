@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  BarChart3,
-  BookOpenCheck,
-  Crown,
+  Building2,
   Cpu,
   Loader2,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import { Link } from "@/src/navigation";
@@ -64,7 +61,6 @@ export default function MasterAdminDashboard() {
   }
 
   const totals = data.totals || {};
-  const usageTotals = data.ai_usage?.totals || {};
 
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 space-y-4 sm:space-y-6">
@@ -75,38 +71,29 @@ export default function MasterAdminDashboard() {
           Master Admin Dashboard
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          Platform overview with usage statistics and quick links.
+          Platform overview with key metrics.
         </p>
       </section>
 
       {/* Stats */}
-      <section className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         <StatCard label="Total users" value={totals.users} icon={Users} />
-        <StatCard label="Students" value={totals.students} icon={BookOpenCheck} tone="green" />
-        <StatCard label="Admins" value={totals.admins} icon={ShieldCheck} tone="amber" />
-        <StatCard label="Master admins" value={totals.master_admins} icon={Crown} tone="purple" />
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-        <StatCard label="AI requests, 30d" value={usageTotals.requests} icon={Cpu} />
-        <StatCard label="Successful calls" value={usageTotals.successful_requests} icon={BarChart3} tone="green" />
-        <StatCard label="Failed calls" value={usageTotals.failed_requests} icon={ShieldCheck} tone="amber" />
-        <StatCard label="Tracked tokens" value={usageTotals.total_tokens} icon={Cpu} tone="purple" />
+        <StatCard label="Total institutions" value={totals.institutions} icon={Building2} tone="green" />
       </section>
 
       {/* Quick Links */}
       <section className="grid gap-3 sm:gap-4 lg:grid-cols-2">
         <Link
-          href="/master-admin/users"
+          href="/master-admin/institutions"
           className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <Users size={19} />
+            <Building2 size={19} />
           </div>
-          <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">User Management</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">Full user list with role assignment and advanced management.</p>
+          <h2 className="font-display text-lg font-semibold text-slate-950 sm:text-xl">Institutions</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Manage institutions, their module access, admins, and students.</p>
           <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600">
-            Open user management <ArrowRight size={15} />
+            Open institutions <ArrowRight size={15} />
           </span>
         </Link>
         <Link

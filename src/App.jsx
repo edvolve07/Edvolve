@@ -16,6 +16,8 @@ import AdminInterviewAnalytics from "@/src/pages/admin/AdminInterviewAnalytics";
 import AiUsagePage from "@/src/pages/admin/AiUsagePage";
 import CreateAdmin from "@/src/pages/admin/CreateAdmin";
 import CreateUser from "@/src/pages/admin/CreateUser";
+import InstitutionsPage from "@/src/pages/admin/Institutions";
+import InstitutionDetailPage from "@/src/pages/admin/InstitutionDetail";
 import MasterAdminDashboard from "@/src/pages/admin/MasterAdminDashboard";
 import MasterAdminsList from "@/src/pages/admin/MasterAdminsList";
 import EdvolveAdminDashboard from "@/src/pages/admin/EdvolveAdminDashboard";
@@ -238,6 +240,8 @@ export default function App() {
         <Route path="/master-admin/students" element={<AppShell><StudentsList /></AppShell>} />
         <Route path="/master-admin/admins" element={<AppShell><AdminsList /></AppShell>} />
         <Route path="/master-admin/master-admins" element={<AppShell><MasterAdminsList /></AppShell>} />
+        <Route path="/master-admin/institutions" element={<AppShell><InstitutionsPage /></AppShell>} />
+        <Route path="/master-admin/institutions/:id" element={<AppShell><InstitutionDetailPage /></AppShell>} />
         <Route path="/master-admin/create-admin" element={<AppShell><CreateAdmin /></AppShell>} />
         <Route path="/master-admin/create-user" element={<AppShell><CreateUser /></AppShell>} />
 

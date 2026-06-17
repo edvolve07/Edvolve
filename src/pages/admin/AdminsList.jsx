@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Loader2, Search, ShieldCheck } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, ChevronDown, Loader2, Search, ShieldCheck } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 function formatDateTime(value) {
@@ -24,6 +25,9 @@ function moduleLabel(modules) {
 }
 
 export default function AdminsList() {
+  const [searchParams] = useSearchParams();
+  const institutionId = searchParams.get("institution_id") || "";
+  const [institution, setInstitution] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,7 +40,9 @@ export default function AdminsList() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    apiFetch("/api/master/users?role=admin&limit=200")
+    const params = new URLSearchParams({ role: "admin", limit: "200" });
+    if (institutionId) params.set("institution_id", institutionId);
+    apiFetch(`/api/master/users?${params.toString()}`)
       .then((payload) => {
         if (active) setAdmins(payload.users || []);
       })
@@ -46,8 +52,15 @@ export default function AdminsList() {
       .finally(() => {
         if (active) setLoading(false);
       });
+    if (institutionId) {
+      apiFetch(`/api/institutions/${institutionId}`)
+        .then((data) => { if (active) setInstitution(data.institution); })
+        .catch(() => {});
+    } else {
+      setInstitution(null);
+    }
     return () => { active = false; };
-  }, []);
+  }, [institutionId]);
 
   useEffect(() => {
     if (openDropdown === null) return;
@@ -103,12 +116,20 @@ export default function AdminsList() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
+        {institution ? (
+          <Link to={`/master-admin/institutions/${institutionId}`}
+            className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+            <ArrowLeft size={14} /> Back to {institution.name}
+          </Link>
+        ) : null}
         <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
         <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          Admins
+          {institution ? `${institution.name} — Admins` : "Admins"}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          View all admin accounts and their module access.
+          {institution
+            ? `Admin accounts under ${institution.name} (${institution.code}).`
+            : "View all admin accounts and their module access."}
         </p>
       </section>
 
@@ -151,10 +172,11 @@ export default function AdminsList() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left text-sm">
+            <table className="w-full min-w-[800px] text-left text-sm">
               <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">Admin</th>
+                  <th className="px-4 py-3">Institution</th>
                   <th className="px-4 py-3">Phone</th>
                   <th className="px-4 py-3">Organization</th>
                   <th className="px-4 py-3">Modules</th>
@@ -171,6 +193,7 @@ export default function AdminsList() {
                         <p className="font-semibold text-slate-950">{a.name}</p>
                         <p className="text-xs text-slate-500">{a.email}</p>
                       </td>
+                      <td className="px-4 py-3 text-xs font-medium">{a.institution_name || "—"}</td>
                       <td className="px-4 py-3 text-xs">{a.phone || "—"}</td>
                       <td className="px-4 py-3 text-xs">{a.organization || "—"}</td>
                       <td className="px-4 py-3">
@@ -203,7 +226,7 @@ export default function AdminsList() {
                 })}
                 {!visible.length ? (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-500" colSpan="6">
+                    <td className="px-4 py-8 text-center text-slate-500" colSpan="7">
                       No admins found.
                     </td>
                   </tr>

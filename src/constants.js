@@ -2,6 +2,7 @@ import {
   BarChart3,
   BookOpenCheck,
   BrainCircuit,
+  Building2,
   ClipboardCheck,
   ClipboardList,
   Code2,
@@ -41,11 +42,9 @@ export const NAV_ITEMS = [
   { href: "/admin/programming/assessments/create", label: "New Coding Test", icon: FilePlus2, roles: ["admin"], modules: ["both", "programming"] },
   { href: "/master-admin/programming", label: "Practice Problems", icon: Code2, roles: ["master_admin"] },
   { href: "/master-admin/programming/assessments", label: "Coding Assessments", icon: ClipboardCheck, roles: ["master_admin"] },
-  { href: "/master-admin/students", label: "Students", icon: BookOpenCheck, roles: ["master_admin"] },
-  { href: "/master-admin/admins", label: "Admins", icon: ShieldCheck, roles: ["master_admin"] },
+  { href: "/master-admin/institutions", label: "Institutions", icon: Building2, roles: ["master_admin"] },
   { href: "/master-admin/master-admins", label: "Master Admins", icon: Crown, roles: ["master_admin"] },
-  { href: "/master-admin/create-admin", label: "Create Admin", icon: ShieldCheck, roles: ["master_admin"] },
-  { href: "/master-admin/create-user", label: "Create User", icon: UserCog, roles: ["master_admin"] },
+
   { href: "/master-admin/ai-usage", label: "AI Usage", icon: Cpu, roles: ["master_admin"] },
 ];
 
