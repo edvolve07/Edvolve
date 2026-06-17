@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, BookOpenCheck, BrainCircuit, Building2, Check, FileSpreadsheet, KeyRound, Loader2,
-  Mail, Phone, Plus, ShieldCheck, TrendingUp, Upload, UserCog, Users, X,
+  Mail, Phone, Plus, ShieldCheck, Trash2, TrendingUp, Upload, UserCog, Users, X,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
@@ -370,6 +370,21 @@ export default function InstitutionDetail() {
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [showCreateStudent, setShowCreateStudent] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    try {
+      await apiFetch(`/api/master/users/${deleteTarget.id}`, { method: "DELETE" });
+      setAdmins((prev) => prev.filter((a) => a.id !== deleteTarget.id));
+      setStudents((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+      loadInstitution();
+    } catch (err) {
+      alert(err.message || "Unable to delete user.");
+    } finally {
+      setDeleteTarget(null);
+    }
+  }
 
   function loadInstitution() {
     setLoading(true);
@@ -513,11 +528,18 @@ export default function InstitutionDetail() {
                   <p className="text-sm font-semibold text-slate-900">{admin.name}</p>
                   <p className="text-xs text-slate-500">{admin.email}{admin.phone ? ` · ${admin.phone}` : ""}</p>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  admin.is_active !== false ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
-                }`}>
-                  {admin.is_active !== false ? "Active" : "Inactive"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    admin.is_active !== false ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                  }`}>
+                    {admin.is_active !== false ? "Active" : "Inactive"}
+                  </span>
+                  <button onClick={() => setDeleteTarget({ id: admin.id, name: admin.name, type: "admin" })}
+                    className="rounded-lg border border-slate-200 p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+                    title="Delete admin">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             )) : (
               <p className="px-5 py-6 text-center text-sm text-slate-500">No admins found for this institution.</p>
@@ -571,6 +593,11 @@ export default function InstitutionDetail() {
                     }`}>
                       {student.is_active !== false ? "Active" : "Inactive"}
                     </span>
+                    <button onClick={() => setDeleteTarget({ id: student.id, name: student.name, type: "student" })}
+                      className="rounded-lg border border-slate-200 p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+                      title="Delete student">
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
               )) : (
@@ -580,6 +607,26 @@ export default function InstitutionDetail() {
           )}
         </section>
       </div>
+
+      {deleteTarget ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-slate-950">Delete {deleteTarget.type}</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete <strong>{deleteTarget.name}</strong>?
+              This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setDeleteTarget(null)}
+                className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+              <button onClick={handleDelete}
+                className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600">
+                <Trash2 size={15} /> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {a.recent_admins?.length ? (
         <section className="mb-6 rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
