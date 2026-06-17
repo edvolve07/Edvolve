@@ -55,7 +55,7 @@ export default function MasterAdminDashboard() {
     return (
       <div className="flex min-h-[70vh] items-center justify-center text-sm font-medium text-slate-500">
         <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
-        Loading master admin dashboard
+        Loading your dashboard
       </div>
     );
   }
