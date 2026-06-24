@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, BookOpenCheck, Code2, Mic2 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
@@ -6,6 +6,19 @@ import StatCard from '../../components/StatCard';
 import { apiFetch, formatDateTime } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import { getTimeBasedGreeting } from '@/src/utils/timeGreeting';
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function formatDuration(seconds) {
   if (!seconds) return '0m';
@@ -23,11 +36,24 @@ export default function StudentDashboard() {
   const hasInterview = userModules.includes("ai_interview") || userModules.includes("both");
   const hasProgramming = userModules.includes("programming") || userModules.includes("both");
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState(() => getTimeBasedGreeting());
 
-  useEffect(() => {
-    apiFetch('/student/dashboard').then(setStats);
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    try {
+      const payload = await apiFetch('/student/dashboard');
+      setStats(payload);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   useEffect(() => {
     const updateGreeting = () => setGreeting(getTimeBasedGreeting());
@@ -53,10 +79,12 @@ export default function StudentDashboard() {
             Track your progress across assessments, interviews, and coding practice.
           </p>
         </div>
-        <Link to="/student/assessments" className="btn-primary">
-          <BookOpenCheck className="h-4 w-4" />
-          Start Practice
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/student/assessments" className="btn-primary">
+            <BookOpenCheck className="h-4 w-4" />
+            Start Practice
+          </Link>
+        </div>
       </div>
 
       {hasAptitude ? (

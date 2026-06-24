@@ -1,8 +1,21 @@
-import { useEffect, useState } from "react";
-import { ArrowRight, BrainCircuit, CalendarDays, Check, CheckCircle2, Clock3, Flame, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { AlertTriangle, ArrowRight, BrainCircuit, CalendarDays, Check, CheckCircle2, Clock3, Flame, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
 import { useNavigate } from "../../navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
-import { getStudentAssessments, isUnauthorizedError } from "@/lib/api";
+import { getStudentAssessments, isUnauthorizedError, apiFetch, startStudentAssessment } from "@/lib/api";
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function formatDateTime(value) {
   if (!value) return "TBD";
@@ -13,46 +26,93 @@ function formatDateTime(value) {
   }).format(new Date(value));
 }
 
+const ACTIVITY_ICON = {
+  aptitude: { icon: CheckCircle2, color: "bg-emerald-600" },
+  interview: { icon: Star, color: "bg-amber-400" },
+  programming: { icon: Target, color: "bg-emerald-600" },
+};
+
+function activityXP(type) {
+  return type === "interview" ? 50 : type === "aptitude" ? 25 : 15;
+}
+
 export default function StudentAssessments() {
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
     setError(null);
 
     const timeout = setTimeout(() => {
-      if (!active) return;
-      setError("API request timed out. Backend may be offline.");
-      setLoading(false);
+      if (!quiet) setError("API request timed out. Backend may be offline.");
+      if (!quiet) setLoading(false);
     }, 5000);
-    
-    getStudentAssessments()
-      .then((data) => {
-        if (!active) return;
-        clearTimeout(timeout);
-        setAssessments(data.assessments || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (!active) return;
-        clearTimeout(timeout);
-        if (isUnauthorizedError(err)) {
-          navigate("/login", { replace: true });
-          return;
-        }
-        setError(err.message || "Unable to load assessments");
-        setLoading(false);
-      });
 
-    return () => {
-      active = false;
+    try {
+      const data = await getStudentAssessments();
       clearTimeout(timeout);
-    };
+      setAssessments(data.assessments || []);
+    } catch (err) {
+      clearTimeout(timeout);
+      if (isUnauthorizedError(err)) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      if (!quiet) setError(err.message || "Unable to load assessments");
+    } finally {
+      if (!quiet) setLoading(false);
+    }
   }, [navigate]);
+
+  const refreshDashboard = useCallback(async () => {
+    try {
+      const data = await apiFetch("/api/student/dashboard");
+      setDashboard(data);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    refreshDashboard();
+    const id = window.setInterval(() => {
+      refresh({ quiet: true });
+      refreshDashboard();
+    }, 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh, refreshDashboard]);
+
+  const studyStreak = dashboard?.study_streak || { current: 0, best: 0, active_days: [] };
+  const weeklyGoal = dashboard?.weekly_goal || { target: 5, completed: 0 };
+  const overallProgress = dashboard?.overall_progress || 0;
+  const recentActivity = dashboard?.recent_activity || [];
+  const [forbiddenMsg, setForbiddenMsg] = useState("");
+
+  async function handleStart(assessmentId) {
+    try {
+      await startStudentAssessment(assessmentId);
+      navigate(`/aptitude/${assessmentId}/start`);
+    } catch (err) {
+      if (err.message?.includes("already submitted")) {
+        setForbiddenMsg(err.message);
+      } else {
+        navigate(`/aptitude/${assessmentId}/start`);
+      }
+    }
+  }
+
+  const activeDays = (() => {
+    const today = new Date();
+    return ["M", "T", "W", "T", "F", "S", "S"].map((label, index) => {
+      const date = new Date(today);
+      date.setDate(date.getDate() - (6 - index));
+      const key = date.toISOString().slice(0, 10);
+      return { label, active: studyStreak.active_days?.includes(key) ?? false };
+    });
+  })();
 
   if (loading) return <LoadingSkeleton label="Loading assessments" />;
 
@@ -72,13 +132,15 @@ export default function StudentAssessments() {
   return (
     <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
       <section className="mb-7">
-        <p className="text-sm font-black uppercase tracking-wide text-emerald-700">Aptitude Practice</p>
-        <h1 className="mt-2 text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">
-          Sharpen your problem-solving rhythm
-        </h1>
-        <p className="mt-2 max-w-2xl text-base text-slate-700">
-          Choose a focused test, build your streak, and keep your prep moving with crisp timed practice.
-        </p>
+        <div>
+          <p className="text-sm font-black uppercase tracking-wide text-emerald-700">Aptitude Practice</p>
+          <h1 className="mt-2 text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">
+            Sharpen your problem-solving rhythm
+          </h1>
+          <p className="mt-2 max-w-2xl text-base text-slate-700">
+            Choose a focused test, build your streak, and keep your prep moving with crisp timed practice.
+          </p>
+        </div>
       </section>
 
       <section className="mb-7 grid gap-4 md:grid-cols-3">
@@ -101,9 +163,9 @@ export default function StudentAssessments() {
               <Trophy size={28} />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-700">Target Score</p>
-              <p className="mt-1 text-3xl font-black text-emerald-950">80%</p>
-              <p className="mt-3 text-xs font-semibold text-emerald-700">+8% this week</p>
+              <p className="text-sm font-medium text-slate-700">Overall Progress</p>
+              <p className="mt-1 text-3xl font-black text-emerald-950">{overallProgress}%</p>
+              <p className="mt-3 text-xs font-semibold text-emerald-700">{weeklyGoal.completed}/{weeklyGoal.target} weekly</p>
             </div>
           </div>
         </article>
@@ -115,7 +177,7 @@ export default function StudentAssessments() {
             </div>
             <div>
               <p className="text-sm font-medium text-slate-700">Study Streak</p>
-              <p className="mt-1 text-3xl font-black text-emerald-950">12 Days</p>
+              <p className="mt-1 text-3xl font-black text-emerald-950">{studyStreak.current} Days</p>
               <p className="mt-3 text-xs font-semibold text-orange-600">Keep it up</p>
             </div>
           </div>
@@ -160,7 +222,7 @@ export default function StudentAssessments() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => navigate(`/aptitude/${assessmentId}/start`)}
+                        onClick={() => handleStart(assessmentId)}
                         disabled={!assessmentId}
                         className={`inline-flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-black transition ${
                           amber
@@ -202,7 +264,7 @@ export default function StudentAssessments() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => navigate(`/aptitude/${assessmentId}/start`)}
+                          onClick={() => handleStart(assessmentId)}
                           disabled={!assessmentId}
                           className="btn-primary px-5 py-3"
                         >
@@ -229,57 +291,82 @@ export default function StudentAssessments() {
                 <div>
                   <p className="flex items-center gap-2 text-2xl font-black text-emerald-700">
                     <Flame size={25} className="text-amber-500" />
-                    12 Days
+                    {studyStreak.current} Days
                   </p>
-                  <p className="mt-2 text-sm text-slate-600">Best Streak: <span className="font-semibold text-orange-600">21 Days</span></p>
+                  <p className="mt-2 text-sm text-slate-600">Best Streak: <span className="font-semibold text-orange-600">{studyStreak.best} Days</span></p>
                 </div>
                 <div className="grid grid-cols-7 gap-1.5 text-center">
-                  {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
-                    <div key={`${day}-${index}`}>
-                      <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-black text-white ${index === 6 ? "bg-amber-400" : "bg-emerald-600"}`}>
-                        {index === 6 ? "" : <Check className="h-3 w-3" />}
+                  {activeDays.map(({ label, active }, index) => (
+                    <div key={`${label}-${index}`}>
+                      <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-black text-white ${active ? "bg-emerald-600" : "bg-slate-200"}`}>
+                        {active ? <Check className="h-3 w-3" /> : ""}
                       </span>
-                      <span className="mt-2 block text-xs text-slate-600">{day}</span>
+                      <span className="mt-2 block text-xs text-slate-600">{label}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </section>
 
-            <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
-              <div className="mb-4 flex items-center gap-2">
-                <CalendarDays size={18} className="text-slate-600" />
-                <h2 className="text-lg font-black text-emerald-950">Next Practice Slot</h2>
-              </div>
-              <h3 className="text-lg font-black text-emerald-700">Quantitative Aptitude</h3>
-              <p className="mt-1 text-sm font-medium text-slate-800">Time & Work • Medium</p>
-              <p className="mt-5 text-sm text-slate-700">Today, 7:00 PM</p>
-            </section>
+            {dashboard?.continue_learning?.[0] ? (
+              <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
+                <div className="mb-4 flex items-center gap-2">
+                  <CalendarDays size={18} className="text-slate-600" />
+                  <h2 className="text-lg font-black text-emerald-950">Continue Learning</h2>
+                </div>
+                <h3 className="text-lg font-black text-emerald-700">{dashboard.continue_learning[0].title}</h3>
+                <p className="mt-1 text-sm font-medium text-slate-800">{dashboard.continue_learning[0].meta}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {dashboard.continue_learning[0].action}
+                </p>
+              </section>
+            ) : null}
 
             <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
               <h2 className="mb-5 text-lg font-black text-emerald-950">Recent Activity</h2>
               <div className="space-y-5">
-                {[
-                  ["Completed Aptitude Test", "Time & Work • Medium", "+25 XP", Star, "bg-amber-400"],
-                  ["Started New Quiz", "Number System • Easy", "+10 XP", CheckCircle2, "bg-emerald-600"],
-                  ["Reviewed Mistakes", "Algebra Practice", "+15 XP", Target, "bg-emerald-600"],
-                ].map(([title, meta, xp, Icon, color]) => (
-                  <div key={title} className="flex items-center gap-4">
-                    <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-white ${color}`}>
-                      <Icon size={18} />
+                {recentActivity.slice(0, 4).length ? recentActivity.slice(0, 4).map((item) => {
+                  const cfg = ACTIVITY_ICON[item.type] || { icon: Star, color: "bg-emerald-600" };
+                  const Icon = cfg.icon;
+                  return (
+                    <div key={item.id} className="flex items-center gap-4">
+                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-white ${cfg.color}`}>
+                        <Icon size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-black text-emerald-950">{item.title}</p>
+                        <p className="text-sm text-slate-600">{item.meta}</p>
+                      </div>
+                      <p className="text-sm font-black text-emerald-700">+{activityXP(item.type)} XP</p>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-black text-emerald-950">{title}</p>
-                      <p className="text-sm text-slate-600">{meta}</p>
-                    </div>
-                    <p className="text-sm font-black text-emerald-700">{xp}</p>
-                  </div>
-                ))}
+                  );
+                }) : (
+                  <p className="py-4 text-center text-sm text-slate-500">No recent activity yet.</p>
+                )}
               </div>
             </section>
           </aside>
         </div>
       )}
+
+      {forbiddenMsg ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm" onClick={() => setForbiddenMsg("")}>
+          <div className="mx-4 max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-red-50">
+              <AlertTriangle size={28} className="text-red-500" />
+            </div>
+            <h2 className="text-center text-lg font-black text-slate-950">Assessment Unavailable</h2>
+            <p className="mt-3 text-center text-sm leading-6 text-slate-600">{forbiddenMsg}</p>
+            <button
+              type="button"
+              onClick={() => setForbiddenMsg("")}
+              className="mt-6 w-full rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-600"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

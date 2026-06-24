@@ -1,6 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { BarChart3, Cpu, Loader2, ShieldCheck } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
@@ -25,20 +38,21 @@ export default function MasterAiUsagePage() {
   const [usage, setUsage] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let active = true;
-    apiFetch("/api/master/dashboard")
-      .then((payload) => {
-        if (active) setUsage(payload.ai_usage || {});
-      })
-      .catch((err) => {
-        if (active) setError(err.message || "Unable to load AI API usage.");
-      });
-
-    return () => {
-      active = false;
-    };
+  const refresh = useCallback(async ({ quiet } = {}) => {
+    try {
+      const payload = await apiFetch("/api/master/dashboard");
+      setUsage(payload.ai_usage || {});
+      if (!quiet) setError("");
+    } catch (err) {
+      if (!quiet) setError(err.message || "Unable to load AI API usage.");
+    }
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   if (error) {
     return (
@@ -64,13 +78,15 @@ export default function MasterAiUsagePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
       <section className="mb-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-        <p className="text-sm font-medium text-emerald-600">Master admin</p>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-950">
-          AI API Usage
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          Usage tracked from interviews, transcription, and AI question generation.
-        </p>
+        <div>
+          <p className="text-sm font-medium text-emerald-600">Master admin</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-950">
+            AI API Usage
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+            Usage tracked from interviews, transcription, and AI question generation.
+          </p>
+        </div>
       </section>
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

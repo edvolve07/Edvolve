@@ -1,8 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight, Layers, AlertTriangle, CalendarDays, Trophy, Flame, BarChart3 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { apiFetch } from '../../utils/api';
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 export default function PracticeTopics() {
   const [topics, setTopics] = useState([]);
@@ -15,43 +28,36 @@ export default function PracticeTopics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError('');
-
-    Promise.all([
-      apiFetch('/programming/student/concepts'),
-      apiFetch('/programming/student/analytics'),
-      apiFetch('/programming/student/challenges/current'),
-      apiFetch('/programming/student/leaderboard'),
-    ])
-      .then(([res, analyticsRes, challengeRes, leaderboardRes]) => {
-        if (cancelled) return;
-        const conceptList = res.concepts || [];
-        const countsMap = res.counts || {};
-        const solvedMap = res.solved_counts || {};
-        const progressMap = res.progress || {};
-
-        setTopics(conceptList);
-        setCounts(countsMap);
-        setSolvedCounts(solvedMap);
-        setProgress(progressMap);
-        setAnalytics(analyticsRes);
-        setChallenges(challengeRes);
-        setLeaderboard((leaderboardRes.leaderboard || []).slice(0, 5));
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err.message || 'Failed to load topics');
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    if (!quiet) setError('');
+    try {
+      const [res, analyticsRes, challengeRes, leaderboardRes] = await Promise.all([
+        apiFetch('/programming/student/concepts'),
+        apiFetch('/programming/student/analytics'),
+        apiFetch('/programming/student/challenges/current'),
+        apiFetch('/programming/student/leaderboard'),
+      ]);
+      const conceptList = res.concepts || [];
+      setTopics(conceptList);
+      setCounts(res.counts || {});
+      setSolvedCounts(res.solved_counts || {});
+      setProgress(res.progress || {});
+      setAnalytics(analyticsRes);
+      setChallenges(challengeRes);
+      setLeaderboard((leaderboardRes.leaderboard || []).slice(0, 5));
+    } catch (err) {
+      if (!quiet) setError(err.message || 'Failed to load topics');
+    } finally {
+      if (!quiet) setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   const totalProblems = topics.reduce((sum, topic) => sum + (counts[topic] || 0), 0);
   const totalSolved = topics.reduce((sum, topic) => sum + (solvedCounts[topic] || 0), 0);
@@ -79,7 +85,7 @@ export default function PracticeTopics() {
 
   return (
     <section className="page-stack max-w-5xl mx-auto pb-16">
-      <div className="page-hero flex flex-wrap items-center justify-between gap-4">
+      <div className="page-hero flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow">Programming Practice</p>
           <h2 className="mt-2 text-3xl font-black text-slate-900">Choose a Topic</h2>

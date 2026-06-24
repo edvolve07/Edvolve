@@ -118,11 +118,13 @@ function AppShell({ children }) {
             <p className="mt-1 text-[11px] font-medium text-slate-500">Unified prep workspace</p>
           </div>
 
-          <button className="hidden h-11 items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-emerald-50 sm:inline-flex">
-            <Flame size={18} className="text-amber-500" />
-            12
-            <ChevronDown size={15} />
-          </button>
+          {user?.role !== "admin" && user?.role !== "master_admin" ? (
+            <button className="hidden h-11 items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-emerald-50 sm:inline-flex">
+              <Flame size={18} className="text-amber-500" />
+              12
+              <ChevronDown size={15} />
+            </button>
+          ) : null}
 
           <button className="relative hidden h-11 w-11 items-center justify-center rounded-2xl border border-emerald-100 bg-white text-slate-600 shadow-sm transition hover:bg-emerald-50 sm:inline-flex">
             <Bell size={18} />

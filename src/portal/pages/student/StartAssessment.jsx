@@ -38,7 +38,6 @@ export default function StartAssessment() {
   const [answers, setAnswers] = useState({});
   const [extraTimeMinutes, setExtraTimeMinutes] = useState(0);
   const [effectiveDurationMinutes, setEffectiveDurationMinutes] = useState(0);
-  const [warnings, setWarnings] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -85,6 +84,7 @@ export default function StartAssessment() {
     try {
       await apiFetch(`/student/attempts/${data.attempt.id}/submit`, { method: 'POST' });
       localStorage.removeItem(getResumeKey(data.attempt.id));
+      document.exitFullscreen?.().catch(() => {});
       toast.success('Assessment submitted');
       navigate(`/student/results/${data.attempt.id}`);
     } catch (error) {
@@ -113,21 +113,48 @@ export default function StartAssessment() {
     [data?.attempt?.id, navigate, toast],
   );
 
+  const autoSubmitted = useRef(false);
+
   useEffect(() => {
     if (!started) return undefined;
     function onVisibility() {
-      if (document.hidden) {
-        setWarnings((count) => {
-          const next = count + 1;
-          toast.error(`Tab switch warning ${next}/3`);
-          if (next >= 3) window.setTimeout(submit, 250);
-          return next;
-        });
+      if (!document.hidden) {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        }
+        return;
+      }
+      if (autoSubmitted.current) return;
+      autoSubmitted.current = true;
+      toast.error("Tab switch detected — submitting assessment");
+      submit();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [started, submit, toast]);
+
+  useEffect(() => {
+    if (!started) return undefined;
+    function onFullscreenChange() {
+      if (document.fullscreenElement) {
+        document.documentElement.dataset.assessmentFullscreen = "true";
+      } else {
+        delete document.documentElement.dataset.assessmentFullscreen;
       }
     }
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [started, submit, toast]);
+    function tryFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      }
+    }
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("click", tryFullscreen);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("click", tryFullscreen);
+      delete document.documentElement.dataset.assessmentFullscreen;
+    };
+  }, [started]);
 
   useEffect(() => {
     if (!started || !data?.attempt?.id) return undefined;
@@ -139,6 +166,16 @@ export default function StartAssessment() {
 
     return () => window.clearInterval(id);
   }, [started, data?.attempt?.id, syncAttemptTime]);
+
+  async function startSecureAssessment() {
+    setStarted(true);
+    try {
+      await document.documentElement.requestFullscreen?.();
+      document.documentElement.dataset.assessmentFullscreen = "true";
+    } catch {
+      // Fullscreen not supported — assessment still runs
+    }
+  }
 
   async function selectAnswer(questionId, option) {
     setAnswers((currentAnswers) => ({ ...currentAnswers, [questionId]: option }));
@@ -172,13 +209,13 @@ export default function StartAssessment() {
           <div className="flex gap-2">
             <AlertTriangle className="h-5 w-5 shrink-0" />
             <p>
-              Answers and explanations are hidden during the test. Repeated tab switching
+              Fullscreen mode is required. Tab switching or exiting fullscreen
               triggers automatic submission.
             </p>
           </div>
         </div>
         <button
-          onClick={() => setStarted(true)}
+          onClick={startSecureAssessment}
           className="btn-primary mt-6"
         >
           Start
@@ -198,7 +235,7 @@ export default function StartAssessment() {
           <p className="eyebrow">Live Assessment</p>
           <h2 className="mt-1 text-2xl font-black text-slate-900">{data.assessment.title}</h2>
           <p className="text-sm text-slate-500">
-            Question {current + 1} of {data.questions.length} · Warnings {warnings}/3
+            Question {current + 1} of {data.questions.length}
             {extraTimeMinutes ? ` · Extra time ${extraTimeMinutes}m` : ''}
           </p>
         </div>

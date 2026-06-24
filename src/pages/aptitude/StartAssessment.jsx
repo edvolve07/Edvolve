@@ -41,7 +41,6 @@ export default function StartAssessment({ assessmentId }) {
   const [answers, setAnswers] = useState({});
   const [extraTimeMinutes, setExtraTimeMinutes] = useState(0);
   const [effectiveDurationMinutes, setEffectiveDurationMinutes] = useState(0);
-  const [warnings, setWarnings] = useState(0);
   const [proctorEvents, setProctorEvents] = useState(0);
   const [snapshotMessage, setSnapshotMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -90,6 +89,7 @@ export default function StartAssessment({ assessmentId }) {
     try {
       await submitStudentAttempt(data.attempt.id);
       localStorage.removeItem(getResumeKey(data.attempt.id));
+      document.exitFullscreen?.().catch(() => {});
       navigate(`/aptitude/results/${data.attempt.id}`);
     } catch (err) {
       setError(err.message || "Unable to submit assessment.");
@@ -129,26 +129,46 @@ export default function StartAssessment({ assessmentId }) {
     [data?.attempt?.id]
   );
 
+  const autoSubmitted = useRef(false);
+
   useEffect(() => {
     if (!started) return undefined;
     function onVisibility() {
-      if (document.hidden) {
-        logEvent("tab_switch", { question_index: current });
-        setWarnings((count) => {
-          const next = count + 1;
-          if (next >= 3) window.setTimeout(submit, 250);
-          return next;
-        });
+      if (!document.hidden) {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        }
+        return;
       }
+      if (autoSubmitted.current) return;
+      autoSubmitted.current = true;
+      logEvent("tab_switch", { question_index: current });
+      submit();
     }
     document.addEventListener("visibilitychange", onVisibility);
-    return () => document.removeEventListener("visibilitychange", onVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [current, logEvent, started, submit]);
 
   useEffect(() => {
     if (!started) return undefined;
-    function onFullscreenChange() {
+    function tryFullscreen() {
       if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      }
+    }
+    document.addEventListener("click", tryFullscreen);
+    return () => document.removeEventListener("click", tryFullscreen);
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return undefined;
+    function onFullscreenChange() {
+      if (document.fullscreenElement) {
+        document.documentElement.dataset.assessmentFullscreen = "true";
+      } else {
+        delete document.documentElement.dataset.assessmentFullscreen;
         logEvent("fullscreen_exit", { question_index: current });
       }
     }
@@ -163,6 +183,7 @@ export default function StartAssessment({ assessmentId }) {
       document.removeEventListener("fullscreenchange", onFullscreenChange);
       document.removeEventListener("copy", blockClipboard);
       document.removeEventListener("paste", blockClipboard);
+      delete document.documentElement.dataset.assessmentFullscreen;
     };
   }, [current, logEvent, started]);
 
@@ -188,6 +209,7 @@ export default function StartAssessment({ assessmentId }) {
     setStarted(true);
     try {
       await document.documentElement.requestFullscreen?.();
+      document.documentElement.dataset.assessmentFullscreen = "true";
     } catch {
       await logEvent("fullscreen_exit", { reason: "fullscreen_request_failed" });
     }
@@ -276,7 +298,7 @@ export default function StartAssessment({ assessmentId }) {
           <p className="eyebrow">Live Assessment</p>
           <h2 className="mt-1 text-2xl font-black text-slate-950">{data.assessment.title}</h2>
           <p className="text-sm text-slate-500">
-            Question {current + 1} of {data.questions.length} · Warnings {warnings}/3 · Proctor events {proctorEvents}
+            Question {current + 1} of {data.questions.length} · Proctor events {proctorEvents}
             {extraTimeMinutes ? ` · Extra time ${extraTimeMinutes}m` : ""}
           </p>
         </div>

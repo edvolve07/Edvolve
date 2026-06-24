@@ -1,9 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, FilePlus2 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import StatCard from '../../components/StatCard';
 import { apiFetch, formatDateTime } from '../../utils/api';
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function formatDuration(seconds) {
   if (!seconds) return '0m';
@@ -16,10 +29,23 @@ function formatDuration(seconds) {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    try {
+      const payload = await apiFetch('/admin/dashboard');
+      setStats(payload);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    apiFetch('/admin/dashboard').then(setStats);
-  }, []);
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   if (!stats) return <LoadingSkeleton label="Loading dashboard" />;
 
@@ -34,10 +60,12 @@ export default function AdminDashboard() {
               Monitor publishing, submissions, pass rates, and student performance from one focused dashboard.
             </p>
           </div>
-          <Link to="/admin/assessments/create" className="btn-primary">
-            <FilePlus2 className="h-4 w-4" />
-            Create Assessment
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/admin/assessments/create" className="btn-primary">
+              <FilePlus2 className="h-4 w-4" />
+              Create Assessment
+            </Link>
+          </div>
         </div>
       </section>
 

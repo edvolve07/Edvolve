@@ -280,19 +280,13 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
-      <section className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <section className="mb-8">
         <div>
           <h1 className="text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">
             {greeting}, {firstName}
           </h1>
           <p className="mt-2 text-base text-slate-700">
             Your dashboard is synced to your current role, module access, and latest progress.
-          </p>
-        </div>
-        <div className="rounded-lg border border-emerald-100 bg-white px-4 py-3 text-sm shadow-card">
-          <p className="font-black text-emerald-950">Live data</p>
-          <p className="mt-1 text-xs text-slate-500">
-            Updated {dashboard?.generated_at ? formatRelativeTime(dashboard.generated_at) : loading ? "now" : "when available"}
           </p>
         </div>
       </section>

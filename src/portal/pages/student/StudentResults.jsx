@@ -1,49 +1,62 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Mic2 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { apiFetch, formatDateTime } from '../../utils/api';
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 export default function StudentResults() {
   const [results, setResults] = useState(null);
   const [interviewReports, setInterviewReports] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    let active = true;
-
-    Promise.all([
-      apiFetch('/student/results'),
-      apiFetch('/reports'),
-    ])
-      .then(([assessmentData, reportData]) => {
-        if (!active) return;
-        setResults(assessmentData.results || []);
-        setInterviewReports(reportData.reports || []);
-      })
-      .catch((err) => {
-        if (!active) return;
-        setError(err.message || 'Unable to load reports');
-        setResults([]);
-        setInterviewReports([]);
-      });
-
-    return () => {
-      active = false;
-    };
+  const refresh = useCallback(async () => {
+    try {
+      const [assessmentData, reportData] = await Promise.all([
+        apiFetch('/student/results'),
+        apiFetch('/reports'),
+      ]);
+      setResults(assessmentData.results || []);
+      setInterviewReports(reportData.reports || []);
+      setError('');
+    } catch (err) {
+      setError(err.message || 'Unable to load reports');
+      setResults([]);
+      setInterviewReports([]);
+    }
   }, []);
+
+  useEffect(() => {
+    refresh();
+    const id = window.setInterval(refresh, 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   if (!results || !interviewReports) return <LoadingSkeleton label="Loading results" />;
 
   return (
     <section className="page-stack">
       <div className="page-hero">
-        <p className="eyebrow">Performance Archive</p>
-        <h2 className="mt-2 text-3xl font-black text-slate-900">Reports and Results</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-          Review interview reports, submitted assessments, scores, pass status, explanations, and topic analytics.
-        </p>
-        {error ? <div className="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
+        <div>
+          <p className="eyebrow">Performance Archive</p>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Reports and Results</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            Review interview reports, submitted assessments, scores, pass status, explanations, and topic analytics.
+          </p>
+          {error ? <div className="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div> : null}
+        </div>
       </div>
 
       <section className="surface p-5">

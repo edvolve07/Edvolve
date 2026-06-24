@@ -130,7 +130,7 @@ export default function ManualGenerationForm() {
   }
 
   return (
-    <form onSubmit={submit} className="page-stack">
+    <form onSubmit={submit} className="mx-auto max-w-[85%] space-y-6 pb-8">
       <div className="page-hero">
         <p className="eyebrow">Assessment Builder</p>
         <h2 className="mt-2 text-3xl font-black text-slate-900">Create Aptitude Assessment</h2>

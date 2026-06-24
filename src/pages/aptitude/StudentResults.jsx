@@ -1,8 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ArrowRight, BarChart3, CheckCircle2, ClipboardCheck, Flame, Trophy, XCircle } from "lucide-react";
 import { useNavigate } from "../../navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
-import { getStudentResults } from "@/lib/api";
+import { getStudentResults, apiFetch } from "@/lib/api";
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function formatDateTime(value) {
   if (!value) return "Open";
@@ -15,15 +28,42 @@ function formatDateTime(value) {
 export default function StudentResults() {
   const navigate = useNavigate();
   const [results, setResults] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    getStudentResults()
-      .then((data) => setResults(data.results || []))
-      .catch((err) => setError(err.message || "Unable to load results"));
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    try {
+      const data = await getStudentResults();
+      setResults(data.results || []);
+    } catch (err) {
+      if (!quiet) setError(err.message || "Unable to load results");
+    } finally {
+      if (!quiet) setLoading(false);
+    }
   }, []);
 
-  if (!results) return <LoadingSkeleton label="Loading results" />;
+  const refreshDashboard = useCallback(async () => {
+    try {
+      const data = await apiFetch("/api/student/dashboard");
+      setDashboard(data);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    refreshDashboard();
+    const id = window.setInterval(() => {
+      refresh({ quiet: true });
+      refreshDashboard();
+    }, 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh, refreshDashboard]);
+
+  const studyStreak = dashboard?.study_streak || { current: 0, best: 0, active_days: [] };
+
+  if (loading || !results) return <LoadingSkeleton label="Loading results" />;
 
   const passedCount = results.filter((result) => result.passed).length;
   const averageScore = results.length
@@ -33,12 +73,14 @@ export default function StudentResults() {
   return (
     <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
       <div className="mb-7">
-        <p className="text-sm font-black uppercase tracking-wide text-emerald-700">Performance Archive</p>
-        <h1 className="mt-2 text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">My aptitude results</h1>
-        <p className="mt-2 max-w-2xl text-base text-slate-700">
-          Review submitted attempts, scores, pass status, and detailed result pages.
-        </p>
-        {error && <div className="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+        <div>
+          <p className="text-sm font-black uppercase tracking-wide text-emerald-700">Performance Archive</p>
+          <h1 className="mt-2 text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">My aptitude results</h1>
+          <p className="mt-2 max-w-2xl text-base text-slate-700">
+            Review submitted attempts, scores, pass status, and detailed result pages.
+          </p>
+          {error && <div className="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+        </div>
       </div>
 
       <section className="mb-7 grid gap-4 md:grid-cols-3">
@@ -74,7 +116,7 @@ export default function StudentResults() {
             <div>
               <p className="text-sm font-medium text-slate-700">Passed</p>
               <p className="mt-1 text-3xl font-black text-emerald-950">{passedCount}</p>
-              <p className="mt-3 text-xs font-semibold text-orange-600">Best streak: 21 days</p>
+              <p className="mt-3 text-xs font-semibold text-orange-600">Best streak: {studyStreak.best} days</p>
             </div>
           </div>
         </article>

@@ -165,19 +165,34 @@ sequenceDiagram
     BE-->>FE: Published Assessments
     FE-->>Student: Assessment List
 
-    Student->>FE: Start Assessment
-    FE->>BE: POST /api/student/assessments/:id/start
-    BE-->>FE: Questions + Timer
-    FE-->>Student: MCQ Interface
+    alt Already Submitted (403)
+        Student->>FE: Click Start on submitted assessment
+        FE->>BE: POST /api/student/assessments/:id/start
+        BE-->>FE: 403 Already submitted
+        FE-->>Student: Modal popup "already submitted"
+    else Fresh Attempt
+        Student->>FE: Start Assessment
+        FE->>BE: POST /api/student/assessments/:id/start
+        BE-->>FE: Questions + Timer
+        FE-->>Student: MCQ Interface
 
-    Student->>FE: Answer Questions
-    FE->>BE: PUT /api/student/attempts/:id/answers
-    BE-->>FE: Saved
+        Student->>FE: Answer Questions
+        FE->>BE: PUT /api/student/attempts/:id/answers
+        BE-->>FE: Saved
 
-    Student->>FE: Submit
-    FE->>BE: POST /api/student/attempts/:id/submit
-    BE-->>FE: Score + Results
-    FE-->>Student: Result Summary
+        alt Tab Switch (Cheat Detection)
+            Student->>FE: Switch tab/window
+            FE->>BE: Auto-submit attempt immediately
+            BE-->>FE: Score + Results
+            FE->>FE: exitFullscreen()
+            FE-->>Student: Result Summary
+        else Manual Submit
+            Student->>FE: Submit
+            FE->>BE: POST /api/student/attempts/:id/submit
+            BE-->>FE: Score + Results
+            FE-->>Student: Result Summary
+        end
+    end
 ```
 
 ---
@@ -325,6 +340,60 @@ The Vite dev server proxies `/api` requests to the configured backend URL.
 | `/master-admin/create-admin` | Create admins with module access |
 | `/master-admin/create-user` | Create users with admin assignment |
 | `/master-admin/ai-usage` | AI usage stats + API key management |
+
+---
+
+---
+
+## Anti-Cheating
+
+### Tab-Switch Detection
+
+Both assessment interfaces (`/aptitude/:id/start` and `/student/assessments/:id/start`) detect tab switches via the `visibilitychange` event. On the **first** switch, the attempt is auto-submitted immediately (no 3-warning grace period), and the browser exits fullscreen.
+
+| Behavior | Detail |
+|---|---|
+| Trigger | `visibilitychange` → `hidden` |
+| Strikes | 0 — submits on first switch |
+| Action | `submit()` called via `autoSubmitted` ref guard |
+| Fullscreen | `document.exitFullscreen?.()` called after submit |
+
+### Duplicate Attempt Prevention
+
+The backend rejects `POST /api/student/assessments/:id/start` with **403 Forbidden** if the student already has a submitted attempt. On the frontend, this is caught in `StudentAssessments.jsx` and displayed as a modal popup on the listing page — no page navigation occurs.
+
+---
+
+## Real-Time Analytics Polling
+
+Dashboards and analytics pages across all roles poll the backend every **30 seconds** to keep data fresh. Polling runs silently — no loading indicators on background refresh.
+
+| Page | Interval |
+|---|---|
+| Student Dashboard (`/dashboard`) | 30s |
+| Admin Dashboard (`/admin-dashboard`) | 30s |
+| Master Admin Dashboard (`/master-admin-dashboard`) | 30s |
+| Student Assessment Results (`/aptitude/results`) | 30s |
+| Admin AI Usage (`/admin/analytics/ai-usage`) | 30s |
+| Master Admin AI Usage (`/master-admin/ai-usage`) | 30s |
+| Institution Detail (`/master-admin/institutions/:id`) | 30s |
+| Programming Practice Topics | 30s |
+
+---
+
+## Security
+
+A security audit identified the following issues that require attention:
+
+| Severity | Issue | Location |
+|---|---|---|
+| **Critical** | Live API keys (Groq, SMTP) committed to git history | Backend `.env` file |
+| **Critical** | `JWT_SECRET` set to placeholder value | Backend `.env` |
+| **High** | CORS allows any origin (`origin: true`) | Backend server config |
+| **High** | Signup endpoint assigns `master_admin` role by default | Backend signup route |
+| **High** | Login has no rate limiter | Backend auth routes |
+
+The frontend does not store secrets — all API calls go through the backend which holds credentials.
 
 ---
 

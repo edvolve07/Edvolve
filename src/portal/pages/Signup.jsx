@@ -58,7 +58,8 @@ export default function Signup() {
       toast.success('Account created');
       navigate(homeForRole(data.user.role));
     } catch (error) {
-      toast.error(error.details?.join(', ') || error.message);
+      const detail = Array.isArray(error.details) ? error.details.join(', ') : error.details;
+      toast.error(detail || error.message);
     } finally {
       setLoading(false);
     }
@@ -95,7 +96,7 @@ export default function Signup() {
           <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Start your Edvolve journey</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create your account</h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">
-            One account for interviews, aptitude practice, coding, reports, and analytics. New users start as students — lecturer and master admin access is assigned from approved emails.
+            One account for interviews, aptitude practice, coding, reports, and analytics.
           </p>
 
           <div className="mt-8 grid gap-5 md:grid-cols-2">

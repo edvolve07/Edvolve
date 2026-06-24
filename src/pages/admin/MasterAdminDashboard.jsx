@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   ArrowRight,
   Building2,
@@ -8,6 +8,19 @@ import {
 } from "lucide-react";
 import { Link } from "@/src/navigation";
 import { apiFetch } from "@/lib/api";
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
@@ -30,18 +43,26 @@ function StatCard({ label, value, icon: Icon, tone = "brand" }) {
 export default function MasterAdminDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    try {
+      const dash = await apiFetch("/api/master/dashboard");
+      setData(dash);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Unable to load dashboard.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let active = true;
-    apiFetch("/api/master/dashboard")
-      .then((dash) => {
-        if (active) setData(dash);
-      })
-      .catch((err) => {
-        if (active) setError(err.message || "Unable to load dashboard.");
-      });
-    return () => { active = false; };
-  }, []);
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   if (error) {
     return (
@@ -66,13 +87,15 @@ export default function MasterAdminDashboard() {
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8 space-y-4 sm:space-y-6">
       {/* Header */}
       <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-6">
-        <p className="text-sm font-medium text-emerald-600">Organization control</p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          Master Admin Dashboard
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          Platform overview with key metrics.
-        </p>
+        <div>
+          <p className="text-sm font-medium text-emerald-600">Organization control</p>
+          <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            Master Admin Dashboard
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+            Platform overview with key metrics.
+          </p>
+        </div>
       </section>
 
       {/* Stats */}

@@ -1,6 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { BarChart3, Cpu, KeyRound, Loader2, Save, ShieldCheck } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
@@ -29,30 +42,28 @@ export default function AiUsagePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  function refresh() {
-    return Promise.all([apiFetch("/api/master/dashboard"), apiFetch("/api/master/api-keys")]).then(
-      ([dashboardPayload, keyPayload]) => {
-        setUsage(dashboardPayload.ai_usage || {});
-        setApiKeys(keyPayload.providers || []);
-      },
-    );
-  }
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    try {
+      const [dashboardPayload, keyPayload] = await Promise.all([
+        apiFetch("/api/master/dashboard"),
+        apiFetch("/api/master/api-keys"),
+      ]);
+      setUsage(dashboardPayload.ai_usage || {});
+      setApiKeys(keyPayload.providers || []);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Unable to load AI usage.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let active = true;
-    setLoading(true);
-    refresh()
-      .catch((err) => {
-        if (active) setError(err.message || "Unable to load AI usage.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+    refresh();
+    const id = window.setInterval(() => refresh({ quiet: true }), 30 * 1000);
+    return () => window.clearInterval(id);
+  }, [refresh]);
 
   async function updateApiKey(providerId) {
     const apiKey = String(keyForms[providerId] || "").trim();
@@ -84,13 +95,15 @@ export default function AiUsagePage() {
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          AI API Usage
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          Track AI usage across interviews, transcription, and assessment generation. Update provider keys from the same page.
-        </p>
+        <div>
+          <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
+          <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+            AI API Usage
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+            Track AI usage across interviews, transcription, and assessment generation. Update provider keys from the same page.
+          </p>
+        </div>
       </section>
 
       {error ? (

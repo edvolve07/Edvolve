@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  ArrowLeft, BookOpenCheck, BrainCircuit, Building2, Check, FileSpreadsheet, KeyRound, Loader2,
-  Mail, Phone, Plus, ShieldCheck, Trash2, TrendingUp, Upload, UserCog, Users, X,
+  ArrowLeft, BookOpenCheck, BrainCircuit, Building2, Loader2,
+  Mail, Phone, Plus, ShieldCheck, Trash2, TrendingUp, Upload, UserCog, Users, X, KeyRound, GraduationCap, Building,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
@@ -13,6 +13,19 @@ const MODULE_LABELS = {
   resumeBuilder: "Resume Builder",
   certificates: "Certificates",
 };
+
+function formatRelativeTime(value) {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+  const diffSeconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSeconds < 60) return "Just now";
+  const diffMinutes = Math.round(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+}
 
 function formatDateTime(value) {
   if (!value) return "—";
@@ -48,18 +61,94 @@ function ModuleBadge({ enabled, label }) {
   );
 }
 
-function CreateAdminForm({ institutionId, onCreated }) {
+function Modal({ open, onClose, title, children }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-100 bg-white p-6 shadow-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
+          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+            <X size={18} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function BulkImportResult({ result }) {
+  if (!result) return null;
+  const isSuccess = result.type === "success";
+  const hasCounts = result.total !== undefined;
+  return (
+    <div className={`rounded-xl p-3 text-sm ${isSuccess ? "border border-emerald-100 bg-emerald-50" : "border border-red-100 bg-red-50"}`}>
+      <p className={`font-semibold ${isSuccess ? "text-emerald-800" : "text-red-700"}`}>
+        {result.message}
+      </p>
+      {result.type === "success" ? (
+        <div className="mt-2 space-y-1">
+          {hasCounts ? (
+            <p className="text-xs text-emerald-700">{result.created} created, {result.skipped} skipped out of {result.total} row(s)</p>
+          ) : null}
+          {result.tempPassword ? (
+            <div className="mt-2 space-y-1">
+              <p className="text-xs text-emerald-700">Email: {result.email}</p>
+              {result.department_name ? <p className="text-xs text-emerald-700">Department: {result.department_name}</p> : null}
+              <p className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-semibold text-emerald-900">
+                <KeyRound size={12} /> {result.tempPassword}
+              </p>
+              <p className={`mt-2 text-xs ${result.email_sent ? "text-emerald-600" : "text-amber-600"}`}>
+                {result.email_sent ? "Email sent with login details." : "Email could not be sent (SMTP not configured)."}
+              </p>
+            </div>
+          ) : null}
+          {result.passwordSample?.length ? (
+            <div className="mt-2 grid gap-1">
+              <p className="text-xs font-semibold text-emerald-700">Sample temp passwords:</p>
+              {result.passwordSample.slice(0, 5).map((s, i) => (
+                <p key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 font-mono text-xs text-emerald-900">
+                  <KeyRound size={10} /> {s.email}: {s.password}
+                </p>
+              ))}
+            </div>
+          ) : null}
+          {result.errors?.length ? (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs font-semibold text-red-600">{result.errors.length} error(s)</summary>
+              <ul className="mt-1 max-h-32 space-y-0.5 overflow-y-auto text-xs text-red-600">
+                {result.errors.map((e, i) => <li key={i}>{e}</li>)}
+              </ul>
+            </details>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function AdminFormModal({ open, onClose, institutionId, departments, onCreated }) {
   const [mode, setMode] = useState("single");
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
-  const [importForm, setImportForm] = useState({ file: null });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", department_id: "", admin_role: "" });
+  const [file, setFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
     if (!result) return;
-    const t = setTimeout(() => setResult(null), 2000);
+    const t = setTimeout(() => setResult(null), 5000);
     return () => clearTimeout(t);
   }, [result]);
+
+  useEffect(() => {
+    if (!open) {
+      setForm({ name: "", email: "", phone: "", department_id: "", admin_role: "" });
+      setFile(null);
+      setResult(null);
+      setMode("single");
+    }
+  }, [open]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -68,10 +157,17 @@ function CreateAdminForm({ institutionId, onCreated }) {
     try {
       const data = await apiFetch("/api/master/admins", {
         method: "POST",
-        body: JSON.stringify({ ...form, institutionId }),
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          department_id: form.department_id || null,
+          admin_role: form.admin_role,
+          institutionId,
+        }),
       });
-      setResult({ type: "success", message: `Admin created`, tempPassword: data.temp_password, email: form.email, email_sent: data.email_sent });
-      setForm({ name: "", email: "", phone: "" });
+      setResult({ type: "success", message: "Admin created", tempPassword: data.temp_password, email: form.email, email_sent: data.email_sent, department_name: data.user?.department_name });
+      setForm({ name: "", email: "", phone: "", department_id: "", admin_role: "" });
       onCreated();
     } catch (err) {
       setResult({ type: "error", message: err.message });
@@ -80,22 +176,19 @@ function CreateAdminForm({ institutionId, onCreated }) {
     }
   }
 
-  async function handleImport(e) {
+  async function handleBulkSubmit(e) {
     e.preventDefault();
-    if (!importForm.file) return;
+    if (!file) return;
     setSaving(true);
     setResult(null);
     try {
       const body = new FormData();
-      body.append("file", importForm.file);
+      body.append("file", file);
       body.append("institutionId", institutionId);
       const data = await apiFetch("/api/master/admins/import", { method: "POST", body });
-      const errCount = data.errors?.length || 0;
-      setResult({
-        type: "success",
-        message: `${data.created} admin(s) created from ${data.total_rows} row(s)${errCount ? `, ${errCount} error(s)` : ""}`,
-      });
-      setImportForm({ file: null });
+      const passwordSample = (data.users || []).slice(0, 5).map((u) => ({ email: u.email, password: u.temp_password }));
+      setResult({ type: "success", message: `${data.created} admin(s) created from ${data.total_rows} row(s)${data.skipped ? `, ${data.skipped} skipped` : ""}`, created: data.created, skipped: data.skipped, total: data.total_rows, errors: data.errors, passwordSample });
+      setFile(null);
       e.target.reset();
       onCreated();
     } catch (err) {
@@ -106,55 +199,18 @@ function CreateAdminForm({ institutionId, onCreated }) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-          <Plus size={15} className="text-emerald-600" />
-        </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-semibold text-slate-800">New Admin</h4>
-          <p className="text-xs text-slate-500">Create admin accounts under this institution.</p>
-        </div>
-        <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
-          <button type="button" onClick={() => { setMode("single"); setResult(null); }}
-            className={`rounded-md px-3 py-1 text-xs font-semibold transition ${mode === "single" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Single</button>
-          <button type="button" onClick={() => { setMode("bulk"); setResult(null); }}
-            className={`rounded-md px-3 py-1 text-xs font-semibold transition ${mode === "bulk" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bulk</button>
-        </div>
+    <Modal open={open} onClose={onClose} title="New Admin">
+      <div className="mb-4 flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+        <button type="button" onClick={() => { setMode("single"); setResult(null); }}
+          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${mode === "single" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Single</button>
+        <button type="button" onClick={() => { setMode("bulk"); setResult(null); }}
+          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${mode === "bulk" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bulk Upload</button>
       </div>
-      {result ? (
-        <div className={`rounded-xl p-3 text-sm ${
-          result.type === "success"
-            ? "border border-emerald-100 bg-emerald-50"
-            : "border border-red-100 bg-red-50"
-        }`}>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className={`font-semibold ${result.type === "success" ? "text-emerald-800" : "text-red-700"}`}>
-                {result.message}
-              </p>
-              {result.type === "success" && result.tempPassword ? (
-                <div className="mt-2 space-y-1">
-                  <p className="text-xs text-emerald-700">Email: {result.email}</p>
-                  <p className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-semibold text-emerald-900">
-                    <KeyRound size={12} /> {result.tempPassword}
-                  </p>
-                </div>
-              ) : null}
-              <p className={`mt-2 text-xs ${result.email_sent ? "text-emerald-600" : "text-amber-600"}`}>
-                {result.email_sent ? "Email sent with login details." : "Email could not be sent (SMTP not configured)."}
-              </p>
-            </div>
-            <button type="button" onClick={() => setResult(null)} className="text-slate-400 hover:text-slate-600">
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      ) : null}
       {mode === "single" ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <BulkImportResult result={result} />
           <div className="grid gap-3 sm:grid-cols-2">
-            <input className="field" placeholder="Full name *" value={form.name}
+            <input className="field sm:col-span-2" placeholder="Full name *" value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required />
             <div className="relative">
               <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -166,8 +222,29 @@ function CreateAdminForm({ institutionId, onCreated }) {
               <input className="field pl-8" placeholder="Phone" value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
             </div>
+            <div className="relative">
+              <ShieldCheck size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.admin_role}
+                onChange={(e) => setForm((p) => ({ ...p, admin_role: e.target.value }))}>
+                <option value="">Select role</option>
+                <option value="hod">HOD</option>
+                <option value="placement_officer">Placement Officer</option>
+              </select>
+            </div>
+            <div className="relative">
+              <Building size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.department_id}
+                onChange={(e) => setForm((p) => ({ ...p, department_id: e.target.value }))}>
+                <option value="">Select department</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose}
+              className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
             <button disabled={saving}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-70">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
@@ -176,17 +253,21 @@ function CreateAdminForm({ institutionId, onCreated }) {
           </div>
         </form>
       ) : (
-        <form onSubmit={handleImport}>
-          <div className="grid gap-3">
-            <input className="field" type="file" accept=".csv,.xlsx,.xls"
-              onChange={(e) => setImportForm((p) => ({ ...p, file: e.target.files?.[0] || null }))} required />
-            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
-              Columns: <span className="font-semibold text-slate-700">name</span>, <span className="font-semibold text-slate-700">email</span>,{" "}
-              <span className="font-semibold text-slate-700">phone</span>, <span className="font-semibold text-slate-700">organization</span>
-            </p>
-          </div>
-          <div className="mt-4 flex justify-end gap-2">
-            <button disabled={saving}
+        <form onSubmit={handleBulkSubmit} className="space-y-4">
+          <BulkImportResult result={result} />
+          <input className="field" type="file" accept=".csv,.xlsx,.xls"
+            onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
+            Columns: <span className="font-semibold text-slate-700">name</span>,{" "}
+            <span className="font-semibold text-slate-700">email</span>,{" "}
+            <span className="font-semibold text-slate-700">phone</span>,{" "}
+            <span className="font-semibold text-slate-700">department</span>,{" "}
+            <span className="font-semibold text-slate-700">admin_role</span>
+          </p>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose}
+              className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+            <button disabled={saving || !file}
               className="inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-70">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
               {saving ? "Importing..." : "Upload & create"}
@@ -194,22 +275,31 @@ function CreateAdminForm({ institutionId, onCreated }) {
           </div>
         </form>
       )}
-    </div>
+    </Modal>
   );
 }
 
-function CreateStudentForm({ institutionId, admins, onCreated }) {
+function StudentFormModal({ open, onClose, institutionId, departments, onCreated }) {
   const [mode, setMode] = useState("single");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", assigned_admin: "" });
-  const [importForm, setImportForm] = useState({ file: null, assigned_admin: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", usn: "", department_id: "", year: "" });
+  const [file, setFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
     if (!result) return;
-    const t = setTimeout(() => setResult(null), 2000);
+    const t = setTimeout(() => setResult(null), 5000);
     return () => clearTimeout(t);
   }, [result]);
+
+  useEffect(() => {
+    if (!open) {
+      setForm({ name: "", email: "", phone: "", usn: "", department_id: "", year: "" });
+      setFile(null);
+      setResult(null);
+      setMode("single");
+    }
+  }, [open]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -222,12 +312,14 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
           name: form.name,
           email: form.email,
           phone: form.phone,
+          usn: form.usn,
+          department_id: form.department_id || null,
+          year: form.year,
           institutionId,
-          assigned_admin: form.assigned_admin || null,
         }),
       });
-      setResult({ type: "success", message: `Student created`, tempPassword: data.temp_password, email: form.email, adminName: data.user?.assigned_admin_name, email_sent: data.email_sent });
-      setForm({ name: "", email: "", phone: "", assigned_admin: "" });
+      setResult({ type: "success", message: "Student created", tempPassword: data.temp_password, email: form.email, email_sent: data.email_sent, department_name: data.user?.department_name });
+      setForm({ name: "", email: "", phone: "", usn: "", department_id: "", year: "" });
       onCreated();
     } catch (err) {
       setResult({ type: "error", message: err.message });
@@ -236,23 +328,19 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
     }
   }
 
-  async function handleImport(e) {
+  async function handleBulkSubmit(e) {
     e.preventDefault();
-    if (!importForm.file) return;
+    if (!file) return;
     setSaving(true);
     setResult(null);
     try {
       const body = new FormData();
-      body.append("file", importForm.file);
+      body.append("file", file);
       body.append("institutionId", institutionId);
-      if (importForm.assigned_admin) body.append("assigned_admin", importForm.assigned_admin);
       const data = await apiFetch("/api/master/users/import-with-details", { method: "POST", body });
-      const errCount = data.errors?.length || 0;
-      setResult({
-        type: "success",
-        message: `${data.created} student(s) created from ${data.total_rows} row(s)${errCount ? `, ${errCount} error(s)` : ""}`,
-      });
-      setImportForm({ file: null, assigned_admin: "" });
+      const passwordSample = (data.users || []).slice(0, 5).map((u) => ({ email: u.email, password: u.temp_password }));
+      setResult({ type: "success", message: `${data.created} student(s) created from ${data.total_rows} row(s)${data.skipped ? `, ${data.skipped} skipped` : ""}`, created: data.created, skipped: data.skipped, total: data.total_rows, errors: data.errors, passwordSample });
+      setFile(null);
       e.target.reset();
       onCreated();
     } catch (err) {
@@ -263,57 +351,45 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-          <Plus size={15} className="text-emerald-600" />
-        </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-semibold text-slate-800">New Student</h4>
-          <p className="text-xs text-slate-500">Create student accounts under this institution.</p>
-        </div>
-        <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
-          <button type="button" onClick={() => { setMode("single"); setResult(null); }}
-            className={`rounded-md px-3 py-1 text-xs font-semibold transition ${mode === "single" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Single</button>
-          <button type="button" onClick={() => { setMode("bulk"); setResult(null); }}
-            className={`rounded-md px-3 py-1 text-xs font-semibold transition ${mode === "bulk" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bulk</button>
-        </div>
+    <Modal open={open} onClose={onClose} title="New Student">
+      <div className="mb-4 flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+        <button type="button" onClick={() => { setMode("single"); setResult(null); }}
+          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${mode === "single" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Single</button>
+        <button type="button" onClick={() => { setMode("bulk"); setResult(null); }}
+          className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${mode === "bulk" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>Bulk Upload</button>
       </div>
-      {result ? (
-        <div className={`rounded-xl p-3 text-sm ${
-          result.type === "success"
-            ? "border border-emerald-100 bg-emerald-50"
-            : "border border-red-100 bg-red-50"
-        }`}>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className={`font-semibold ${result.type === "success" ? "text-emerald-800" : "text-red-700"}`}>
-                {result.message}
-              </p>
-              {result.type === "success" && result.tempPassword ? (
-                <div className="mt-2 space-y-1">
-                  <p className="text-xs text-emerald-700">Email: {result.email}</p>
-                  {result.adminName ? <p className="text-xs text-emerald-700">Admin: {result.adminName}</p> : null}
-                  <p className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-semibold text-emerald-900">
-                    <KeyRound size={12} /> {result.tempPassword}
-                  </p>
-                </div>
-              ) : null}
-              <p className={`mt-2 text-xs ${result.email_sent ? "text-emerald-600" : "text-amber-600"}`}>
-                {result.email_sent ? "Email sent with login details." : "Email could not be sent (SMTP not configured)."}
-              </p>
-            </div>
-            <button type="button" onClick={() => setResult(null)} className="text-slate-400 hover:text-slate-600">
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      ) : null}
       {mode === "single" ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <BulkImportResult result={result} />
           <div className="grid gap-3 sm:grid-cols-2">
-            <input className="field" placeholder="Full name *" value={form.name}
+            <input className="field sm:col-span-2" placeholder="Full name *" value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required />
+            <div className="relative">
+              <GraduationCap size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input className="field pl-8" placeholder="USN" value={form.usn}
+                onChange={(e) => setForm((p) => ({ ...p, usn: e.target.value }))} />
+            </div>
+            <div className="relative">
+              <Building size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.department_id}
+                onChange={(e) => setForm((p) => ({ ...p, department_id: e.target.value }))}>
+                <option value="">Select branch</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="relative">
+              <GraduationCap size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select className="field pl-8" value={form.year}
+                onChange={(e) => setForm((p) => ({ ...p, year: e.target.value }))}>
+                <option value="">Select year</option>
+                <option value="1st">1st Year</option>
+                <option value="2nd">2nd Year</option>
+                <option value="3rd">3rd Year</option>
+                <option value="4th">4th Year</option>
+              </select>
+            </div>
             <div className="relative">
               <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input className="field pl-8" type="email" placeholder="Email *" value={form.email}
@@ -324,18 +400,10 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
               <input className="field pl-8" placeholder="Phone" value={form.phone}
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
             </div>
-            <div className="relative">
-              <UserCog size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <select className="field pl-8" value={form.assigned_admin}
-                onChange={(e) => setForm((p) => ({ ...p, assigned_admin: e.target.value }))}>
-                <option value="">No admin assigned</option>
-                {admins.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name} ({a.email})</option>
-                ))}
-              </select>
-            </div>
           </div>
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose}
+              className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
             <button disabled={saving}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-70">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
@@ -344,27 +412,22 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
           </div>
         </form>
       ) : (
-        <form onSubmit={handleImport}>
-          <div className="grid gap-3">
-            <input className="field" type="file" accept=".csv,.xlsx,.xls"
-              onChange={(e) => setImportForm((p) => ({ ...p, file: e.target.files?.[0] || null }))} required />
-            <div className="relative">
-              <UserCog size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <select className="field pl-8" value={importForm.assigned_admin}
-                onChange={(e) => setImportForm((p) => ({ ...p, assigned_admin: e.target.value }))}>
-                <option value="">No admin assigned</option>
-                {admins.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name} ({a.email})</option>
-                ))}
-              </select>
-            </div>
-            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
-              Columns: <span className="font-semibold text-slate-700">name</span>, <span className="font-semibold text-slate-700">email</span>,{" "}
-              <span className="font-semibold text-slate-700">phone</span>, <span className="font-semibold text-slate-700">organization</span>
-            </p>
-          </div>
-          <div className="mt-4 flex justify-end gap-2">
-            <button disabled={saving}
+        <form onSubmit={handleBulkSubmit} className="space-y-4">
+          <BulkImportResult result={result} />
+          <input className="field" type="file" accept=".csv,.xlsx,.xls"
+            onChange={(e) => setFile(e.target.files?.[0] || null)} required />
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
+            Columns: <span className="font-semibold text-slate-700">name</span>,{" "}
+            <span className="font-semibold text-slate-700">email</span>,{" "}
+            <span className="font-semibold text-slate-700">usn</span>,{" "}
+            <span className="font-semibold text-slate-700">department</span>,{" "}
+            <span className="font-semibold text-slate-700">year</span>,{" "}
+            <span className="font-semibold text-slate-700">phone</span>
+          </p>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose}
+              className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+            <button disabled={saving || !file}
               className="inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-70">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
               {saving ? "Importing..." : "Upload & create"}
@@ -372,7 +435,58 @@ function CreateStudentForm({ institutionId, admins, onCreated }) {
           </div>
         </form>
       )}
-    </div>
+    </Modal>
+  );
+}
+
+function DepartmentModal({ open, onClose, institutionId, onCreated }) {
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) { setName(""); setError(""); }
+  }, [open]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setSaving(true);
+    setError("");
+    try {
+      await apiFetch(`/api/institutions/${institutionId}/departments`, {
+        method: "POST",
+        body: JSON.stringify({ name: name.trim() }),
+      });
+      setName("");
+      onCreated();
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Add Department">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error ? (
+          <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm font-medium text-red-700">{error}</div>
+        ) : null}
+        <input className="field" placeholder="Department name *" value={name}
+          onChange={(e) => setName(e.target.value)} required autoFocus />
+        <div className="flex justify-end gap-2">
+          <button type="button" onClick={onClose}
+            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+          <button disabled={saving}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-70">
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+            {saving ? "Adding..." : "Add Department"}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 
@@ -385,10 +499,13 @@ export default function InstitutionDetail() {
   const [analytics, setAnalytics] = useState(null);
   const [admins, setAdmins] = useState([]);
   const [students, setStudents] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [showCreateStudent, setShowCreateStudent] = useState(false);
+  const [showAddDepartment, setShowAddDepartment] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingDept, setDeletingDept] = useState(null);
 
   async function handleDelete() {
     if (!deleteTarget) return;
@@ -404,6 +521,22 @@ export default function InstitutionDetail() {
     }
   }
 
+  async function handleDeleteDept(deptId) {
+    try {
+      await apiFetch(`/api/institutions/${id}/departments/${deptId}`, { method: "DELETE" });
+      setDepartments((prev) => prev.filter((d) => d.id !== deptId));
+      setDeletingDept(null);
+    } catch (err) {
+      alert(err.message || "Unable to delete department.");
+    }
+  }
+
+  function loadDepartments() {
+    apiFetch(`/api/institutions/${id}/departments`)
+      .then((data) => setDepartments(data.departments || []))
+      .catch(() => {});
+  }
+
   function loadInstitution() {
     setLoading(true);
     setError("");
@@ -416,6 +549,7 @@ export default function InstitutionDetail() {
         setInstitution(instData.institution);
         setAnalytics(analyticsData.analytics);
         setAdmins(adminsData.admins || []);
+        setDepartments(instData.institution.departments || []);
       })
       .catch((err) => setError(err.message || "Unable to load institution details."))
       .finally(() => setLoading(false));
@@ -443,6 +577,18 @@ export default function InstitutionDetail() {
 
   useEffect(() => { loadInstitution(); }, [id]);
   useEffect(() => { if (institution) loadStudents(); }, [institution?.id]);
+
+  const refreshAnalytics = useCallback(() => {
+    apiFetch(`/api/institutions/${id}/analytics`)
+      .then((data) => setAnalytics(data.analytics))
+      .catch(() => {});
+  }, [id]);
+
+  useEffect(() => {
+    if (!institution) return;
+    const id_interval = window.setInterval(refreshAnalytics, 30 * 1000);
+    return () => window.clearInterval(id_interval);
+  }, [institution, refreshAnalytics]);
 
   if (loading) {
     return (
@@ -526,8 +672,8 @@ export default function InstitutionDetail() {
           color={{ bg: "bg-emerald-50", text: "text-emerald-600" }} />
       </section>
 
-      <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-100 bg-white shadow-card">
+      <div className="mb-6 grid gap-6 lg:grid-cols-3">
+        <section className="rounded-2xl border border-slate-100 bg-white shadow-card lg:col-span-2">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-blue-500" />
@@ -539,18 +685,12 @@ export default function InstitutionDetail() {
                 className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">
                 View all
               </Link>
-              <button onClick={() => setShowCreateAdmin((p) => !p)}
+              <button onClick={() => setShowCreateAdmin(true)}
                 className="inline-flex items-center gap-1 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600">
-                {showCreateAdmin ? <X size={13} /> : <Plus size={13} />}
-                {showCreateAdmin ? "Cancel" : "Add"}
+                <Plus size={13} /> Add
               </button>
             </div>
           </div>
-          {showCreateAdmin ? (
-            <div className="border-b border-slate-100 px-5 py-4">
-              <CreateAdminForm institutionId={id} onCreated={refreshAdmins} />
-            </div>
-          ) : null}
           <div className="divide-y divide-slate-100">
             {admins.length ? admins.slice(0, 10).map((admin) => (
               <div key={admin.id} className="flex items-center justify-between px-5 py-3">
@@ -580,6 +720,44 @@ export default function InstitutionDetail() {
         <section className="rounded-2xl border border-slate-100 bg-white shadow-card">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div className="flex items-center gap-2">
+              <Building className="h-5 w-5 text-amber-500" />
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Departments</h2>
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{departments.length}</span>
+            </div>
+            <button onClick={() => setShowAddDepartment(true)}
+              className="inline-flex items-center gap-1 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600">
+              <Plus size={13} /> Add
+            </button>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {departments.length ? departments.map((dept) => (
+              <div key={dept.id} className="flex items-center justify-between px-5 py-3">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{dept.name}</p>
+                  <p className="text-xs text-slate-500">{dept.user_count} user(s)</p>
+                </div>
+                <button onClick={() => setDeletingDept(dept.id === deletingDept?.id && deletingDept?.confirm ? null : { id: dept.id, confirm: true })}
+                  className="rounded-lg border border-slate-200 p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+                  title="Delete department">
+                  {deletingDept?.id === dept.id && deletingDept?.confirm ? (
+                    <span className="flex items-center gap-1 px-1 text-xs font-semibold text-red-500"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteDept(dept.id); }}>
+                      Confirm
+                    </span>
+                  ) : <Trash2 size={14} />}
+                </button>
+              </div>
+            )) : (
+              <p className="px-5 py-6 text-center text-sm text-slate-500">No departments yet.</p>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <div className="mb-6">
+        <section className="rounded-2xl border border-slate-100 bg-white shadow-card">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-violet-500" />
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Students</h2>
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">{students.length}</span>
@@ -589,18 +767,12 @@ export default function InstitutionDetail() {
                 className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">
                 View all
               </Link>
-              <button onClick={() => setShowCreateStudent((p) => !p)}
+              <button onClick={() => setShowCreateStudent(true)}
                 className="inline-flex items-center gap-1 rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600">
-                {showCreateStudent ? <X size={13} /> : <Plus size={13} />}
-                {showCreateStudent ? "Cancel" : "Add"}
+                <Plus size={13} /> Add
               </button>
             </div>
           </div>
-          {showCreateStudent ? (
-            <div className="border-b border-slate-100 px-5 py-4">
-              <CreateStudentForm institutionId={id} admins={admins} onCreated={loadStudents} />
-            </div>
-          ) : null}
           {studentsLoading ? (
             <div className="flex items-center justify-center px-5 py-8 text-sm text-slate-500">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -608,11 +780,15 @@ export default function InstitutionDetail() {
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
-              {students.length ? students.slice(0, 10).map((student) => (
+              {students.length ? students.slice(0, 20).map((student) => (
                 <div key={student.id} className="flex items-center justify-between px-5 py-3">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{student.name}</p>
-                    <p className="text-xs text-slate-500">{student.email}{student.phone ? ` · ${student.phone}` : ""}</p>
+                    <p className="text-xs text-slate-500">
+                      {student.email}
+                      {student.usn ? ` · ${student.usn}` : ""}
+                      {student.phone ? ` · ${student.phone}` : ""}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {student.assigned_admin_name ? (
@@ -637,6 +813,15 @@ export default function InstitutionDetail() {
           )}
         </section>
       </div>
+
+      <AdminFormModal open={showCreateAdmin} onClose={() => setShowCreateAdmin(false)}
+        institutionId={id} departments={departments} onCreated={refreshAdmins} />
+
+      <StudentFormModal open={showCreateStudent} onClose={() => setShowCreateStudent(false)}
+        institutionId={id} departments={departments} onCreated={loadStudents} />
+
+      <DepartmentModal open={showAddDepartment} onClose={() => setShowAddDepartment(false)}
+        institutionId={id} onCreated={loadDepartments} />
 
       {deleteTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm">

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   BadgeCheck,
   BriefcaseBusiness,
-  Building2,
   CalendarDays,
   ClipboardCheck,
   Code2,
@@ -46,21 +45,6 @@ const ROLE_CONTENT = {
       "Maintain programming and assessment content",
     ],
     focus: "Company-level control over users, admins, modules, and system configuration.",
-  },
-  admin: {
-    label: "Admin",
-    eyebrow: "Institution Workspace",
-    title: "Institution or college coordinator",
-    description:
-      "Represents a college, department, training center, or institution and manages assigned students, assessments, and performance analytics.",
-    icon: Building2,
-    duties: [
-      "Create and manage assessments for assigned students",
-      "Review aptitude, interview, and coding analytics",
-      "Track student readiness and submission quality",
-      "Coordinate practice activity for the institution",
-    ],
-    focus: "Institution-level management for students, tests, results, and learning progress.",
   },
   student: {
     label: "Student",
@@ -225,41 +209,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <section className="grid gap-5 lg:grid-cols-[1fr_1.1fr]">
-        <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-card">
-          <div className="flex items-start gap-4">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700">
-              <RoleIcon className="h-6 w-6" />
-            </span>
-            <div>
-              <h2 className="text-lg font-black text-emerald-950">{roleContent.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{roleContent.description}</p>
-            </div>
-          </div>
-          <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Primary Focus</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-emerald-950">{roleContent.focus}</p>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-card">
-          <h2 className="text-lg font-black text-emerald-950">Responsibilities</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {roleContent.duties.map((duty, index) => {
-              const icons = [UsersRound, ClipboardCheck, Code2, ShieldCheck];
-              const DutyIcon = icons[index] || ClipboardCheck;
-              return (
-                <div key={duty} className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-white p-3">
-                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
-                    <DutyIcon className="h-4 w-4" />
-                  </span>
-                  <p className="text-sm font-semibold leading-5 text-slate-700">{duty}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+     
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Detail icon={UserRound} label="Full Name" value={user?.name} />
