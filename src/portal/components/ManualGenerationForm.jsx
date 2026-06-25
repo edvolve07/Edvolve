@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Minus, Plus, Sparkles } from 'lucide-react';
+import { Building2, FileText, Minus, Plus, Sparkles, Users } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
 
@@ -34,6 +34,9 @@ export default function ManualGenerationForm() {
   const navigate = useNavigate();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [targetAudience, setTargetAudience] = useState('all');
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [form, setForm] = useState({
     title: '',
     concept: 'All Concepts',
@@ -50,6 +53,12 @@ export default function ManualGenerationForm() {
     generation_mode: 'fast',
     file: null,
   });
+
+  useEffect(() => {
+    apiFetch('/admin/departments')
+      .then((data) => setDepartments(data.departments || []))
+      .catch(() => {});
+  }, []);
 
   const questionCount = useMemo(
     () => (form.concept === 'All Concepts' ? form.perConcept * singleConceptCount : form.totalQuestions),
@@ -94,6 +103,10 @@ export default function ManualGenerationForm() {
       payload.append('passingMarks', String(form.passing_marks));
       payload.append('status', form.status);
       payload.append('generation_mode', form.generation_mode);
+      payload.append('target_audience', targetAudience);
+      if (targetAudience === 'department' && selectedDepartments.length) {
+        payload.append('department_ids', JSON.stringify(selectedDepartments));
+      }
 
       if (form.start_time) {
         const [datePart, timePart] = form.start_time.split('T');
@@ -271,6 +284,73 @@ export default function ManualGenerationForm() {
             />
           </label>
         </div>
+      </div>
+
+      <div className="surface p-6">
+        <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">Target Audience</h3>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => { setTargetAudience('all'); setSelectedDepartments([]); }}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition ${
+              targetAudience === 'all'
+                ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Users className="h-4 w-4" />
+            All Students
+          </button>
+          <button
+            type="button"
+            onClick={() => setTargetAudience('department')}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition ${
+              targetAudience === 'department'
+                ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Building2 className="h-4 w-4" />
+            Department-wise
+          </button>
+        </div>
+
+        {targetAudience === 'department' && (
+          <div className="mt-4">
+            <p className="mb-2 text-sm font-semibold text-slate-700">Select Departments</p>
+            {departments.length === 0 ? (
+              <p className="text-sm text-slate-400">No departments found for your institution.</p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {departments.map((dept) => {
+                  const checked = selectedDepartments.includes(dept.id);
+                  return (
+                    <label
+                      key={dept.id}
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition ${
+                        checked
+                          ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
+                          : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          setSelectedDepartments((prev) =>
+                            checked ? prev.filter((id) => id !== dept.id) : [...prev, dept.id],
+                          );
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      {dept.name}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="surface p-6">

@@ -130,29 +130,27 @@ export default function MasterAdminProblemForm() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <section className="page-stack">
         <div className="h-32 animate-pulse rounded-2xl bg-white" />
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+    <section className="page-stack">
       <button
         onClick={() => navigate('/master-admin/programming')}
-        className="mb-4 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-700"
+        className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-700"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Problems
       </button>
 
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-          {isEdit ? 'Edit Problem' : 'Create Problem'}
-        </h1>
-      </section>
+      <div className="page-hero">
+        <h2 className="text-3xl font-black text-slate-900">{isEdit ? 'Edit Problem' : 'Create Problem'}</h2>
+      </div>
 
-      <section className="space-y-5 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-6">
+      <section className="surface p-6">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">Title</label>
@@ -299,12 +297,12 @@ export default function MasterAdminProblemForm() {
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-5">
-          <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:opacity-70">
+          <button onClick={handleSave} disabled={saving} className="btn-primary">
             <Save className="h-4 w-4" />
             {saving ? 'Saving...' : isEdit ? 'Update Problem' : 'Create Problem'}
           </button>
         </div>
       </section>
-    </div>
+    </section>
   );
 }

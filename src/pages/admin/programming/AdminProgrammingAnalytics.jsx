@@ -37,9 +37,9 @@ export default function AdminProgrammingAnalytics() {
 
   if (!data) {
     return (
-      <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <section className="page-stack">
         <div className="h-32 animate-pulse rounded-2xl bg-white" />
-      </div>
+      </section>
     );
   }
 
@@ -48,22 +48,18 @@ export default function AdminProgrammingAnalytics() {
     : null;
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-emerald-600">Lecturer workspace</p>
-            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-              Programming Analytics
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-              View your students&apos; coding performance and submission analytics.
-            </p>
-          </div>
+    <section className="page-stack">
+      <div className="page-hero">
+        <div>
+          <p className="eyebrow">Lecturer workspace</p>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Programming Analytics</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            View your students&apos; coding performance and submission analytics.
+          </p>
         </div>
-      </section>
+      </div>
 
-      <div className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-3 sm:gap-4">
+      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <Users size={19} />
@@ -142,6 +138,6 @@ export default function AdminProgrammingAnalytics() {
           </table>
         </div>
       </section>
-    </div>
+    </section>
   );
 }

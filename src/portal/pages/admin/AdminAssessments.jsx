@@ -57,7 +57,7 @@ export default function AdminAssessments() {
   if (!assessments) return <LoadingSkeleton label="Loading assessments" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Assessment Library</p>
@@ -81,6 +81,7 @@ export default function AdminAssessments() {
                 <th>Title</th>
                 <th>Concept</th>
                 <th>Difficulty</th>
+                <th>Target</th>
                 <th>Duration</th>
                 <th>Extend Time</th>
                 <th>Questions</th>
@@ -95,6 +96,15 @@ export default function AdminAssessments() {
                   <td className="font-semibold text-slate-900">{assessment.title}</td>
                   <td>{assessment.concept}</td>
                   <td>{assessment.difficulty}</td>
+                  <td>
+                    <span className={`badge ${
+                      assessment.target_audience === 'department'
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'bg-purple-50 text-purple-700'
+                    }`}>
+                      {assessment.target_audience === 'department' ? 'Dept-wise' : 'All'}
+                    </span>
+                  </td>
                   <td>
                     <span className="inline-flex items-center gap-1 font-semibold">
                       <Clock3 className="h-4 w-4 text-slate-400" />

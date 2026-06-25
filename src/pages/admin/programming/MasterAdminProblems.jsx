@@ -35,34 +35,30 @@ export default function MasterAdminProblems() {
 
   if (!data) {
     return (
-      <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <section className="page-stack">
         <div className="h-32 animate-pulse rounded-2xl bg-white" />
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
-            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-              Programming Challenges
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-              Create and manage coding problems for students.
-            </p>
-          </div>
-          <Link
-            to="/master-admin/programming/create"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600"
-          >
-            <Plus className="h-4 w-4" />
-            Create Problem
-          </Link>
+    <section className="page-stack">
+      <div className="page-hero flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="eyebrow">Master admin tools</p>
+          <h2 className="mt-2 text-3xl font-black text-slate-900">Programming Challenges</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Create and manage coding problems for students.
+          </p>
         </div>
-      </section>
+        <Link
+          to="/master-admin/programming/create"
+          className="btn-primary"
+        >
+          <Plus className="h-4 w-4" />
+          Create Problem
+        </Link>
+      </div>
 
       <section className="rounded-2xl border border-slate-100 bg-white shadow-card">
         <div className="overflow-x-auto">
@@ -144,6 +140,6 @@ export default function MasterAdminProblems() {
           </table>
         </div>
       </section>
-    </div>
+    </section>
   );
 }

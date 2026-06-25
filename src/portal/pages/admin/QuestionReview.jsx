@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import QuestionList from '../../components/QuestionList';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { useToast } from '../../context/ToastContext';
@@ -7,6 +7,7 @@ import { apiFetch } from '../../utils/api';
 
 export default function QuestionReview() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const toast = useToast();
   const [assessment, setAssessment] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -39,6 +40,10 @@ export default function QuestionReview() {
         setAssessment(updated.assessment);
       }
       toast.success(status === 'published' ? 'Saved and published' : 'Questions saved');
+      if (status === 'published') {
+        navigate('/admin/assessments');
+        return;
+      }
     } catch (error) {
       toast.error(error.details?.join(', ') || error.message);
     } finally {

@@ -185,7 +185,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl space-y-6">
+    <section className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <div className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex items-center gap-5">
