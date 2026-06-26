@@ -144,12 +144,12 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <p className="mt-8 text-center text-sm text-slate-500">
+          {/* <p className="mt-8 text-center text-sm text-slate-500">
             New here?{' '}
             <Link className="font-bold text-emerald-700 transition hover:text-emerald-800" to="/signup">
               Create account <ArrowRight className="ml-0.5 inline h-3.5 w-3.5" />
             </Link>
-          </p>
+          </p> */}
         </form>
       </section>
     </main>
