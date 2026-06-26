@@ -15,7 +15,7 @@ export default function ResultDetails() {
   if (!data) return <LoadingSkeleton label="Loading result" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero">
         <p className="eyebrow">Result Review</p>
         <h2 className="mt-2 text-3xl font-black text-slate-900">{data.assessment.title}</h2>

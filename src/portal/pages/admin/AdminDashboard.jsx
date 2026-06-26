@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   if (!stats) return <LoadingSkeleton label="Loading dashboard" />;
 
   return (
-    <div className="page-stack">
+    <div className="page-stack mx-auto max-w-7xl">
       <section className="page-hero">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>

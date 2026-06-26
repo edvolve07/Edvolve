@@ -37,7 +37,7 @@ export default function AdminProgrammingAnalytics() {
 
   if (!data) {
     return (
-      <section className="page-stack">
+      <section className="page-stack mx-auto max-w-6xl">
         <div className="h-32 animate-pulse rounded-2xl bg-white" />
       </section>
     );
@@ -48,7 +48,7 @@ export default function AdminProgrammingAnalytics() {
     : null;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-6xl">
       <div className="page-hero">
         <div>
           <p className="eyebrow">Lecturer workspace</p>

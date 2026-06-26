@@ -47,7 +47,7 @@ export default function StudentResults() {
   if (!results || !interviewReports) return <LoadingSkeleton label="Loading results" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero">
         <div>
           <p className="eyebrow">Performance Archive</p>

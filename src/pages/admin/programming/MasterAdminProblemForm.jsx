@@ -130,14 +130,14 @@ export default function MasterAdminProblemForm() {
 
   if (loading) {
     return (
-      <section className="page-stack">
+      <section className="page-stack mx-auto max-w-5xl">
         <div className="h-32 animate-pulse rounded-2xl bg-white" />
       </section>
     );
   }
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-5xl">
       <button
         onClick={() => navigate('/master-admin/programming')}
         className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-700"

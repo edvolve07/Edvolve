@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BarChart3, BookOpenCheck, Code2, Mic2 } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpenCheck, Code2, MessageSquareText, Mic2 } from 'lucide-react';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import StatCard from '../../components/StatCard';
 import { apiFetch, formatDateTime } from '../../utils/api';
@@ -35,6 +35,7 @@ export default function StudentDashboard() {
   const hasAptitude = userModules.includes("aptitude") || userModules.includes("both");
   const hasInterview = userModules.includes("ai_interview") || userModules.includes("both");
   const hasProgramming = userModules.includes("programming") || userModules.includes("both");
+  const hasCommunication = userModules.includes("communication") || userModules.includes("both");
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState(() => getTimeBasedGreeting());
@@ -70,7 +71,7 @@ export default function StudentDashboard() {
   const firstName = (user?.name || 'Learner').split(' ')[0];
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Student Overview</p>
@@ -167,6 +168,33 @@ export default function StudentDashboard() {
                 No interview reports saved yet.
               </p>
             )}
+          </div>
+        </section>
+      ) : null}
+
+      {hasCommunication ? (
+        <section className="surface p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <MessageSquareText className="h-5 w-5 text-emerald-800" />
+              <h3 className="text-lg font-black text-slate-900">Interview Communication</h3>
+            </div>
+            <Link
+              to="/communication"
+              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Practice Answers <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className="rounded-md border border-slate-200 bg-slate-50/60 p-4">
+              <p className="text-xs font-bold uppercase text-slate-500">Questions Answered</p>
+              <p className="mt-2 text-2xl font-black text-slate-900">{stats.communication?.total_sessions || 0}</p>
+            </div>
+            <div className="rounded-md border border-slate-200 bg-slate-50/60 p-4">
+              <p className="text-xs font-bold uppercase text-slate-500">Avg Communication Score</p>
+              <p className="mt-2 text-2xl font-black text-slate-900">{stats.communication?.average_percentage || 0}%</p>
+            </div>
           </div>
         </section>
       ) : null}

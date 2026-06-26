@@ -54,7 +54,7 @@ export default function QuestionReview() {
   if (!assessment) return <LoadingSkeleton label="Loading questions" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Question Review</p>

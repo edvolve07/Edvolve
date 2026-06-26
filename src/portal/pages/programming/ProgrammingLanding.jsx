@@ -3,7 +3,7 @@ import { Code2, ClipboardCheck, ArrowRight } from 'lucide-react';
 
 export default function ProgrammingLanding() {
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-5xl">
       <h1 className="text-3xl font-black text-slate-900">Programming</h1>
       <p className="text-slate-500">Choose how you want to practice or test your coding skills</p>
 

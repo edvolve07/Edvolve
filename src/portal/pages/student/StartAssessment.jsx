@@ -229,7 +229,7 @@ export default function StartAssessment() {
   const selected = answers[question.id];
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="eyebrow">Live Assessment</p>

@@ -11,6 +11,7 @@ import {
   FileText,
   FilePlus2,
   LayoutDashboard,
+  MessageSquareText,
   Mic2,
   ShieldCheck,
   Sparkles,
@@ -28,12 +29,14 @@ export const NAV_ITEMS = [
   { href: "/programming/practice", label: "Coding Practice", icon: Code2, roles: ["student"], modules: ["both", "programming"] },
   // { href: "/programming", label: "AI Mock Interview", icon: Cpu, roles: ["student"], modules: ["both", "programming"] },
   { href: "/programming/assessments", label: "Contests", icon: ClipboardCheck, roles: ["student"], modules: ["both", "programming"] },
+  { href: "/communication", label: "Interview Communication", icon: MessageSquareText, roles: ["student"], modules: ["both", "communication"] },
   { href: "/reports", label: "Reports", icon: FileText, roles: ["student"], modules: ["both", "aptitude", "ai_interview"] },
   { href: "/resume-builder", label: "Resume Builder", icon: FilePlus2, roles: ["student"] },
   { href: "/profile", label: "Profile", icon: UserRound, roles: ["student", "admin", "master_admin"] },
   { href: "/admin-dashboard", label: "Admin Dashboard", icon: ShieldCheck, roles: ["admin"] },
   { href: "/admin/analytics/aptitude", label: "Aptitude Analytics", icon: BrainCircuit, roles: ["admin"], modules: ["both", "aptitude"] },
   { href: "/admin/analytics/interviews", label: "Interview Analytics", icon: Mic2, roles: ["admin"], modules: ["both", "ai_interview"] },
+  { href: "/admin/analytics/communication", label: "Interview Comm Analytics", icon: MessageSquareText, roles: ["admin"], modules: ["both", "communication"] },
   { href: "/master-admin-dashboard", label: "Master Admin", icon: Crown, roles: ["master_admin"] },
   { href: "/admin/assessments/create", label: "New Aptitude Test", icon: FilePlus2, roles: ["admin"], modules: ["both", "aptitude"] },
   { href: "/admin/assessments", label: "Aptitude Assessments", icon: ClipboardList, roles: ["admin"], modules: ["both", "aptitude"] },
@@ -142,6 +145,48 @@ export const METRIC_COLORS = {
   fluency: "#f59e0b",
   skill_relevance: "#8b5cf6",
 };
+
+export const COMMUNICATION_CATEGORIES = [
+  'Tell Me About Yourself',
+  'Behavioral Questions (STAR)',
+  'Strengths & Weaknesses',
+  'Why This Role / Company',
+  'Technical Explanations',
+  'Handling Difficult Questions',
+  'Career Goals & Aspirations',
+  'Salary & Negotiation Talk',
+];
+
+export const COMMUNICATION_METRICS = {
+  clarity: { label: 'Clarity', color: '#5f6bf3' },
+  structure: { label: 'Structure', color: '#06b6d4' },
+  conciseness: { label: 'Conciseness', color: '#10b981' },
+  relevance: { label: 'Relevance', color: '#f59e0b' },
+  confidence_tone: { label: 'Confidence & Tone', color: '#8b5cf6' },
+};
+
+export const COMMUNICATION_WORKFLOW = [
+  {
+    title: 'Pick an interview topic',
+    description: 'Choose a question type you want to practice answering.',
+    icon: MessageSquareText,
+  },
+  {
+    title: 'Practice your answer',
+    description: 'Respond to realistic interview prompts with text answers.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Get scored',
+    description: 'See clarity, structure, conciseness, relevance, and confidence scores.',
+    icon: TrendingUp,
+  },
+  {
+    title: 'Improve faster',
+    description: 'Use feedback and tips to ace your real interview.',
+    icon: TrendingUp,
+  },
+];
 
 export const WORKFLOW_STEPS = [
   {

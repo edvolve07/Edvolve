@@ -43,7 +43,7 @@ export default function AssessmentResult() {
   const { result, problems } = data;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <Link
         to="/programming/assessments"
         className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-700"

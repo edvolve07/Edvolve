@@ -50,7 +50,7 @@ export default function Submissions() {
   if (!data) return <LoadingSkeleton label="Loading submissions" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero">
         <p className="eyebrow">Programming Practice</p>
         <h2 className="mt-2 text-3xl font-black text-slate-900">My Submissions</h2>

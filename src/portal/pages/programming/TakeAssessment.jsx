@@ -135,7 +135,7 @@ export default function TakeAssessment() {
 
   if (error && !attempt) {
     return (
-      <section className="page-stack">
+      <section className="page-stack mx-auto max-w-7xl">
         <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
       </section>
     );
@@ -143,7 +143,7 @@ export default function TakeAssessment() {
 
   if (submitResult) {
     return (
-      <section className="page-stack">
+      <section className="page-stack mx-auto max-w-7xl">
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
           <h2 className="mt-3 text-xl font-bold text-emerald-800">Assessment Submitted!</h2>

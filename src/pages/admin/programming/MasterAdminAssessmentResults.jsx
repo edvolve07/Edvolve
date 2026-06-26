@@ -15,7 +15,7 @@ export default function MasterAdminAssessmentResults() {
   if (!data) return <LoadingSkeleton label="Loading results" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <Link
         to="/master-admin/programming/assessments"
         className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-700"

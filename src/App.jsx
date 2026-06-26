@@ -61,6 +61,9 @@ import AdminAssessmentResults from "./pages/admin/programming/AdminAssessmentRes
 import MasterAdminAssessmentList from "./pages/admin/programming/MasterAdminAssessmentList";
 import MasterAdminAssessmentForm from "./pages/admin/programming/MasterAdminAssessmentForm";
 import MasterAdminAssessmentResults from "./pages/admin/programming/MasterAdminAssessmentResults";
+import CommunicationPage from "./pages/CommunicationPage";
+import CommunicationReport from "./pages/CommunicationReport";
+import AdminCommunicationAnalytics from "./pages/admin/AdminCommunicationAnalytics";
 
 function AppShell({ children }) {
   const navigate = useNavigate();
@@ -219,6 +222,8 @@ export default function App() {
         <Route path="/reports/results/:attemptId" element={<AppShell><ReportsResultDetailsRoute /></AppShell>} />
         <Route path="/resume-builder" element={<AppShell><ResumeBuilderPage /></AppShell>} />
         <Route path="/profile" element={<AppShell><ProfilePage /></AppShell>} />
+        <Route path="/communication" element={<AppShell><CommunicationPage /></AppShell>} />
+        <Route path="/communication/report" element={<AppShell><CommunicationReport /></AppShell>} />
       </Route>
 
       <Route element={<RequireRole roles={["admin"]} />}>
@@ -235,6 +240,7 @@ export default function App() {
         <Route path="/admin/programming/assessments/create" element={<AppShell><AdminAssessmentForm /></AppShell>} />
         <Route path="/admin/programming/assessments/:assessmentId/problems" element={<AppShell><AdminAssessmentForm /></AppShell>} />
         <Route path="/admin/programming/assessments/:assessmentId/results" element={<AppShell><AdminAssessmentResults /></AppShell>} />
+        <Route path="/admin/analytics/communication" element={<AppShell><AdminCommunicationAnalytics /></AppShell>} />
       </Route>
 
       <Route element={<RequireRole roles={["master_admin"]} />}>

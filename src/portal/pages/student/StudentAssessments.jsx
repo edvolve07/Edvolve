@@ -16,7 +16,7 @@ export default function StudentAssessments() {
   if (!assessments) return <LoadingSkeleton label="Loading assessments" />;
 
   return (
-    <section className="page-stack">
+    <section className="page-stack mx-auto max-w-7xl">
       <div className="page-hero">
         <p className="eyebrow">Assessment Library</p>
         <h2 className="mt-2 text-3xl font-black text-slate-900">Available Assessments</h2>
