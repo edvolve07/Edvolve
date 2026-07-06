@@ -1,76 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Download, FileText, Plus, Save, Sparkles, TrendingUp, Wand2 } from "lucide-react";
+import { Download, FileText, Plus, Save, Sparkles, TrendingUp } from "lucide-react";
 import { apiFetch, downloadResumePdf } from "@/lib/api";
 import { useAuth } from "@/src/portal/context/AuthContext";
 
 const emptySection = { title: "", items: [""] };
-
-const IISc_TEMPLATE = {
-  title: "IISc Placement Resume Template",
-  target_role: "AI/ML Research Intern",
-  summary:
-    "Pre-final-year engineering student with research experience in Large Language Models, Retrieval-Augmented Generation, Natural Language Processing, and Information Security. Skilled in building mission-critical AI systems and cybersecurity applications using Python, PyTorch, TensorFlow, and LangChain. Seeking opportunities to contribute to applied AI, secure systems, and research-driven engineering teams.",
-  skills:
-    "LLMs, RAG, NLP, Deep Learning, Computer Vision, Supervised Learning, Unsupervised Learning, PyTorch, TensorFlow, Scikit-learn, LangChain, Hugging Face Transformers, Python, Rust, Linux, Docker, Git, Flask, Jupyter, Google Colab, VS Code, Cybersecurity, Threat Detection, Phishing Analysis, SOC Workflows",
-  experience: [
-    {
-      title: "AI/ML Intern | Vithsutra Technologies Pvt Ltd | Mar 2026 - Present | Mangaluru, India",
-      items: [
-        "Building an NLP and LLM-driven adaptive training platform; developed an ML pipeline for NIR sensor-based cashew moisture classification using signal processing and supervised learning.",
-        "Deployed models via Flask and Docker in real-time data ingestion pipelines for production environments.",
-      ],
-    },
-    {
-      title: "Research Intern | SPIRE Lab, Indian Institute of Science (IISc) | Nov 2025 - Jan 2026 | Bengaluru, India",
-      items: [
-        "Fine-tuned LLMs for domain-specific NLP tasks; built a RAG-based chatbot for secure, domain-restricted information retrieval.",
-        "Benchmarked and optimized inference latency for deployment in resource-constrained environments.",
-      ],
-    },
-  ],
-  projects: [
-    {
-      title: "LLM AI Assistant for SOC Alert Escalation | PyTorch, RAG, LangChain, Flask | May 2026",
-      items: [
-        "Built a RAG-LLM system for SOC analysts to automate alert triage and threat classification over vector-embedded alert databases.",
-      ],
-    },
-    {
-      title: "Phishing Link Detector | Scikit-learn, Flask | Oct 2025",
-      items: [
-        "Developed an ML-based communication security tool detecting malicious URLs with 98% accuracy and deployed it as a REST API.",
-      ],
-    },
-    {
-      title: "Phishing Email Detector | Scikit-learn, NLP, Flask | Oct 2025",
-      items: [
-        "Created an NLP-driven email classification system with 95% accuracy using TF-IDF for security screening workflows.",
-      ],
-    },
-  ],
-  education: [
-    {
-      title: "B.E. in CSE (IoT, Cybersecurity & Blockchain Technology) | Alva's Institute of Engineering and Technology | 2023 - Present",
-      items: ["CGPA: 7.60/10"],
-    },
-  ],
-  certifications:
-    "Microsoft SOC Analyst (In Progress), Google Cybersecurity Professional, Cisco Intro to Cybersecurity, Kali Linux Essentials",
-  achievements: [
-    {
-      title: "Regionals Top 3 | TCS Techbytes Tech Quiz | 2026",
-      items: ["Secured Top 3 position among regional participants in the TCS Techbytes national technology quiz competition."],
-    },
-    {
-      title: "Event President, Cybersiege 2026 | National Level CTF Competition | 2026",
-      items: ["Led and organized a national-level Capture The Flag cybersecurity competition as President and Technical Head."],
-    },
-    {
-      title: "HackathonX Semi-finalist | National Cybersecurity Hackathon | 2025",
-      items: ["Reached the semi-finals of a national-level cybersecurity hackathon, developing AI-driven security solutions under time constraints."],
-    },
-  ],
-};
 
 function listToText(list = []) {
   return list.join(", ");
@@ -99,10 +32,10 @@ function SectionEditor({ label, sections, onChange }) {
   }
 
   return (
-    <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
+    <section className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-black text-emerald-950">{label}</h2>
-        <button type="button" onClick={addSection} className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 px-3 py-2 text-sm font-bold text-emerald-800">
+        <h2 className="text-lg font-bold text-slate-900">{label}</h2>
+        <button type="button" onClick={addSection} className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50">
           <Plus className="h-4 w-4" />
           Add
         </button>
@@ -114,14 +47,14 @@ function SectionEditor({ label, sections, onChange }) {
               value={section.title || ""}
               onChange={(event) => updateSection(index, "title", event.target.value)}
               placeholder={`${label} title`}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold outline-none focus:border-emerald-400"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold outline-none focus:border-brand-400"
             />
             <textarea
               value={(section.items || []).join("\n")}
               onChange={(event) => updateSection(index, "items", event.target.value)}
               placeholder="One bullet per line"
               rows={4}
-              className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-400"
+              className="mt-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
           </div>
         ))}
@@ -132,14 +65,14 @@ function SectionEditor({ label, sections, onChange }) {
 
 function TextListEditor({ label, value, onChange, placeholder }) {
   return (
-    <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
-      <h2 className="text-lg font-black text-emerald-950">{label}</h2>
+    <section className="rounded-lg border border-slate-200 bg-white p-5">
+      <h2 className="text-lg font-bold text-slate-900">{label}</h2>
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder || "One item per line or comma separated"}
         rows={4}
-        className="mt-4 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-emerald-400"
+        className="mt-4 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400"
       />
     </section>
   );
@@ -234,98 +167,75 @@ export default function ResumeBuilderPage() {
     }
   }
 
-  function applyIIScTemplate() {
-    setForm((current) => ({
-      ...current,
-      ...IISc_TEMPLATE,
-      phone: current.phone || user?.phone || "",
-      email: current.email || user?.email || "",
-      linkedin: current.linkedin || "",
-      github: current.github || "",
-      location: current.location || user?.location || "",
-      target_role: current.target_role || IISc_TEMPLATE.target_role,
-    }));
-    setMessage("IISc placed-student template applied. Replace the sample content with the user's details.");
-    setError("");
-  }
-
   return (
     <section className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+      <div className="rounded-lg border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="eyebrow">Resume Builder</p>
-            <h1 className="mt-2 text-3xl font-black text-emerald-950">ATS-focused resume versions</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              Start from the IISc placed-student template, replace details, save versions, and download a polished PDF.
+            <h1 className="mt-2 text-3xl font-bold text-slate-900">ATS-focused resume versions</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              Build ATS-optimized resume versions, replace details, save iterations, and download a polished PDF.
             </p>
-            <button
-              type="button"
-              onClick={applyIIScTemplate}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-800 transition hover:bg-emerald-100"
-            >
-              <Wand2 className="h-4 w-4" />
-              Use IISc Placed Template
-            </button>
           </div>
-          <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-5 py-4">
-            <p className="text-xs font-bold uppercase text-emerald-700">Latest ATS Score</p>
-            <p className="mt-1 text-3xl font-black text-emerald-950">{latest?.ats_analysis?.ats_score || 0}</p>
-            <p className="text-xs font-semibold text-slate-500">
+          <div className="rounded-lg border border-slate-200 bg-brand-50 px-5 py-4">
+            <p className="text-xs font-semibold uppercase text-brand-700">Latest ATS Score</p>
+            <p className="mt-1 text-3xl font-bold text-slate-900">{latest?.ats_analysis?.ats_score || 0}</p>
+            <p className="text-xs text-slate-500">
               {scoreDelta >= 0 ? "+" : ""}{scoreDelta} from previous
             </p>
           </div>
         </div>
       </div>
 
-      {message ? <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">{message}</div> : null}
+      {message ? <div className="rounded-lg border border-accent-200 bg-accent-50 p-4 text-sm font-semibold text-accent-800">{message}</div> : null}
       {error ? <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div> : null}
 
       <form onSubmit={saveVersion} className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
-            <h2 className="text-lg font-black text-emerald-950">Basics</h2>
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="text-lg font-bold text-slate-900">Basics</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <input
                 value={form.title}
                 onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="Resume title"
               />
               <input
                 value={form.target_role}
                 onChange={(event) => setForm((current) => ({ ...current, target_role: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="Target role"
               />
               <input
                 value={form.phone}
                 onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="Phone"
               />
               <input
                 value={form.email}
                 onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="Email"
               />
               <input
                 value={form.linkedin}
                 onChange={(event) => setForm((current) => ({ ...current, linkedin: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="LinkedIn"
               />
               <input
                 value={form.github}
                 onChange={(event) => setForm((current) => ({ ...current, github: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
                 placeholder="GitHub"
               />
               <input
                 value={form.location}
                 onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400 md:col-span-2"
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400 md:col-span-2"
                 placeholder="Location"
               />
             </div>
@@ -333,13 +243,13 @@ export default function ResumeBuilderPage() {
               value={form.summary}
               onChange={(event) => setForm((current) => ({ ...current, summary: event.target.value }))}
               rows={5}
-              className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+              className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
               placeholder="Professional summary with role, skills, and measurable impact"
             />
             <input
               value={form.skills}
               onChange={(event) => setForm((current) => ({ ...current, skills: event.target.value }))}
-              className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-400"
+              className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
               placeholder="Skills separated by commas"
             />
           </section>
@@ -357,35 +267,35 @@ export default function ResumeBuilderPage() {
             {saving ? "Saving..." : "Save New Version"}
           </button>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-emerald-700" />
-              <h2 className="text-lg font-black text-emerald-950">ATS Suggestions</h2>
+              <Sparkles className="h-5 w-5 text-brand-700" />
+              <h2 className="text-lg font-bold text-slate-900">ATS Suggestions</h2>
             </div>
             <ul className="mt-4 space-y-3 text-sm text-slate-600">
               {(latest?.ats_analysis?.improvements || ["Save a version to receive score improvement suggestions."]).map((item) => (
                 <li key={item} className="flex gap-2">
-                  <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                  <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
                   {item}
                 </li>
               ))}
             </ul>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-emerald-700" />
-              <h2 className="text-lg font-black text-emerald-950">Versions</h2>
+              <FileText className="h-5 w-5 text-brand-700" />
+              <h2 className="text-lg font-bold text-slate-900">Versions</h2>
             </div>
             <div className="mt-4 space-y-3">
               {versions.map((version) => (
                 <div key={version.id} className="rounded-lg border border-slate-200 p-3">
-                  <p className="font-black text-slate-900">Version {version.version}</p>
+                  <p className="font-semibold text-slate-900">Version {version.version}</p>
                   <p className="text-xs text-slate-500">ATS {version.ats_analysis?.ats_score || 0} / 100</p>
                   <button
                     type="button"
                     onClick={() => downloadResumePdf(version.id, version.version)}
-                    className="mt-3 inline-flex items-center gap-2 rounded-lg border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-800"
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Download PDF

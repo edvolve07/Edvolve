@@ -3,40 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --sidebar-bg: #0f172a;
+  --sidebar-bg: #064e3b;
   --sidebar-text: #ffffff;
-  --sidebar-text-muted: #94a3b8;
-  --sidebar-active-bg: rgba(255,255,255,0.08);
+  --sidebar-text-muted: #a7f3d0;
+  --sidebar-active-bg: rgba(255,255,255,0.14);
   --sidebar-active-text: #ffffff;
 
-  --canvas-bg: #EFF6FF;
+  --canvas-bg: #f4f7f6;
   --card-bg: #ffffff;
-  --card-border: #E2E8F0;
+  --card-border: #dfe8e4;
 
-  --text-heading: #0f172a;
-  --text-body: #334155;
+  --text-heading: #064e3b;
+  --text-body: #1e293b;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
 
-  --primary: #1E40AF;
-  --primary-hover: #2563EB;
-  --primary-light: #DBE4FF;
-  --primary-muted: #BACFFF;
+  --primary: #064e3b;
+  --primary-hover: #047857;
+  --primary-light: #d1fae5;
+  --primary-muted: #6ee7b7;
 
-  --accent: #22c55e;
-  --accent-light: #dcfce7;
+  --accent: #059669;
+  --accent-light: #d1fae5;
 
   --amber: #f59e0b;
   --amber-light: #fef3c7;
 
-  --success: #22c55e;
+  --success: #059669;
   --warning: #f59e0b;
   --danger: #ef4444;
 
-  --border: #E2E8F0;
-  --border-light: #F1F5F9;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
   --surface: #ffffff;
-  --surface-2: #F8FAFC;
+  --surface-2: #ecfdf5;
 }
 
 * {
@@ -195,7 +195,7 @@ h6 {
   }
 
   .sidebar-link:hover {
-    background-color: rgba(255,255,255,0.08);
+    background-color: var(--sidebar-active-bg);
     color: var(--sidebar-text);
   }
 

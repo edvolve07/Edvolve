@@ -47,7 +47,7 @@ export default function Login() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 py-8 bg-slate-50">
+    <main className="grid min-h-screen place-items-center px-4 py-8 bg-canvas">
       <section className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-200 lg:grid-cols-[1fr_1.1fr]">
         <div className="relative hidden flex-col justify-between bg-brand-950 p-10 text-white lg:flex">
           <div className="flex items-center gap-3">
