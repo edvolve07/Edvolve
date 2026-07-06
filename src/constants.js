@@ -21,15 +21,7 @@ import {
 } from "lucide-react";
 
 
-
-
-
-
-
-
 export const APP_NAME = "Edvols";
-
-
 
 
 export const NAV_ITEMS = [
@@ -59,6 +51,8 @@ export const NAV_ITEMS = [
   { href: "/admin/programming/assessments/create", label: "New Coding Test", icon: FilePlus2, roles: ["admin"], modules: ["both", "programming"] },
   { href: "/profile", label: "Profile", icon: UserRound, roles: ["student", "admin", "master_admin"] },
 ];
+
+
 
 export const DASHBOARD_STATS = [
   { label: "Interviews", value: "0", icon: Mic2, tone: "brand" },
