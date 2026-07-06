@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Flame, Menu, Search, Sparkles } from "lucide-react";
+import { ChevronDown, Flame, Menu, Search, Sparkles } from "lucide-react";
 import { Navigate, Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AccessRevoked from "@/src/pages/AccessRevoked";
@@ -73,10 +73,20 @@ function AppShell({ children }) {
     const stored = Number(window.localStorage.getItem("app-sidebar-width"));
     return Number.isFinite(stored) ? Math.min(Math.max(stored, 88), 360) : 288;
   });
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     window.localStorage.setItem("app-sidebar-width", String(sidebarWidth));
   }, [sidebarWidth]);
+
+  useEffect(() => {
+    if (!user || user.role === "admin" || user.role === "master_admin") return;
+    import("@/lib/api").then(({ apiFetch }) =>
+      apiFetch("/api/student/dashboard")
+        .then((data) => setStreak(data.study_streak?.current || 0))
+        .catch(() => {})
+    );
+  }, [user]);
 
   return (
     <div className="flex min-h-screen bg-canvas" style={{ "--app-sidebar-width": `${sidebarWidth}px` }}>
@@ -124,16 +134,9 @@ function AppShell({ children }) {
           {user?.role !== "admin" && user?.role !== "master_admin" ? (
             <button className="hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 sm:inline-flex">
               <Flame size={17} className="text-amber-500" />
-              12
+              {streak}
             </button>
           ) : null}
-
-          <button className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 sm:inline-flex">
-            <Bell size={18} />
-            <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-brand-600 text-[9px] font-bold text-white">
-              3
-            </span>
-          </button>
 
           <button
             type="button"
