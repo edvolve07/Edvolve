@@ -20,7 +20,7 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const resizingRef = useRef(false);
-  const compact = width <= COMPACT_THRESHOLD;
+  const compact = width <= COMPACT_THRESHOLD && window.innerWidth >= 1024;
   const userModules = user?.modules_access || ["both"];
   const visibleItems = NAV_ITEMS.filter((item) => {
     if (item.roles && !item.roles.includes(user?.role)) return false;

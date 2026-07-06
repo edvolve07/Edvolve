@@ -70,13 +70,16 @@ function AppShell({ children }) {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (window.innerWidth < 1024) return 288;
     const stored = Number(window.localStorage.getItem("app-sidebar-width"));
     return Number.isFinite(stored) ? Math.min(Math.max(stored, 88), 360) : 288;
   });
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    window.localStorage.setItem("app-sidebar-width", String(sidebarWidth));
+    if (window.innerWidth >= 1024) {
+      window.localStorage.setItem("app-sidebar-width", String(sidebarWidth));
+    }
   }, [sidebarWidth]);
 
   useEffect(() => {
