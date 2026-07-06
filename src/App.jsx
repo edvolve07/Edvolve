@@ -95,19 +95,19 @@ function AppShell({ children }) {
         onWidthChange={setSidebarWidth}
       />
       <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-[var(--app-sidebar-width)]">
-        <header className="sticky top-0 z-30 flex h-[76px] items-center gap-3 border-b border-emerald-100/60 bg-white/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10">
+        <header className="sticky top-0 z-30 flex h-[76px] items-center gap-3 border-b border-slate-200 bg-white/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10">
           <button
             type="button"
             aria-label="Open sidebar"
             onClick={() => setSidebarOpen(true)}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-white text-emerald-900 shadow-sm transition hover:bg-emerald-50 lg:hidden"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 lg:hidden"
           >
             <Menu size={20} />
           </button>
 
           <div className="hidden flex-1 justify-center md:flex">
-            <label className="flex h-12 w-full max-w-[520px] items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-4 text-slate-500 shadow-card">
-              <Search size={19} className="text-slate-500" />
+            <label className="flex h-12 w-full max-w-[520px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-slate-500">
+              <Search size={19} className="text-slate-400" />
               <input
                 type="search"
                 placeholder="Search topics, questions, or tests..."
@@ -117,21 +117,20 @@ function AppShell({ children }) {
           </div>
 
           <div className="min-w-0 flex-1 md:hidden">
-            <p className="text-base font-black leading-none text-emerald-900">{APP_NAME}</p>
-            <p className="mt-1 text-[11px] font-medium text-slate-500">Unified prep workspace</p>
+            <p className="text-base font-bold leading-none text-slate-900">{APP_NAME}</p>
+            <p className="mt-0.5 text-[11px] font-medium text-slate-500">Unified prep workspace</p>
           </div>
 
           {user?.role !== "admin" && user?.role !== "master_admin" ? (
-            <button className="hidden h-11 items-center gap-2 rounded-2xl border border-emerald-100 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-emerald-50 sm:inline-flex">
-              <Flame size={18} className="text-amber-500" />
+            <button className="hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 sm:inline-flex">
+              <Flame size={17} className="text-amber-500" />
               12
-              <ChevronDown size={15} />
             </button>
           ) : null}
 
-          <button className="relative hidden h-11 w-11 items-center justify-center rounded-2xl border border-emerald-100 bg-white text-slate-600 shadow-sm transition hover:bg-emerald-50 sm:inline-flex">
+          <button className="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 sm:inline-flex">
             <Bell size={18} />
-            <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-brand-600 text-[9px] font-bold text-white">
               3
             </span>
           </button>
@@ -139,17 +138,16 @@ function AppShell({ children }) {
           <button
             type="button"
             onClick={() => navigate("/profile")}
-            className="inline-flex shrink-0 items-center gap-3 rounded-2xl px-1 py-1 text-sm font-bold text-emerald-950 transition hover:bg-emerald-50 sm:px-2"
+            className="inline-flex shrink-0 items-center gap-3 rounded-xl px-1 py-1 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:px-2"
           >
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-emerald-900 text-sm font-black text-white shadow-card">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-800 text-sm font-bold text-white">
               {(user?.name || "U").slice(0, 1).toUpperCase()}
             </span>
             <span className="hidden max-w-36 truncate sm:inline">{user?.name || "User"}</span>
-            <ChevronDown size={16} className="hidden text-slate-500 sm:block" />
           </button>
         </header>
 
-        <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden bg-[linear-gradient(180deg,#fbfefd_0%,#f4f7f6_100%)]">
+        <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden">
           {children}
         </main>
       </div>

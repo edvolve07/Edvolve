@@ -82,20 +82,20 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
     <aside
       style={{ "--sidebar-current-width": `${width}px` }}
       className={clsx(
-        "sidebar fixed inset-y-0 left-0 z-50 flex w-[82vw] max-w-72 flex-col border-r border-white/10 bg-[radial-gradient(circle_at_30%_0%,rgba(5,150,105,0.35),transparent_34%),linear-gradient(180deg,#064e3b_0%,#053f31_48%,#042f25_100%)] shadow-sidebar transition-transform duration-200 sm:w-72 lg:w-[var(--sidebar-current-width)] lg:max-w-none",
+        "sidebar fixed inset-y-0 left-0 z-50 flex w-[82vw] max-w-72 flex-col border-r border-white/5 bg-[radial-gradient(circle_at_30%_0%,rgba(30,64,175,0.25),transparent_34%),linear-gradient(180deg,#0f172a_0%,#0f172a_48%,#0a0f1e_100%)] transition-transform duration-200 sm:w-72 lg:w-[var(--sidebar-current-width)] lg:max-w-none",
         open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}
     >
       <div className={clsx("pb-7 pt-8", compact ? "px-3" : "px-6")}>
         <div className={clsx("flex items-center gap-3", compact && "justify-center")}>
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-emerald-900 shadow-sm">
-            <Sparkles size={18} className="text-emerald-700" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-700">
+            <Sparkles size={18} className="text-white" />
           </div>
           <div className={clsx("min-w-0", compact && "hidden")}>
-            <p className="text-[22px] font-black leading-none tracking-normal text-white">
-              {APP_NAME} AI
+            <p className="text-[22px] font-bold leading-none tracking-tight text-white">
+              {APP_NAME}
             </p>
-            <p className="mt-2 text-[13px] font-medium text-emerald-50">Practice. Improve. Crack it.</p>
+            <p className="mt-1.5 text-[12px] font-medium text-slate-400">Placement readiness</p>
           </div>
         </div>
         <button
@@ -121,9 +121,9 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
               className={clsx(
                 "group relative flex items-center rounded-2xl py-3.5 text-[15px] font-bold transition-all duration-150",
                 compact ? "justify-center px-3" : "gap-4 px-4",
-                active ? "bg-emerald-600/80 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_22px_rgba(0,0,0,0.12)]" : "text-emerald-50 hover:bg-white/10 hover:text-white",
+                active ? "bg-white/10 text-white" : "text-slate-400 hover:bg-white/[0.07] hover:text-white",
               )}>
-              <Icon size={20} className={clsx("transition-colors", active ? "text-white" : "text-emerald-100/80 group-hover:text-white")} />
+              <Icon size={20} className={clsx("transition-colors", active ? "text-white" : "text-slate-500 group-hover:text-white")} />
               <span className={clsx("min-w-0 flex-1 truncate", compact && "hidden")}>{label}</span>
               {active && !compact ? <ChevronRight size={15} className="text-emerald-100" /> : null}
             </Link>
@@ -134,12 +134,12 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
       <div className={clsx("space-y-4 pb-5", compact ? "px-2" : "px-5")}>
         
 
-        <div className={clsx("rounded-2xl border border-white/15 bg-white/[0.05]", compact ? "p-3" : "p-4")}>
+        <div className={clsx("rounded-xl border border-white/5 bg-white/[0.03]", compact ? "p-3" : "p-4")}>
           <div className={clsx("flex items-center", compact ? "justify-center" : "gap-3")}>
-            <Headphones size={24} className="text-emerald-100" />
+            <Headphones size={20} className="text-slate-500" />
             <div className={clsx(compact && "hidden")}>
-              <p className="text-sm font-bold text-white">Need Help?</p>
-              <p className="text-xs text-emerald-50">Contact Support</p>
+              <p className="text-sm font-semibold text-white">Need Help?</p>
+              <p className="text-xs text-slate-500">Contact Support</p>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
           type="button"
           onClick={handleLogout}
           title={compact ? "Logout" : undefined}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-bold text-white transition hover:bg-white/15"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-white/10 hover:text-white"
         >
           <LogOut size={16} />
           <span className={clsx(compact && "hidden")}>Logout</span>
@@ -170,7 +170,7 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
         onKeyDown={handleResizeKeyDown}
         className="group absolute inset-y-0 right-0 hidden w-3 cursor-col-resize touch-none items-center justify-center outline-none lg:flex"
       >
-        <span className="h-14 w-1 rounded-full bg-white/20 transition group-hover:bg-white/50 group-focus:bg-white/60" />
+        <span className="h-14 w-1 rounded-full bg-white/10 transition group-hover:bg-white/30 group-focus:bg-white/40" />
       </div>
     </aside>
   );

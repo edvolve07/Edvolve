@@ -33,15 +33,15 @@ const moduleLabels = {
 };
 
 const toneClass = {
-  brand: "from-emerald-500 to-emerald-800 text-white",
-  green: "from-teal-500 to-emerald-800 text-white",
-  amber: "from-amber-400 to-amber-600 text-white",
-  blue: "from-sky-500 to-emerald-700 text-white",
+  brand: "bg-brand-800 text-white",
+  green: "bg-accent-600 text-white",
+  amber: "bg-amber-500 text-white",
+  blue: "bg-brand-600 text-white",
 };
 
 const typeMeta = {
-  aptitude: { icon: BrainCircuit, tone: "bg-emerald-600", label: "Aptitude" },
-  interview: { icon: Mic2, tone: "bg-sky-600", label: "Interview" },
+  aptitude: { icon: BrainCircuit, tone: "bg-brand-700", label: "Aptitude" },
+  interview: { icon: Mic2, tone: "bg-brand-600", label: "Interview" },
   programming: { icon: Code2, tone: "bg-amber-500", label: "Coding" },
 };
 
@@ -282,30 +282,30 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
       <section className="mb-8">
         <div>
-          <h1 className="text-2xl font-black tracking-normal text-emerald-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {greeting}, {firstName}
           </h1>
-          <p className="mt-2 text-base text-slate-700">
+          <p className="mt-1.5 text-base text-slate-500">
             Your dashboard is synced to your current role, module access, and latest progress.
           </p>
         </div>
       </section>
 
       {analyticsError ? (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-800">
+        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {analyticsError}
         </div>
       ) : null}
 
       <section className="mb-7 grid gap-5 lg:grid-cols-[1fr_1.1fr]">
-        <article className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+        <article className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow">Placement Readiness Score</p>
-              <h2 className="mt-3 text-5xl font-black leading-none text-emerald-950">{readiness.score}</h2>
-              <p className="mt-2 text-sm font-bold text-emerald-700">{readiness.label}</p>
+              <h2 className="mt-3 text-5xl font-bold leading-none text-slate-900">{readiness.score}</h2>
+              <p className="mt-2 text-sm font-semibold text-brand-700">{readiness.label}</p>
             </div>
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-emerald-50 text-emerald-700">
+            <div className="grid h-14 w-14 place-items-center rounded-full bg-brand-50 text-brand-700">
               <Award className="h-7 w-7" />
             </div>
           </div>
@@ -318,53 +318,53 @@ export default function DashboardPage() {
               Resume: readiness.components?.resume,
             }).map(([label, value]) => (
               <div key={label} className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-bold text-slate-500">{label}</p>
-                <p className="mt-1 text-lg font-black text-slate-900">{formatPercent(value)}</p>
+                <p className="text-xs font-semibold text-slate-500">{label}</p>
+                <p className="mt-1 text-lg font-bold text-slate-900">{formatPercent(value)}</p>
               </div>
             ))}
           </div>
         </article>
 
-        <article className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+        <article className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="eyebrow">Streaks, Badges, XP</p>
-              <h2 className="mt-2 text-2xl font-black text-emerald-950">{engagement.rank} Rank</h2>
+              <h2 className="mt-2 text-2xl font-bold text-slate-900">{engagement.rank} Rank</h2>
             </div>
-            <p className="rounded-lg bg-amber-50 px-4 py-2 text-sm font-black text-amber-700">{engagement.xp || 0} XP</p>
+            <p className="rounded-lg bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700">{engagement.xp || 0} XP</p>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {(engagement.badges || []).map((badge) => (
-              <span key={badge.title} className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800">
+              <span key={badge.title} className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-800">
                 {badge.title}
               </span>
             ))}
             {!engagement.badges?.length ? (
-              <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-500">
+              <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">
                 Complete milestones to earn badges
               </span>
             ) : null}
           </div>
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-emerald-50">
-            <div className="h-full rounded-full bg-emerald-600" style={{ width: `${readiness.score || 0}%` }} />
+          <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-brand-600" style={{ width: `${readiness.score || 0}%` }} />
           </div>
         </article>
       </section>
 
       <section className="mb-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {statCards.map(({ label, value, caption, icon: Icon, tone }) => (
-          <article key={label} className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <article key={label} className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="flex items-center gap-5">
-              <div className={clsx("grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br shadow-card", toneClass[tone])}>
+              <div className={clsx("grid h-16 w-16 shrink-0 place-items-center rounded-full", toneClass[tone])}>
                 <Icon size={26} />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-700">{label}</p>
-                <p className="mt-1 text-3xl font-black leading-none text-emerald-950">{loading && !dashboard ? "--" : value}</p>
-                <p className="mt-4 text-xs font-semibold text-emerald-700">{caption}</p>
+                <p className="text-sm font-medium text-slate-600">{label}</p>
+                <p className="mt-1 text-3xl font-bold leading-none text-slate-900">{loading && !dashboard ? "--" : value}</p>
+                <p className="mt-4 text-xs font-semibold text-brand-700">{caption}</p>
                 {label === "Overall Progress" ? (
-                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-emerald-50">
-                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${progress}%` }} />
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-brand-600" style={{ width: `${progress}%` }} />
                   </div>
                 ) : null}
               </div>
@@ -375,25 +375,25 @@ export default function DashboardPage() {
 
       <div className="grid gap-7 xl:grid-cols-[1.45fr_0.95fr]">
         <div className="space-y-7">
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
-            <h2 className="text-xl font-black text-emerald-950">Continue Learning</h2>
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
+            <h2 className="text-xl font-bold text-slate-900">Continue Learning</h2>
             {continueItem ? (
               <div className="mt-7 grid gap-5 md:grid-cols-[104px_1fr_auto] md:items-center">
-                <div className={clsx("grid h-24 w-24 place-items-center rounded-lg text-white shadow-card", continueMeta.tone)}>
+                <div className={clsx("grid h-24 w-24 place-items-center rounded-lg text-white", continueMeta.tone)}>
                   <ContinueIcon size={44} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-emerald-950">{continueItem.title}</h3>
-                  <p className="mt-1 text-sm font-medium text-slate-700">{continueItem.meta || continueMeta.label}</p>
+                  <h3 className="text-xl font-bold text-slate-900">{continueItem.title}</h3>
+                  <p className="mt-1 text-sm font-medium text-slate-500">{continueItem.meta || continueMeta.label}</p>
                   <div className="mt-5 flex items-center gap-3">
-                    <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-emerald-50">
-                      <div className="h-full rounded-full bg-emerald-600" style={{ width: `${Math.max(0, Math.min(100, Number(continueItem.progress || progress)))}%` }} />
+                    <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-full rounded-full bg-brand-600" style={{ width: `${Math.max(0, Math.min(100, Number(continueItem.progress || progress)))}%` }} />
                     </div>
-                    <span className="text-sm font-semibold text-slate-700">
+                    <span className="text-sm font-semibold text-slate-600">
                       {formatPercent(continueItem.progress ?? progress)}
                     </span>
                   </div>
-                  <p className="mt-5 text-sm text-slate-600">
+                  <p className="mt-5 text-sm text-slate-500">
                     Latest update: {formatDateTime(continueItem.updated_at || dashboard?.generated_at)}
                   </p>
                 </div>
@@ -402,46 +402,46 @@ export default function DashboardPage() {
                 </Link>
               </div>
             ) : (
-              <div className="mt-7 rounded-lg border border-dashed border-emerald-200 bg-emerald-50/40 p-6">
-                <p className="font-black text-emerald-950">No progress yet</p>
-                <p className="mt-2 text-sm text-slate-600">Start a practice session and this area will track your next step.</p>
+              <div className="mt-7 rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6">
+                <p className="font-semibold text-slate-900">No progress yet</p>
+                <p className="mt-2 text-sm text-slate-500">Start a practice session and this area will track your next step.</p>
               </div>
             )}
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="text-xl font-black text-emerald-950">Student Learning Path</h2>
-              <span className="text-xs font-black uppercase text-slate-400">Personalized</span>
+              <h2 className="text-xl font-bold text-slate-900">Student Learning Path</h2>
+              <span className="text-xs font-semibold uppercase text-slate-400">Personalized</span>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               {(dashboard?.learning_path || []).slice(0, 5).map((item) => (
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="rounded-lg border border-slate-200 bg-slate-50 p-4 transition hover:border-emerald-200 hover:bg-emerald-50/50"
+                  className="rounded-lg border border-slate-200 bg-white p-4 transition hover:border-brand-200 hover:bg-brand-50/50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs font-black uppercase text-emerald-700">{item.category}</p>
-                      <h3 className="mt-1 font-black text-slate-950">{item.title}</h3>
+                      <p className="text-xs font-semibold uppercase text-brand-700">{item.category}</p>
+                      <h3 className="mt-1 font-semibold text-slate-900">{item.title}</h3>
                     </div>
                     <span
                       className={clsx(
-                        "rounded-md px-2 py-1 text-[11px] font-black uppercase",
+                        "rounded-md px-2 py-1 text-[11px] font-semibold uppercase",
                         item.priority === "high"
                           ? "bg-red-50 text-red-600"
                           : item.priority === "medium"
                             ? "bg-amber-50 text-amber-700"
-                            : "bg-emerald-50 text-emerald-700",
+                            : "bg-accent-50 text-accent-700",
                       )}
                     >
                       {item.priority}
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600">{item.task}</p>
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white">
-                    <div className="h-full rounded-full bg-emerald-600" style={{ width: `${Math.max(0, Math.min(100, Number(item.progress || 0)))}%` }} />
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-brand-600" style={{ width: `${Math.max(0, Math.min(100, Number(item.progress || 0)))}%` }} />
                   </div>
                 </Link>
               ))}
@@ -453,10 +453,10 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-5 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-emerald-950">Recommended for you</h2>
-              <span className="text-xs font-black uppercase text-slate-400">
+              <h2 className="text-lg font-bold text-slate-900">Recommended for you</h2>
+              <span className="text-xs font-semibold uppercase text-slate-400">
                 {enabledModuleLabels.join(" / ") || "Student"}
               </span>
             </div>
@@ -471,7 +471,7 @@ export default function DashboardPage() {
                     key={`${item.type}-${item.title}`}
                     className={clsx(
                       "rounded-lg border p-5",
-                      amber ? "border-amber-200 bg-amber-50/40" : "border-emerald-100 bg-emerald-50/35",
+                      amber ? "border-amber-200 bg-amber-50/40" : "border-brand-100 bg-brand-50/35",
                     )}
                   >
                     <div className="mb-5 flex items-center gap-4">
@@ -479,21 +479,21 @@ export default function DashboardPage() {
                         <Icon size={23} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-black text-emerald-950">{item.title}</h3>
-                        <p className="mt-1 text-xs text-slate-600">{item.meta}</p>
+                        <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
+                        <p className="mt-1 text-xs text-slate-500">{item.meta}</p>
                       </div>
                     </div>
-                    <p className="mb-5 flex items-center gap-2 text-sm text-slate-700">
-                      <ListChecks size={15} className={amber ? "text-amber-600" : "text-emerald-700"} />
+                    <p className="mb-5 flex items-center gap-2 text-sm text-slate-600">
+                      <ListChecks size={15} className={amber ? "text-amber-600" : "text-brand-700"} />
                       {meta.label}
                     </p>
                     <Link
                       href={item.href}
                       className={clsx(
-                        "inline-flex w-full items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-black transition",
+                        "inline-flex w-full items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition",
                         amber
                           ? "border-amber-400 text-amber-700 hover:bg-amber-100"
-                          : "border-emerald-400 text-emerald-800 hover:bg-emerald-100",
+                          : "border-brand-200 text-brand-800 hover:bg-brand-50",
                       )}
                     >
                       {item.action}
@@ -511,11 +511,11 @@ export default function DashboardPage() {
           </section>
 
           {hasInterview ? (
-            <section className="overflow-hidden rounded-lg border border-emerald-100 bg-emerald-50 p-6 shadow-card">
+            <section className="overflow-hidden rounded-lg border border-brand-100 bg-brand-50 p-6">
               <div className="grid gap-6 md:grid-cols-[1fr_310px] md:items-center">
                 <div>
-                  <h2 className="text-xl font-black text-emerald-900">AI interview feedback</h2>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-700">
+                  <h2 className="text-xl font-bold text-brand-900">AI interview feedback</h2>
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
                     Latest average: {formatPercent(interviewAnalytics?.average_percentage)} across {interviewAnalytics?.reports || 0} saved report{interviewAnalytics?.reports === 1 ? "" : "s"}.
                   </p>
                   <Link href="/interview" className="btn-primary mt-5 px-5 py-3">
@@ -523,11 +523,11 @@ export default function DashboardPage() {
                   </Link>
                 </div>
                 <div className="relative hidden h-36 md:block">
-                  <div className="absolute right-6 top-1 grid h-28 w-28 place-items-center rounded-full bg-white shadow-card">
-                    <Bot size={58} className="text-emerald-700" />
+                  <div className="absolute right-6 top-1 grid h-28 w-28 place-items-center rounded-full bg-white">
+                    <Bot size={58} className="text-brand-700" />
                   </div>
-                  <div className="absolute bottom-5 left-4 h-12 w-24 rounded-lg bg-white/70 shadow-sm" />
-                  <div className="absolute right-0 top-16 h-14 w-24 rounded-lg bg-emerald-100/80 shadow-sm" />
+                  <div className="absolute bottom-5 left-4 h-12 w-24 rounded-lg bg-white/70" />
+                  <div className="absolute right-0 top-16 h-14 w-24 rounded-lg bg-brand-100/80" />
                 </div>
               </div>
             </section>
@@ -535,16 +535,16 @@ export default function DashboardPage() {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
-            <h2 className="text-lg font-black text-emerald-950">Study Streak</h2>
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-bold text-slate-900">Study Streak</h2>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
               <div>
-                <p className="flex items-center gap-2 text-2xl font-black text-emerald-700">
+                <p className="flex items-center gap-2 text-2xl font-bold text-slate-900">
                   <Flame size={25} className="text-amber-500" />
                   {studyStreak.current || 0} Days
                 </p>
-                <p className="mt-2 text-sm text-slate-600">
-                  Best streak: <span className="font-semibold text-orange-600">{studyStreak.best || 0} Days</span>
+                <p className="mt-2 text-sm text-slate-500">
+                  Best streak: <span className="font-semibold text-amber-600">{studyStreak.best || 0} Days</span>
                 </p>
               </div>
               <div className="grid grid-cols-7 gap-2 text-center">
@@ -552,9 +552,9 @@ export default function DashboardPage() {
                   <div key={day.key}>
                     <span
                       className={clsx(
-                        "grid h-7 w-7 place-items-center rounded-full text-xs font-black",
+                        "grid h-7 w-7 place-items-center rounded-full text-xs font-semibold",
                         day.active
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-brand-600 text-white"
                           : day.today
                             ? "bg-amber-100 text-amber-700"
                             : "bg-slate-100 text-slate-400",
@@ -562,26 +562,26 @@ export default function DashboardPage() {
                     >
                       {day.active ? <Check className="h-3 w-3" /> : ""}
                     </span>
-                    <span className="mt-2 block text-xs text-slate-600">{day.label}</span>
+                    <span className="mt-2 block text-xs text-slate-500">{day.label}</span>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-4 flex items-center gap-2">
-              <CalendarDays size={18} className="text-slate-600" />
-              <h2 className="text-lg font-black text-emerald-950">Role Focus</h2>
+              <CalendarDays size={18} className="text-slate-500" />
+              <h2 className="text-lg font-bold text-slate-900">Role Focus</h2>
             </div>
-            <h3 className="text-lg font-black text-emerald-700">
+            <h3 className="text-lg font-bold text-brand-700">
               {dashboard?.user?.interested_role || user?.interested_role || "Skill preparation"}
             </h3>
-            <p className="mt-1 text-sm font-medium text-slate-800">
+            <p className="mt-1 text-sm font-medium text-slate-600">
               {enabledModuleLabels.length ? enabledModuleLabels.join(", ") : "Student workspace"}
             </p>
             <div className="mt-5 flex items-center justify-between gap-3">
-              <p className="text-sm text-slate-700">
+              <p className="text-sm text-slate-600">
                 Weekly goal: {weeklyGoal.raw_completed || weeklyGoal.completed || 0}/{weeklyGoal.target || 5} sessions
               </p>
               <Link href={hasInterview ? "/interview" : hasProgramming ? "/programming/practice" : "/aptitude"} className="btn-primary whitespace-nowrap px-5 py-3">
@@ -590,35 +590,35 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-4 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-emerald-700" />
-              <h2 className="text-lg font-black text-emerald-950">Resume Builder</h2>
+              <FileText className="h-5 w-5 text-brand-700" />
+              <h2 className="text-lg font-bold text-slate-900">Resume Builder</h2>
             </div>
             <p className="text-sm text-slate-600">
-              Latest ATS score: <span className="font-black text-emerald-800">{dashboard?.resume_builder?.latest_version?.ats_score || 0}</span>
+              Latest ATS score: <span className="font-semibold text-brand-800">{dashboard?.resume_builder?.latest_version?.ats_score || 0}</span>
             </p>
             {dashboard?.resume_builder?.latest_version?.improvements?.length ? (
               <p className="mt-3 text-xs leading-5 text-slate-500">{dashboard.resume_builder.latest_version.improvements[0]}</p>
             ) : null}
-            <Link href="/resume-builder" className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-emerald-300 px-4 py-2.5 text-sm font-black text-emerald-800 hover:bg-emerald-50">
+            <Link href="/resume-builder" className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-brand-200 px-4 py-2.5 text-sm font-semibold text-brand-800 hover:bg-brand-50">
               Improve Resume
             </Link>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-5 flex items-center gap-2">
-              <Award className="h-5 w-5 text-emerald-700" />
-              <h2 className="text-lg font-black text-emerald-950">Certificates</h2>
+              <Award className="h-5 w-5 text-brand-700" />
+              <h2 className="text-lg font-bold text-slate-900">Certificates</h2>
             </div>
             <div className="space-y-3">
               {(dashboard?.certificates?.issued || []).map((certificate) => (
-                <div key={certificate.id || certificate._id} className="rounded-lg border border-emerald-100 bg-emerald-50 p-3">
-                  <p className="text-sm font-black text-emerald-950">{certificate.title}</p>
+                <div key={certificate.id || certificate._id} className="rounded-lg border border-brand-100 bg-brand-50 p-3">
+                  <p className="text-sm font-semibold text-slate-900">{certificate.title}</p>
                   <button
                     type="button"
                     onClick={() => downloadCertificatePdf(certificate.id || certificate._id)}
-                    className="mt-2 inline-flex items-center gap-2 text-xs font-black text-emerald-700"
+                    className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-brand-700"
                   >
                     <Download className="h-3.5 w-3.5" />
                     Download PDF
@@ -633,7 +633,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={() => issueCertificate(milestone.milestone)}
                     disabled={certificateBusy === milestone.milestone}
-                    className="w-full rounded-lg border border-emerald-200 bg-white px-3 py-2 text-left text-sm font-black text-emerald-800 hover:bg-emerald-50 disabled:opacity-60"
+                    className="w-full rounded-lg border border-brand-200 bg-white px-3 py-2 text-left text-sm font-semibold text-brand-800 hover:bg-brand-50 disabled:opacity-60"
                   >
                     {certificateBusy === milestone.milestone ? "Generating..." : `Generate: ${milestone.title}`}
                   </button>
@@ -644,10 +644,10 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-emerald-950">Recent Activity</h2>
-              <Link href="/reports" className="text-sm font-black text-emerald-700 hover:text-emerald-900">
+              <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
+              <Link href="/reports" className="text-sm font-semibold text-brand-700 hover:text-brand-900">
                 View all
               </Link>
             </div>
@@ -656,17 +656,17 @@ export default function DashboardPage() {
                 const meta = getTypeMeta(activity.type);
                 const Icon = activity.score >= 80 || activity.result === "Accepted" ? CheckCircle2 : activity.type === "aptitude" ? Star : meta.icon;
                 return (
-                  <Link key={`${activity.type}-${activity.id}`} href={activity.href || "/dashboard"} className="flex items-center gap-4 rounded-lg transition hover:bg-emerald-50/60">
+                  <Link key={`${activity.type}-${activity.id}`} href={activity.href || "/dashboard"} className="flex items-center gap-4 rounded-lg transition hover:bg-brand-50/60">
                     <div className={clsx("grid h-10 w-10 shrink-0 place-items-center rounded-full text-white", meta.tone)}>
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-black text-emerald-950">{activity.title}</p>
-                      <p className="text-sm text-slate-600">{activity.meta}</p>
+                      <p className="truncate text-sm font-semibold text-slate-900">{activity.title}</p>
+                      <p className="text-sm text-slate-500">{activity.meta}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-slate-500">{formatRelativeTime(activity.occurred_at)}</p>
-                      <p className="mt-1 text-sm font-black capitalize text-emerald-700">
+                      <p className="mt-1 text-sm font-semibold capitalize text-brand-700">
                         {Number.isFinite(Number(activity.score)) ? formatPercent(activity.score) : activity.result}
                       </p>
                     </div>
@@ -683,17 +683,17 @@ export default function DashboardPage() {
           </section>
 
           {focusMetrics.length ? (
-            <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
-              <h2 className="text-lg font-black text-emerald-950">Focus Metrics</h2>
+            <section className="rounded-lg border border-slate-200 bg-white p-6">
+              <h2 className="text-lg font-bold text-slate-900">Focus Metrics</h2>
               <div className="mt-5 space-y-4">
                 {focusMetrics.map((metric) => (
                   <div key={metric.key}>
                     <div className="mb-2 flex items-center justify-between text-sm">
-                      <span className="font-semibold text-slate-700">{metric.label}</span>
-                      <span className="font-black text-emerald-800">{metric.value}%</span>
+                      <span className="font-semibold text-slate-600">{metric.label}</span>
+                      <span className="font-semibold text-slate-900">{metric.value}%</span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-emerald-50">
-                      <div className="h-full rounded-full bg-emerald-600" style={{ width: `${metric.value}%` }} />
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-full rounded-full bg-brand-600" style={{ width: `${metric.value}%` }} />
                     </div>
                   </div>
                 ))}
@@ -701,14 +701,14 @@ export default function DashboardPage() {
             </section>
           ) : null}
 
-          <section className="rounded-lg border border-emerald-100 bg-white p-6 shadow-card">
+          <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="flex items-center gap-3">
               <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-600">
                 <Trophy size={22} />
               </div>
               <div>
-                <p className="font-black text-emerald-950">Weekly Goal</p>
-                <p className="text-sm text-slate-600">
+                <p className="font-semibold text-slate-900">Weekly Goal</p>
+                <p className="text-sm text-slate-500">
                   {weeklyGoal.completed || 0} of {weeklyGoal.target || 5} sessions complete
                 </p>
               </div>

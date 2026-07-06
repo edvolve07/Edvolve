@@ -1,50 +1,42 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Deep Emerald & Mint Tech Palette */
-  --sidebar-bg: #064e3b;
+  --sidebar-bg: #0f172a;
   --sidebar-text: #ffffff;
-  --sidebar-text-muted: #a7f3d0;
-  --sidebar-active-bg: rgba(255,255,255,0.14);
+  --sidebar-text-muted: #94a3b8;
+  --sidebar-active-bg: rgba(255,255,255,0.08);
   --sidebar-active-text: #ffffff;
 
-  --canvas-bg: #f4f7f6;
+  --canvas-bg: #EFF6FF;
   --card-bg: #ffffff;
-  --card-border: #dfe8e4;
-  --card-shadow: 0 1px 2px rgba(6,78,59,0.04), 0 8px 24px rgba(6,78,59,0.06);
+  --card-border: #E2E8F0;
 
-  --text-heading: #064e3b;
-  --text-body: #1e293b;
+  --text-heading: #0f172a;
+  --text-body: #334155;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
 
-  --primary: #064e3b;
-  --primary-hover: #059669;
-  --primary-light: #d1fae5;
-  --primary-muted: #6ee7b7;
+  --primary: #1E40AF;
+  --primary-hover: #2563EB;
+  --primary-light: #DBE4FF;
+  --primary-muted: #BACFFF;
 
-  --accent: #059669;
-  --accent-light: #d1fae5;
+  --accent: #22c55e;
+  --accent-light: #dcfce7;
 
   --amber: #f59e0b;
   --amber-light: #fef3c7;
 
-  --success: #059669;
+  --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
 
-  --border: #e2e8f0;
-  --border-light: #f1f5f9;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
   --surface: #ffffff;
-  --surface-2: #ecfdf5;
-
-  --radius-sm: 8px;
-  --radius: 10px;
-  --radius-lg: 12px;
+  --surface-2: #F8FAFC;
 }
 
 * {
@@ -62,7 +54,7 @@ html {
 body {
   background: var(--canvas-bg);
   color: var(--text-body);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   line-height: 1.6;
 }
 
@@ -89,19 +81,15 @@ h6 {
   }
 
   .page-hero {
-    @apply overflow-hidden rounded-card-lg bg-white p-6;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
+    @apply overflow-hidden rounded-card-lg border border-slate-200 bg-white p-6;
   }
 
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-wider text-emerald-700;
+    @apply text-xs font-semibold uppercase tracking-wider text-brand-600;
   }
 
-  /* Card Components - Pure white with minimal borders */
   .card {
-    @apply rounded-card bg-white shadow-card;
-    border: 1px solid var(--card-border);
+    @apply rounded-card border border-slate-200 bg-white;
   }
 
   .card-hover {
@@ -109,29 +97,23 @@ h6 {
   }
 
   .card-hover:hover {
-    @apply shadow-card-hover;
-    transform: translateY(-1px);
+    @apply border-brand-200;
   }
 
   .surface {
-    @apply rounded-card-sm border bg-white shadow-sm;
-    border-color: var(--card-border);
+    @apply rounded-card-sm border border-slate-200 bg-white;
   }
 
   .table-shell {
-    @apply overflow-hidden rounded-card border bg-white shadow-sm;
-    border-color: var(--card-border);
+    @apply overflow-hidden rounded-card border border-slate-200 bg-white;
   }
 
-  /* Primary Button - Deep Emerald with Mint Green hover */
   .btn-primary {
-    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200;
-    background-color: var(--primary);
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-800 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150;
   }
 
   .btn-primary:hover {
     background-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
   }
 
   .btn-primary:active {
@@ -142,64 +124,54 @@ h6 {
     @apply cursor-not-allowed opacity-60;
   }
 
-  /* Secondary Button */
   .btn-secondary {
-    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200;
-    border-color: var(--card-border);
-    color: var(--primary);
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-800 transition-all duration-150;
   }
 
   .btn-secondary:hover {
-    @apply bg-emerald-50;
-    border-color: #a7f3d0;
+    @apply bg-brand-50 border-brand-200;
   }
 
-  /* Outline Button */
+  .btn-accent {
+    @apply focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150;
+  }
+
+  .btn-accent:hover {
+    background-color: var(--accent);
+  }
+
   .btn-outline {
-    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-emerald-600 bg-transparent px-5 py-2.5 text-sm font-semibold text-emerald-700 transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-200 bg-transparent px-5 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-150;
   }
 
   .btn-outline:hover {
-    @apply bg-emerald-50;
+    @apply bg-brand-50;
   }
 
-  /* Dark Button - For sidebar/footer */
-  .btn-dark {
-    @apply focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200;
-  }
-
-  .btn-dark:hover {
-    @apply bg-slate-800;
-  }
-
-  /* Form Fields */
   .field {
-    @apply mt-1 w-full rounded-lg border bg-white px-4 py-2.5 text-slate-800 shadow-sm transition placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500;
-    border-color: var(--card-border);
+    @apply mt-1 w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-800 transition placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
   }
 
-  /* Badges */
   .badge {
     @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
   }
 
   .badge-success {
-    @apply bg-emerald-100 text-emerald-800;
+    @apply bg-accent-50 text-accent-700;
   }
 
   .badge-warning {
-    @apply bg-amber-100 text-amber-700;
+    @apply bg-amber-50 text-amber-700;
   }
 
   .badge-danger {
-    @apply bg-red-100 text-red-700;
+    @apply bg-red-50 text-red-700;
   }
 
   .badge-info {
     @apply bg-slate-100 text-slate-700;
   }
 
-  /* Dashboard Table */
   .dashboard-table th {
     @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
   }
@@ -212,20 +184,18 @@ h6 {
     @apply border-b border-slate-100 last:border-0;
   }
 
-  /* Sidebar Navigation Styles */
   .sidebar {
     background-color: var(--sidebar-bg);
     color: var(--sidebar-text);
-    box-shadow: 0 12px 40px rgba(6, 78, 59, 0.24);
   }
 
   .sidebar-link {
-    @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200;
+    @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150;
     color: var(--sidebar-text-muted);
   }
 
   .sidebar-link:hover {
-    @apply bg-white/10;
+    background-color: rgba(255,255,255,0.08);
     color: var(--sidebar-text);
   }
 
@@ -248,19 +218,16 @@ h6 {
     opacity: 0.7;
   }
 
-  /* Stat Cards */
   .stat-card {
-    @apply rounded-card bg-white p-5 shadow-card;
-    border: 1px solid var(--card-border);
+    @apply rounded-card border border-slate-200 bg-white p-5;
   }
 
   .stat-card-icon {
     @apply flex h-10 w-10 items-center justify-center rounded-lg;
   }
 
-  /* Progress Bar */
   .progress-track {
-    @apply h-2 overflow-hidden rounded-full bg-emerald-50;
+    @apply h-2 overflow-hidden rounded-full bg-slate-100;
   }
 
   .progress-fill {
@@ -268,9 +235,8 @@ h6 {
     background-color: var(--accent);
   }
 
-  /* Focus Ring */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2;
   }
 }
 
