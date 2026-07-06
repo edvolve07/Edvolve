@@ -17,18 +17,18 @@ function formatRelativeTime(value) {
 
 function StatCard({ label, value, icon: Icon, tone = "brand" }) {
   const tones = {
-    brand: "bg-emerald-50 text-emerald-600",
-    green: "bg-emerald-50 text-emerald-600",
+    brand: "bg-brand-50 text-brand-700",
+    green: "bg-accent-50 text-accent-700",
     amber: "bg-amber-50 text-amber-600",
     purple: "bg-purple-50 text-purple-600",
   };
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
-      <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${tones[tone]}`}>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+      <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-lg ${tones[tone]}`}>
         <Icon size={19} />
       </div>
-      <p className="font-display text-2xl font-semibold text-slate-950 sm:text-3xl">{value ?? 0}</p>
+      <p className="text-2xl font-bold text-slate-900 sm:text-3xl">{value ?? 0}</p>
       <p className="mt-1 text-sm text-slate-500">{label}</p>
     </div>
   );
@@ -94,10 +94,10 @@ export default function AiUsagePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <section className="mb-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:mb-6 sm:p-6">
+      <section className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:mb-6 sm:p-6">
         <div>
-          <p className="text-sm font-medium text-emerald-600">Master admin tools</p>
-          <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          <p className="text-sm font-medium text-brand-700">Master admin tools</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             AI API Usage
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
@@ -107,14 +107,14 @@ export default function AiUsagePage() {
       </section>
 
       {error ? (
-        <div className="mb-6 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
           {error}
         </div>
       ) : null}
 
       {loading ? (
         <div className="flex min-h-[45vh] items-center justify-center text-sm font-medium text-slate-500">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin text-emerald-500" />
+          <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-600" />
           Loading AI usage
         </div>
       ) : (
@@ -126,8 +126,8 @@ export default function AiUsagePage() {
             <StatCard label="Tracked tokens" value={totals.total_tokens} icon={Cpu} tone="purple" />
           </section>
 
-          <section className="mb-6 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card">
-            <div className="border-b border-slate-100 px-4 py-4 sm:px-5">
+          <section className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-200 px-4 py-4 sm:px-5">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Usage by Feature</h2>
               <p className="mt-1 text-sm text-slate-500">
                 Usage tracked from interviews, transcription, and AI question generation.
@@ -138,10 +138,10 @@ export default function AiUsagePage() {
                 usage.by_feature.map((item) => (
                   <div key={item.feature} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-950">{item.feature.replaceAll("_", " ")}</p>
+                      <p className="font-semibold text-slate-900">{item.feature.replaceAll("_", " ")}</p>
                       <p className="text-xs text-slate-500">{item.total_tokens || 0} tracked tokens</p>
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+                    <span className="rounded-full bg-accent-50 px-3 py-1 text-sm font-semibold text-accent-700">
                       {item.requests} calls
                     </span>
                   </div>
@@ -152,34 +152,34 @@ export default function AiUsagePage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
             <div className="mb-5 flex items-center gap-2">
-              <KeyRound className="h-5 w-5 text-emerald-500" />
+              <KeyRound className="h-5 w-5 text-brand-700" />
               <div>
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-800">Provider API Keys</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Update keys used by interviews, transcription, and AI question generation.
+                  Manage API keys stored in the database. No server restart needed — updates take effect immediately.
                 </p>
               </div>
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
               {apiKeys.map((provider) => (
-                <div key={provider.id} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <div key={provider.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-slate-950">{provider.name}</p>
+                      <p className="font-semibold text-slate-900">{provider.name}</p>
                       <p className="mt-1 text-xs font-mono text-slate-500">{provider.env_key}</p>
                     </div>
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        provider.configured ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                        provider.configured ? "bg-accent-50 text-accent-700" : "bg-amber-50 text-amber-700"
                       }`}
                     >
                       {provider.configured ? "Configured" : "Missing"}
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-500">{provider.description}</p>
-                  <div className="mt-3 rounded-lg bg-white px-3 py-2 text-xs text-slate-500">
+                  <div className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
                     Current key:{" "}
                     <span className="font-mono font-semibold text-slate-700">
                       {provider.masked_value || "Not set"}
@@ -187,7 +187,7 @@ export default function AiUsagePage() {
                   </div>
                   <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                     <input
-                      className="field"
+                      className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400"
                       type="password"
                       placeholder={`New ${provider.name} API key`}
                       value={keyForms[provider.id] || ""}
@@ -199,7 +199,7 @@ export default function AiUsagePage() {
                       type="button"
                       disabled={keySaving === provider.id}
                       onClick={() => updateApiKey(provider.id)}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                     >
                       <Save size={16} />
                       {keySaving === provider.id ? "Saving..." : "Save"}
