@@ -55,7 +55,7 @@ export default function Login() {
               <GraduationCap className="h-6 w-6 text-emerald-200" />
             </span>
             <div>
-              <p className="text-2xl font-black tracking-tight">Edvolve</p>
+              <p className="text-2xl font-black tracking-tight">Edvols</p>
               <p className="text-sm font-medium text-emerald-200/80">Placement readiness workspace</p>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function Login() {
               Train smarter.<br />Test faster.<br />Walk in prepared.
             </h1>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-emerald-100/80">
-              Edvolve combines AI mock interviews, aptitude practice, coding challenges, and performance analytics into one focused workspace.
+              Edvols combines AI mock interviews, aptitude practice, coding challenges, and performance analytics into one focused workspace.
             </p>
           </div>
           <div className="relative z-10 space-y-3">
@@ -85,13 +85,13 @@ export default function Login() {
               <span className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-800 to-emerald-900 text-white">
                 <GraduationCap className="h-5 w-5" />
               </span>
-              <p className="text-xl font-black text-emerald-900">Edvolve</p>
+              <p className="text-xl font-black text-emerald-900">Edvols</p>
             </div>
           </div>
 
           <div className="mt-10 lg:mt-0">
             <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Welcome back</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Sign in to Edvolve</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Sign in to Edvols</h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-500">
               Resume your interviews, check aptitude results, and track your progress.
             </p>
@@ -144,12 +144,12 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          {/* <p className="mt-8 text-center text-sm text-slate-500">
+          <p className="mt-8 text-center text-sm text-slate-500">
             New here?{' '}
             <Link className="font-bold text-emerald-700 transition hover:text-emerald-800" to="/signup">
               Create account <ArrowRight className="ml-0.5 inline h-3.5 w-3.5" />
             </Link>
-          </p> */}
+          </p>
         </form>
       </section>
     </main>

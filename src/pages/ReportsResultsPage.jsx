@@ -299,7 +299,7 @@ export default function ReportsResultsPage() {
           Reports and Results
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-          View interview reports and aptitude assessment results without leaving the Edvolve workspace.
+          View interview reports and aptitude assessment results without leaving the Edvols workspace.
         </p>
       </section>
 

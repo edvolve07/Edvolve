@@ -75,7 +75,7 @@ export default function Signup() {
                 <GraduationCap className="h-5 w-5 text-emerald-200" />
               </span>
               <div>
-                <p className="text-xl font-black">Edvolve</p>
+                <p className="text-xl font-black">Edvols</p>
                 <p className="text-xs font-semibold text-emerald-200/70">Build your placement-ready profile</p>
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function Signup() {
         </div>
 
         <form onSubmit={submit} className="bg-white p-8 sm:p-10">
-          <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Start your Edvolve journey</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Start your Edvols journey</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Create your account</h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">
             One account for interviews, aptitude practice, coding, reports, and analytics.

@@ -20,7 +20,7 @@ import {
   UserCog,
 } from "lucide-react";
 
-export const APP_NAME = "Edvolve";
+export const APP_NAME = "Edvols";
 
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["student"], modules: ["both", "aptitude", "ai_interview"] },

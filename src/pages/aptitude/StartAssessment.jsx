@@ -12,7 +12,7 @@ import {
 } from "@/lib/api";
 
 function getResumeKey(attemptId) {
-  return `edvolve_attempt_resume_${attemptId}`;
+  return `edvols_attempt_resume_${attemptId}`;
 }
 
 function getStoredResume(attemptId) {

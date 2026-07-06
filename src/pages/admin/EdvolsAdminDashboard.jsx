@@ -253,7 +253,7 @@ function StudentDetailPanel({ studentId, onClose }) {
   );
 }
 
-export default function EdvolveAdminDashboard() {
+export default function EdvolsAdminDashboard() {
   const { user } = useAuth();
   const userModules = user?.modules_access || ["both"];
   const hasAptitude = userModules.includes("aptitude") || userModules.includes("both");

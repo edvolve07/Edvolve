@@ -43,7 +43,7 @@ export default function ResetPassword() {
               <GraduationCap className="h-5 w-5 text-emerald-200" />
             </span>
             <div>
-              <p className="text-lg font-black">Edvolve</p>
+              <p className="text-lg font-black">Edvols</p>
               <p className="text-xs font-semibold text-emerald-200/70">Create a new password</p>
             </div>
           </div>
