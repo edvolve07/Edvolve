@@ -27,6 +27,9 @@ import {
 
 export const APP_NAME = "Edvols";
 
+
+
+
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["student"], modules: ["both", "aptitude", "ai_interview"] },
   { href: "/interview", label: "Interview Prep", icon: Mic2, roles: ["student"], modules: ["both", "ai_interview"] },
