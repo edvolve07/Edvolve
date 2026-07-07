@@ -39,9 +39,7 @@ export default function ResetPassword() {
       <section className="w-full max-w-md overflow-hidden rounded-2xl shadow-2xl">
         <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-6 py-5 text-white">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
-              <GraduationCap className="h-5 w-5 text-emerald-200" />
-            </span>
+            <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
             <div>
               <p className="text-lg font-black">Edvols</p>
               <p className="text-xs font-semibold text-emerald-200/70">Create a new password</p>

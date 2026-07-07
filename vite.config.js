@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
               }
               res.end(
                 JSON.stringify({
-                  message: "Backend API is not reachable from the Vite dev proxy.",
+                  message: "The backend service is currently unavailable. Please try again later.",
                   detail: err.message,
                   target: apiTarget,
                 })

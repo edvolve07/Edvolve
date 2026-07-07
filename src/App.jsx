@@ -141,6 +141,10 @@ function AppShell({ children }) {
             </button>
           ) : null}
 
+          <div className="flex items-center gap-2 mr-4">
+            <img src="/edvols%20logo.png" alt="Edvols" className="h-7 w-auto hidden md:block" />
+          </div>
+
           <button
             type="button"
             onClick={() => navigate("/profile")}

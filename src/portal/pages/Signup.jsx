@@ -68,12 +68,10 @@ export default function Signup() {
   return (
     <main className="grid min-h-screen place-items-center px-4 py-8" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #f4f7f6 50%, #ecfdf5 100%)' }}>
       <section className="w-full max-w-3xl overflow-hidden rounded-2xl shadow-2xl">
-        <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-8 py-6 text-white sm:px-10">
+        <div className="bg-gradient-to-b-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-8 py-6 text-white sm:px-10">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/15 backdrop-blur-sm">
-                <GraduationCap className="h-5 w-5 text-emerald-200" />
-              </span>
+              <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
               <div>
                 <p className="text-xl font-black">Edvols</p>
                 <p className="text-xs font-semibold text-emerald-200/70">Build your placement-ready profile</p>

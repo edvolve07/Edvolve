@@ -88,9 +88,7 @@ export default function Sidebar({ open = false, onClose = () => {}, width = DEFA
     >
       <div className={clsx("pb-7 pt-8", compact ? "px-3" : "px-6")}>
         <div className={clsx("flex items-center gap-3", compact && "justify-center")}>
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-800">
-            <Sparkles size={18} className="text-white" />
-          </div>
+          <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
           <div className={clsx("min-w-0", compact && "hidden")}>
             <p className="text-[22px] font-bold leading-none tracking-tight text-white">
               {APP_NAME}

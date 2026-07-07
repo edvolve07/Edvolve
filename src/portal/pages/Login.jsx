@@ -51,9 +51,7 @@ export default function Login() {
       <section className="grid w-full max-w-5xl overflow-hidden rounded-2xl bg-brand-950 lg:grid-cols-[1fr_1.1fr]">
         <div className="relative hidden flex-col justify-between p-10 text-white lg:flex">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-800">
-              <GraduationCap className="h-6 w-6 text-brand-200" />
-            </span>
+            <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
             <div>
               <p className="text-2xl font-bold tracking-tight">Edvols</p>
               <p className="text-sm font-medium text-brand-300">Placement readiness workspace</p>
@@ -81,9 +79,7 @@ export default function Login() {
         <form onSubmit={submit} className="bg-white p-8 sm:p-12">
           <div className="lg:hidden">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-800 text-white">
-                <GraduationCap className="h-5 w-5" />
-              </span>
+              <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
               <p className="text-xl font-bold text-slate-900">Edvols</p>
             </div>
           </div>

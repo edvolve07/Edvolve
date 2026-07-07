@@ -72,12 +72,12 @@ export default function Sidebar({ role }) {
                 className={`h-4 w-4 ${
                     isActive
                       ? compact
-                      ? 'text-emerald-900'
-                      : 'text-emerald-200'
-                    : compact
+                        ? 'text-emerald-900'
+                        : 'text-emerald-200'
+                      : compact
                       ? 'text-emerald-700'
                       : 'text-emerald-200/75 group-hover:text-white'
-                }`}
+                  }`}
               />
               <span>{item.label}</span>
             </>
@@ -91,15 +91,7 @@ export default function Sidebar({ role }) {
     <div className="min-h-screen bg-canvas">
       <aside className="sidebar fixed inset-y-0 left-0 hidden w-72 border-r border-white/10 p-5 text-white shadow-sidebar lg:block">
         <Link to={home} className="flex items-center gap-3 rounded-md border border-white/10 bg-white/10 p-3">
-          <span className="grid h-11 w-11 place-items-center rounded-md bg-emerald-600 text-white shadow-sm">
-            <ShieldCheck className="h-5 w-5" />
-          </span>
-          <span>
-            <span className="text-lg font-black">Edvols</span>
-            <span className="block text-xs font-semibold text-emerald-100">
-              {role === 'admin' ? 'Assessment Admin' : 'Student Prep'}
-            </span>
-          </span>
+          <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
         </Link>
 
         <div className="mt-5 rounded-md border border-white/10 bg-white/10 p-4">
