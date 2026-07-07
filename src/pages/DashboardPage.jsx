@@ -350,6 +350,20 @@ export default function DashboardPage() {
         ))}
       </section>
 
+      <section className="mb-7 rounded-lg border border-slate-200 bg-white p-6">
+        <div className="flex items-center gap-3">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-600">
+            <Trophy size={22} />
+          </div>
+          <div>
+            <p className="font-semibold text-slate-900">Weekly Goal</p>
+            <p className="text-sm text-slate-500">
+              {weeklyGoal.completed || 0} of {weeklyGoal.target || 5} sessions complete
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div className="grid gap-7 xl:grid-cols-[1.45fr_0.95fr]">
         <div className="space-y-7">
           <section className="rounded-lg border border-slate-200 bg-white p-6">
@@ -586,20 +600,6 @@ export default function DashboardPage() {
               </div>
             </section>
           ) : null}
-
-          <section className="rounded-lg border border-slate-200 bg-white p-6">
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-600">
-                <Trophy size={22} />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">Weekly Goal</p>
-                <p className="text-sm text-slate-500">
-                  {weeklyGoal.completed || 0} of {weeklyGoal.target || 5} sessions complete
-                </p>
-              </div>
-            </div>
-          </section>
         </aside>
       </div>
     </div>
