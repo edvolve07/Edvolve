@@ -7,10 +7,12 @@ import {
   FilePlus2,
   LayoutDashboard,
   LogOut,
+  Menu,
   ShieldCheck,
   UserRound,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
 
 const adminLinks = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -32,54 +34,57 @@ export default function Sidebar({ role }) {
   const navigate = useNavigate();
   const links = role === 'admin' ? adminLinks : studentLinks;
   const home = role === 'admin' ? '/admin/dashboard' : '/student/dashboard';
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    if (window.innerWidth < 1024) return 288;
+    const stored = Number(window.localStorage.getItem("portal-sidebar-width"));
+    return Number.isFinite(stored) ? Math.min(Math.max(stored, 88), 360) : 288;
+  });
+  const compact = sidebarWidth <= 136 && window.innerWidth >= 1024;
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) {
+      window.localStorage.setItem("portal-sidebar-width", String(sidebarWidth));
+    }
+  }, [sidebarWidth]);
 
   function handleLogout() {
     logout();
     navigate('/login');
   }
 
-  function renderLinks(compact = false) {
+  function renderLinks(compactMode = false) {
     return links.map((item) => {
       const Icon = item.icon;
       return (
         <NavLink
           key={item.to}
           to={item.to}
+          onClick={() => setSidebarOpen(false)}
+          title={compactMode ? item.label : undefined}
           className={({ isActive }) =>
-            compact
+            compactMode
               ? `inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-xs font-bold shadow-sm ${
                   isActive
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
                     : 'border-emerald-100 bg-white text-emerald-900 hover:bg-emerald-50'
                 }`
-              : `group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-bold transition ${
+              : `group relative flex items-center rounded-2xl py-3.5 text-[15px] font-bold transition-all duration-150 ${
+                  compact ? 'justify-center px-3' : 'gap-4 px-4'
+                } ${
                   isActive
-                    ? 'bg-white/15 text-white'
-                    : 'text-emerald-100 hover:bg-white/10 hover:text-white'
+                    ? 'bg-emerald-600/80 text-white'
+                    : 'text-emerald-50 hover:bg-white/10 hover:text-white'
                 }`
           }
         >
           {({ isActive }) => (
             <>
-              {!compact ? (
-                <span
-                  className={`absolute left-0 h-6 w-1 rounded-r ${
-                    isActive ? 'bg-emerald-400' : 'bg-transparent'
-                  }`}
-                />
-              ) : null}
               <Icon
-                className={`h-4 w-4 ${
-                    isActive
-                      ? compact
-                        ? 'text-emerald-900'
-                        : 'text-emerald-200'
-                      : compact
-                      ? 'text-emerald-700'
-                      : 'text-emerald-200/75 group-hover:text-white'
-                  }`}
+                size={20}
+                className={compactMode ? 'h-4 w-4' : ''}
               />
-              <span>{item.label}</span>
+              {!compactMode ? <span className="min-w-0 flex-1 truncate">{item.label}</span> : null}
             </>
           )}
         </NavLink>
@@ -88,51 +93,87 @@ export default function Sidebar({ role }) {
   }
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <aside className="sidebar fixed inset-y-0 left-0 hidden w-72 border-r border-white/10 p-5 text-white shadow-sidebar lg:block">
-        <Link to={home} className="flex items-center gap-3 rounded-md border border-white/10 bg-white/10 p-3">
-          <img src="/edvols%20logo.png" alt="Edvols" className="h-10 w-auto" />
-        </Link>
-
-        <div className="mt-5 rounded-md border border-white/10 bg-white/10 p-4">
-          <p className="text-xs font-bold uppercase text-emerald-100/70">{role}</p>
-          <p className="mt-1 truncate text-sm font-bold text-white">{user?.name}</p>
-          <p className="truncate text-xs text-emerald-100/80">{user?.email}</p>
-        </div>
-
-        <div className="mt-7 border-t border-white/10 pt-5">
-          <p className="mb-3 px-3 text-xs font-bold uppercase text-emerald-100/70">Navigation</p>
-          <nav className="space-y-1.5">{renderLinks()}</nav>
-        </div>
-
+    <div className="flex min-h-screen bg-canvas" style={{ "--sidebar-width": `${sidebarWidth}px` }}>
+      {sidebarOpen ? (
         <button
-          onClick={handleLogout}
-          className="focus-ring absolute bottom-5 left-5 right-5 flex items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-bold text-white transition hover:bg-white/15"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
+          type="button"
+          aria-label="Close sidebar"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px]"
+        />
+      ) : null}
+
+      <aside
+        className="sidebar fixed inset-y-0 left-0 z-50 flex w-[82vw] max-w-72 flex-col border-r border-white/10 bg-[radial-gradient(circle_at_30%_0%,rgba(5,150,105,0.35),transparent_34%),linear-gradient(180deg,#064e3b_0%,#053f31_48%,#042f25_100%)] transition-transform duration-200 sm:w-72 lg:w-[var(--sidebar-width)] lg:max-w-none"
+        style={sidebarOpen ? {} : { transform: 'none' }}
+      >
+        <div className={compact ? 'px-3 pb-7 pt-8' : 'px-6 pb-7 pt-8'}>
+          <Link to={home} className={compact ? 'flex justify-center' : 'flex items-center gap-3'}>
+            <img src="/edvols%20logo.png" alt="Edvols" className={compact ? 'h-10 w-auto' : 'h-10 w-auto'} />
+            {!compact ? (
+              <div className="min-w-0">
+                <p className="text-[22px] font-bold leading-none tracking-tight text-white">Edvols</p>
+                <p className="mt-1.5 text-[12px] font-medium text-emerald-200">Placement readiness</p>
+              </div>
+            ) : null}
+          </Link>
+        </div>
+
+        <nav className={compact ? 'flex-1 space-y-2 overflow-y-auto px-2 pb-5' : 'flex-1 space-y-2 overflow-y-auto px-3 pb-5'}>
+          {renderLinks(false)}
+        </nav>
+
+        <div className={compact ? 'space-y-4 px-2 pb-5' : 'space-y-4 px-5 pb-5'}>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={compact ? 'Logout' : undefined}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15"
+          >
+            <LogOut size={16} />
+            {!compact ? <span>Logout</span> : null}
+          </button>
+        </div>
       </aside>
 
-      <main className="lg:pl-72">
-        <header className="sticky top-0 z-30 border-b border-emerald-100 bg-white/95 px-4 py-3 backdrop-blur lg:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="eyebrow">{role === 'admin' ? 'Admin Console' : 'Student Portal'}</p>
-              <h1 className="text-lg font-black text-emerald-900">{user?.name}</h1>
-            </div>
-            <button onClick={handleLogout} className="btn-secondary px-3 py-2 lg:hidden">
-              <LogOut className="h-4 w-4" />
-              Logout
-            </button>
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-[var(--sidebar-width)]">
+        <header className="sticky top-0 z-30 flex h-[76px] items-center gap-3 border-b border-slate-200 bg-white/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10">
+          <button
+            type="button"
+            aria-label="Open sidebar"
+            onClick={() => setSidebarOpen(true)}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 lg:hidden"
+          >
+            <Menu size={20} />
+          </button>
+
+          <div className="min-w-0 flex-1">
+            <p className="eyebrow">{role === 'admin' ? 'Admin Console' : 'Student Portal'}</p>
+            <h1 className="text-lg font-black text-slate-900">{user?.name}</h1>
           </div>
-          <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:hidden">{renderLinks(true)}</nav>
+
+          <img src="/edvols%20logo.png" alt="Edvols" className="h-7 w-auto hidden md:block" />
+
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="inline-flex shrink-0 items-center gap-3 rounded-xl px-1 py-1 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:px-2"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-800 text-sm font-bold text-white">
+              {(user?.name || "U").slice(0, 1).toUpperCase()}
+            </span>
+            <span className="hidden max-w-36 truncate sm:inline">{user?.name || "User"}</span>
+          </button>
         </header>
 
-        <div className="p-4 lg:p-8">
+        <nav className="flex gap-2 overflow-x-auto border-b border-slate-100 bg-white px-4 py-2 lg:hidden">
+          {renderLinks(true)}
+        </nav>
+
+        <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden p-4 lg:p-8">
           <Outlet />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

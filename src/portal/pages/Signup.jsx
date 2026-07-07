@@ -6,8 +6,8 @@ import { useToast } from '../context/ToastContext';
 import { apiFetch } from '../utils/api';
 
 function homeForRole(role) {
-  if (role === 'master_admin') return '/master-admin-dashboard';
-  if (role === 'admin') return '/admin-dashboard';
+  if (role === 'master_admin') return '/master-admin/dashboard';
+  if (role === 'admin') return '/admin/dashboard';
   return '/dashboard';
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { AlertTriangle, ArrowRight, BrainCircuit, CalendarDays, Check, CheckCircle2, Clock3, Flame, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
+import { AlertTriangle, ArrowRight, BrainCircuit, CalendarDays, CheckCircle2, Clock3, ListChecks, Play, Star, Target, Trophy } from "lucide-react";
 import { useNavigate } from "../../navigation";
 import LoadingSkeleton from "./LoadingSkeleton";
 import { getStudentAssessments, isUnauthorizedError, apiFetch, startStudentAssessment } from "@/lib/api";
@@ -85,7 +85,6 @@ export default function StudentAssessments() {
     return () => window.clearInterval(id);
   }, [refresh, refreshDashboard]);
 
-  const studyStreak = dashboard?.study_streak || { current: 0, best: 0, active_days: [] };
   const weeklyGoal = dashboard?.weekly_goal || { target: 5, completed: 0 };
   const overallProgress = dashboard?.overall_progress || 0;
   const recentActivity = dashboard?.recent_activity || [];
@@ -103,16 +102,6 @@ export default function StudentAssessments() {
       }
     }
   }
-
-  const activeDays = (() => {
-    const today = new Date();
-    return ["M", "T", "W", "T", "F", "S", "S"].map((label, index) => {
-      const date = new Date(today);
-      date.setDate(date.getDate() - (6 - index));
-      const key = date.toISOString().slice(0, 10);
-      return { label, active: studyStreak.active_days?.includes(key) ?? false };
-    });
-  })();
 
   if (loading) return <LoadingSkeleton label="Loading assessments" />;
 
@@ -166,19 +155,6 @@ export default function StudentAssessments() {
               <p className="text-sm font-medium text-slate-700">Overall Progress</p>
               <p className="mt-1 text-3xl font-black text-emerald-950">{overallProgress}%</p>
               <p className="mt-3 text-xs font-semibold text-emerald-700">{weeklyGoal.completed}/{weeklyGoal.target} weekly</p>
-            </div>
-          </div>
-        </article>
-
-        <article className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
-          <div className="flex items-center gap-5">
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-800 text-white shadow-card">
-              <Flame size={28} />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-700">Study Streak</p>
-              <p className="mt-1 text-3xl font-black text-emerald-950">{studyStreak.current} Days</p>
-              <p className="mt-3 text-xs font-semibold text-orange-600">Keep it up</p>
             </div>
           </div>
         </article>
@@ -285,29 +261,7 @@ export default function StudentAssessments() {
           </div>
 
           <aside className="space-y-5">
-            <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
-              <h2 className="text-lg font-black text-emerald-950">Study Streak</h2>
-              <div className="mt-5 flex items-center justify-between gap-4">
-                <div>
-                  <p className="flex items-center gap-2 text-2xl font-black text-emerald-700">
-                    <Flame size={25} className="text-amber-500" />
-                    {studyStreak.current} Days
-                  </p>
-                  <p className="mt-2 text-sm text-slate-600">Best Streak: <span className="font-semibold text-orange-600">{studyStreak.best} Days</span></p>
-                </div>
-                <div className="grid grid-cols-7 gap-1.5 text-center">
-                  {activeDays.map(({ label, active }, index) => (
-                    <div key={`${label}-${index}`}>
-                      <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-black text-white ${active ? "bg-emerald-600" : "bg-slate-200"}`}>
-                        {active ? <Check className="h-3 w-3" /> : ""}
-                      </span>
-                      <span className="mt-2 block text-xs text-slate-600">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
+            
             {dashboard?.continue_learning?.[0] ? (
               <section className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-card">
                 <div className="mb-4 flex items-center gap-2">

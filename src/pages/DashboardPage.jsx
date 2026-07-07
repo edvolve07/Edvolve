@@ -6,12 +6,10 @@ import {
   Bot,
   BrainCircuit,
   CalendarDays,
-  Check,
   CheckCircle2,
   Code2,
   Download,
   FileText,
-  Flame,
   ListChecks,
   Mic2,
   Star,
@@ -81,31 +79,13 @@ function formatRelativeTime(value) {
   return formatDateTime(value);
 }
 
-function dateKey(date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function getRecentWeek(activeDays = []) {
-  const active = new Set(activeDays);
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (6 - index));
-    return {
-      key: dateKey(date),
-      label: new Intl.DateTimeFormat(undefined, { weekday: "narrow" }).format(date),
-      active: active.has(dateKey(date)),
-      today: index === 6,
-    };
-  });
-}
-
 function getTypeMeta(type) {
   return typeMeta[type] || { icon: Target, tone: "bg-emerald-600", label: "Practice" };
 }
 
 function roleHome(role) {
-  if (role === "master_admin") return "/master-admin-dashboard";
-  if (role === "admin") return "/admin-dashboard";
+  if (role === "master_admin") return "/master-admin/dashboard";
+  if (role === "admin") return "/admin/dashboard";
   return null;
 }
 
@@ -167,7 +147,6 @@ export default function DashboardPage() {
 
   const interviewAnalytics = dashboard?.interview_analytics || null;
   const programmingAnalytics = dashboard?.programming_analytics || null;
-  const studyStreak = dashboard?.study_streak || { current: 0, best: 0, active_days: [] };
   const weeklyGoal = dashboard?.weekly_goal || { target: 5, completed: 0, raw_completed: 0 };
   const continueItem = dashboard?.continue_learning?.[0] || dashboard?.recommendations?.[0] || null;
   const continueMeta = getTypeMeta(continueItem?.type);
@@ -252,11 +231,11 @@ export default function DashboardPage() {
     }
 
     cards.push({
-      label: "Study Streak",
-      value: `${studyStreak.current || 0} Days`,
-      caption: `Best ${studyStreak.best || 0} days`,
-      icon: Flame,
-      tone: "amber",
+      label: "Interviews Saved",
+      value: interviewAnalytics?.reports || 0,
+      caption: `${interviewAnalytics?.average_percentage || 0}% avg score`,
+      icon: Mic2,
+      tone: "purple",
     });
 
     return cards.slice(0, 4);
@@ -272,8 +251,6 @@ export default function DashboardPage() {
     interviewAnalytics?.reports,
     programmingAnalytics?.solved_unique,
     programmingAnalytics?.total_submissions,
-    studyStreak.best,
-    studyStreak.current,
   ]);
 
   if (adminHome) return <Navigate to={adminHome} replace />;
@@ -453,63 +430,6 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-slate-200 bg-white p-5">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900">Recommended for you</h2>
-              <span className="text-xs font-semibold uppercase text-slate-400">
-                {enabledModuleLabels.join(" / ") || "Student"}
-              </span>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {(dashboard?.recommendations || []).map((item) => {
-                const meta = getTypeMeta(item.type);
-                const Icon = meta.icon;
-                const amber = item.type === "programming";
-                return (
-                  <article
-                    key={`${item.type}-${item.title}`}
-                    className={clsx(
-                      "rounded-lg border p-5",
-                      amber ? "border-amber-200 bg-amber-50/40" : "border-brand-100 bg-brand-50/35",
-                    )}
-                  >
-                    <div className="mb-5 flex items-center gap-4">
-                      <div className={clsx("grid h-14 w-14 place-items-center rounded-full text-white", meta.tone)}>
-                        <Icon size={23} />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
-                        <p className="mt-1 text-xs text-slate-500">{item.meta}</p>
-                      </div>
-                    </div>
-                    <p className="mb-5 flex items-center gap-2 text-sm text-slate-600">
-                      <ListChecks size={15} className={amber ? "text-amber-600" : "text-brand-700"} />
-                      {meta.label}
-                    </p>
-                    <Link
-                      href={item.href}
-                      className={clsx(
-                        "inline-flex w-full items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition",
-                        amber
-                          ? "border-amber-400 text-amber-700 hover:bg-amber-100"
-                          : "border-brand-200 text-brand-800 hover:bg-brand-50",
-                      )}
-                    >
-                      {item.action}
-                    </Link>
-                  </article>
-                );
-              })}
-
-              {!dashboard?.recommendations?.length ? (
-                <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-5 text-sm text-slate-500 md:col-span-3">
-                  Recommendations will appear after your admin enables modules or publishes practice material.
-                </div>
-              ) : null}
-            </div>
-          </section>
-
           {hasInterview ? (
             <section className="overflow-hidden rounded-lg border border-brand-100 bg-brand-50 p-6">
               <div className="grid gap-6 md:grid-cols-[1fr_310px] md:items-center">
@@ -535,40 +455,6 @@ export default function DashboardPage() {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-slate-200 bg-white p-6">
-            <h2 className="text-lg font-bold text-slate-900">Study Streak</h2>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
-              <div>
-                <p className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-                  <Flame size={25} className="text-amber-500" />
-                  {studyStreak.current || 0} Days
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  Best streak: <span className="font-semibold text-amber-600">{studyStreak.best || 0} Days</span>
-                </p>
-              </div>
-              <div className="grid grid-cols-7 gap-2 text-center">
-                {getRecentWeek(studyStreak.active_days).map((day) => (
-                  <div key={day.key}>
-                    <span
-                      className={clsx(
-                        "grid h-7 w-7 place-items-center rounded-full text-xs font-semibold",
-                        day.active
-                          ? "bg-brand-600 text-white"
-                          : day.today
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-slate-100 text-slate-400",
-                      )}
-                    >
-                      {day.active ? <Check className="h-3 w-3" /> : ""}
-                    </span>
-                    <span className="mt-2 block text-xs text-slate-500">{day.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           <section className="rounded-lg border border-slate-200 bg-white p-6">
             <div className="mb-4 flex items-center gap-2">
               <CalendarDays size={18} className="text-slate-500" />

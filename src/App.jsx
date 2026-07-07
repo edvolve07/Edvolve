@@ -1,5 +1,5 @@
 import { ChevronDown, Flame, Menu, Search, Sparkles } from "lucide-react";
-import { Navigate, Outlet, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import AccessRevoked from "@/src/pages/AccessRevoked";
 import AdminsList from "@/src/pages/admin/AdminsList";
@@ -68,6 +68,7 @@ import AdminCommunicationAnalytics from "./pages/admin/AdminCommunicationAnalyti
 function AppShell({ children }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const pathname = useLocation().pathname;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     if (window.innerWidth < 1024) return 288;
@@ -134,16 +135,25 @@ function AppShell({ children }) {
             <p className="mt-0.5 text-[11px] font-medium text-slate-500">Unified prep workspace</p>
           </div>
 
+          {(user?.role === "admin" || user?.role === "master_admin") && (
+            <div className="hidden md:flex items-center gap-1.5 text-xs font-medium text-slate-400 ml-4">
+              <span className="text-slate-500">/</span>
+              <span className="text-slate-700 font-semibold capitalize">
+                {user?.role === "master_admin" ? "Master Admin" : "Admin"}
+              </span>
+              <span className="text-slate-500">/</span>
+              <span className="text-slate-500">
+                {pathname.split("/").pop()?.replace(/-/g, " ") || "Dashboard"}
+              </span>
+            </div>
+          )}
+
           {user?.role !== "admin" && user?.role !== "master_admin" ? (
             <button className="hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 sm:inline-flex">
               <Flame size={17} className="text-amber-500" />
               {streak}
             </button>
           ) : null}
-
-          <div className="flex items-center gap-2 mr-4">
-            <img src="/edvols%20logo.png" alt="Edvols" className="h-7 w-auto hidden md:block" />
-          </div>
 
           <button
             type="button"
@@ -186,8 +196,8 @@ function ReportsResultDetailsRoute() {
 }
 
 function homeForRole(role) {
-  if (role === "master_admin") return "/master-admin-dashboard";
-  if (role === "admin") return "/admin-dashboard";
+  if (role === "master_admin") return "/master-admin/dashboard";
+  if (role === "admin") return "/admin/dashboard";
   return "/dashboard";
 }
 
@@ -235,10 +245,11 @@ export default function App() {
       </Route>
 
       <Route element={<RequireRole roles={["admin"]} />}>
-        <Route path="/admin-dashboard" element={<AppShell><EdvolsAdminDashboard /></AppShell>} />
-        <Route path="/admin/dashboard" element={<Navigate to="/admin-dashboard" replace />} />
+        <Route path="/admin/dashboard" element={<AppShell><EdvolsAdminDashboard /></AppShell>} />
+        <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/analytics/aptitude" element={<AppShell><AdminAptitudeAnalytics /></AppShell>} />
         <Route path="/admin/analytics/interviews" element={<AppShell><AdminInterviewAnalytics /></AppShell>} />
+        <Route path="/admin/analytics/communication" element={<AppShell><AdminCommunicationAnalytics /></AppShell>} />
         <Route path="/admin/assessments" element={<AppShell><AdminAssessments /></AppShell>} />
         <Route path="/admin/assessments/create" element={<AppShell><CreateAssessment /></AppShell>} />
         <Route path="/admin/assessments/:id/questions" element={<AppShell><QuestionReview /></AppShell>} />
@@ -248,11 +259,11 @@ export default function App() {
         <Route path="/admin/programming/assessments/create" element={<AppShell><AdminAssessmentForm /></AppShell>} />
         <Route path="/admin/programming/assessments/:assessmentId/problems" element={<AppShell><AdminAssessmentForm /></AppShell>} />
         <Route path="/admin/programming/assessments/:assessmentId/results" element={<AppShell><AdminAssessmentResults /></AppShell>} />
-        <Route path="/admin/analytics/communication" element={<AppShell><AdminCommunicationAnalytics /></AppShell>} />
       </Route>
 
       <Route element={<RequireRole roles={["master_admin"]} />}>
-        <Route path="/master-admin-dashboard" element={<AppShell><MasterAdminDashboard /></AppShell>} />
+        <Route path="/master-admin/dashboard" element={<AppShell><MasterAdminDashboard /></AppShell>} />
+        <Route path="/master-admin-dashboard" element={<Navigate to="/master-admin/dashboard" replace />} />
         <Route path="/master-admin/students" element={<AppShell><StudentsList /></AppShell>} />
         <Route path="/master-admin/admins" element={<AppShell><AdminsList /></AppShell>} />
         <Route path="/master-admin/master-admins" element={<AppShell><MasterAdminsList /></AppShell>} />
@@ -260,7 +271,6 @@ export default function App() {
         <Route path="/master-admin/institutions/:id" element={<AppShell><InstitutionDetailPage /></AppShell>} />
         <Route path="/master-admin/create-admin" element={<AppShell><CreateAdmin /></AppShell>} />
         <Route path="/master-admin/create-user" element={<AppShell><CreateUser /></AppShell>} />
-
         <Route path="/master-admin/ai-usage" element={<AppShell><AiUsagePage /></AppShell>} />
         <Route path="/master-admin/programming" element={<AppShell><MasterAdminProblems /></AppShell>} />
         <Route path="/master-admin/programming/create" element={<AppShell><MasterAdminProblemForm /></AppShell>} />

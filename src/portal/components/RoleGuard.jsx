@@ -3,8 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import LoadingSkeleton from './LoadingSkeleton';
 
 function homeForRole(role) {
-  if (role === 'master_admin') return '/master-admin-dashboard';
-  if (role === 'admin') return '/admin-dashboard';
+  if (role === 'master_admin') return '/master-admin/dashboard';
+  if (role === 'admin') return '/admin/dashboard';
   return '/dashboard';
 }
 

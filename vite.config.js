@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
               }
               res.end(
                 JSON.stringify({
-                  message: "The backend service is currently unavailable. Please try again later.",
+                  message: "Something went wrong, please try again later.",
                   detail: err.message,
                   target: apiTarget,
                 })

@@ -61,8 +61,6 @@ export default function StudentResults() {
     return () => window.clearInterval(id);
   }, [refresh, refreshDashboard]);
 
-  const studyStreak = dashboard?.study_streak || { current: 0, best: 0, active_days: [] };
-
   if (loading || !results) return <LoadingSkeleton label="Loading results" />;
 
   const passedCount = results.filter((result) => result.passed).length;
@@ -116,7 +114,7 @@ export default function StudentResults() {
             <div>
               <p className="text-sm font-medium text-slate-700">Passed</p>
               <p className="mt-1 text-3xl font-black text-emerald-950">{passedCount}</p>
-              <p className="mt-3 text-xs font-semibold text-orange-600">Best streak: {studyStreak.best} days</p>
+              <p className="mt-3 text-xs font-semibold text-orange-600">out of {results.length}</p>
             </div>
           </div>
         </article>
