@@ -28,9 +28,10 @@ export const APP_NAME = "Edvols";
 
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["student"], modules: ["both", "aptitude", "ai_interview"] },
-  
+
   { href: "/interview", label: "Interview Prep", icon: Mic2, roles: ["student"], modules: ["both", "ai_interview"] },
   { href: "/aptitude", label: "Aptitude Practice", icon: BrainCircuit, roles: ["student"], modules: ["both", "aptitude"] },
+  
   { href: "/programming/practice", label: "Coding Practice", icon: Code2, roles: ["student"], modules: ["both", "programming"] },
   // { href: "/programming", label: "AI Mock Interview", icon: Cpu, roles: ["student"], modules: ["both", "programming"] },
   { href: "/programming/assessments", label: "Contests", icon: ClipboardCheck, roles: ["student"], modules: ["both", "programming"] },
