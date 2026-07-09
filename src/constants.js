@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 
-export const APP_NAME = "Edvols";
+export const APP_NAME = "Edvols";  
 
 
 
